@@ -1,0 +1,7 @@
+.mdl-card__actions{
+	padding:8px 16px;
+}
+.todos-wrap .mdl-textfield {
+	width:calc(100% - 32px);
+	display:inline-block;
+}

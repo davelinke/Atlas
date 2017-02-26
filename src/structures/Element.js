@@ -1,0 +1,22 @@
+export default {
+    id:null,
+    label:null,
+    type:0,
+    states:[
+        {
+            name:'idle',
+            classes:[],
+            style:{
+                top:0,
+                left:0,
+                width:375,
+                height:559,
+                display:'block',
+                'border-width':0
+            },
+            actions:[]
+        }
+    ],
+	locked:false,
+    children:[]
+};
