@@ -1,26 +1,21 @@
-a.infoIcon {
-    position: absolute;
-    background-color: #999;
-    color: #fff;
-    text-decoration: none;
-    font-size: 1rem;
-    padding: 2rem 2rem 0.25rem;
-    transform: rotate(45deg);
-    right: -31px;
-    top: -16px;
+.wrap{
+    height:100%;
+    display:flex;
+    flex-direction:column;
 }
-.demo-card-wide.mdl-card {
-  width: 100%;
-  min-height:0;
-  height: calc(100vh - 20px);
+.menubar{
+    height:32px;
+    background-color:#fafafa;
 }
-
-.todos-wrap .mdl-card__supporting-text{
-	flex-grow: 1;
-    overflow-y: auto;
-	width: auto;
+.main{
+    display:flex;
+    flex-grow: 1;
 }
-
-.todo.done .label{
-    text-decoration: line-through;
+.toolbar{
+    width:32px;
+    background-color:#efefef;
+}
+.sidebar{
+    width:200px;
+    background-color:#efefef;
 }

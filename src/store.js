@@ -1,11 +1,21 @@
 import { combineReducers, createStore } from 'redux';
+import keyboardReducer from  './reducers/keyboardReducer';
+import mouseReducer from  './reducers/mouseReducer';
 import todosReducer from  './reducers/todosReducer';
+import toolsReducer from  './reducers/toolsReducer';
+import undosReducer from  './reducers/undosReducer';
+import workareaReducer from  './reducers/workareaReducer';
 
 
 // combine reducers - Although we have one only,
 // it is good to separate reducers through logical groups and then combine them.
 const combinedReducers = combineReducers({
-  main:todosReducer
+  main:todosReducer,
+  workarea:workareaReducer,
+  keyboard:keyboardReducer,
+  mouse:mouseReducer,
+  undos:undosReducer,
+  tools:toolsReducer
 });
 
 // create the holy grail of truth... The Store
