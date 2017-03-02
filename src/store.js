@@ -1,10 +1,12 @@
 import { combineReducers, createStore } from 'redux';
+import historyReducer from  './reducers/historyReducer';
 import keyboardReducer from  './reducers/keyboardReducer';
 import mouseReducer from  './reducers/mouseReducer';
 import todosReducer from  './reducers/todosReducer';
 import toolsReducer from  './reducers/toolsReducer';
 import undosReducer from  './reducers/undosReducer';
 import workareaReducer from  './reducers/workareaReducer';
+import screenReducer from  './reducers/screenReducer';
 
 
 // combine reducers - Although we have one only,
@@ -15,7 +17,9 @@ const combinedReducers = combineReducers({
   keyboard:keyboardReducer,
   mouse:mouseReducer,
   undos:undosReducer,
-  tools:toolsReducer
+  tools:toolsReducer,
+  history:historyReducer,
+  screen:screenReducer
 });
 
 // create the holy grail of truth... The Store

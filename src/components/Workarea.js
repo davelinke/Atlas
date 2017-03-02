@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import CoordFilters from '../factories/CoordFilters';
 import store from '../store';
 import Events from '../factories/Events';
+import Tools from '../factories/Tools';
+//import History from '../factories/History';
 
 import './Workarea.css';
 
@@ -9,10 +11,10 @@ const state = store.getState;
 
 class Workarea extends Component {
     logEvent = function(e){
-        //console.log(e.type);
+        e.persist();
         e.preventDefault();
         let
-            //g = e.target,
+//g = e.target,
             xy,
             xyo,
             eType = e.type
@@ -51,7 +53,7 @@ class Workarea extends Component {
             });
         }
         if(eType==='mousedown'||eType==='touchstart'){
-            console.log('mousedown')
+
             store.dispatch({
                 type: 'WORKAREA_CLASS',
                 val:'mouse-down'
@@ -86,7 +88,7 @@ class Workarea extends Component {
 //check what do we need so that we dont'save the full event
             // set the timeout for that will verify thel longpress
             store.dispatch({
-                type:'MOUSE_LONGPRESS',
+                type:'MOUSE_LONGPRESS_TIMEOUT',
                 val: self.setTimeout(function() {
                     // of we get here, the it's a longpress
                     Events.sendEvent({
@@ -102,9 +104,140 @@ class Workarea extends Component {
             });
         }
 
+
+        if(eType==='mouseup'||eType==='touchend'){
+            //$(this).removeClass('mouse-down');
+            store.dispatch({
+                type: 'WORKAREA_CLASS',
+                val:''
+            });
+            // check if the mousedown event still exists
+            if(state().mouse.isDown){
+                // if it exists then longpress didn't fire
+                clearTimeout(state().mouse.longPressTimeout);
+                // send the mousedown event before the mouseup one
+                Events.sendEvent({
+                    theEvent:'mousedown',
+                    e:state().mouse.mouseDownEvent
+                });
+                //clear the event from the variable
+                store.dispatch({
+                    type: 'MOUSE_DOWN_EVENT',
+                    val: null
+                });
+            }
+
+            // enable undos
+            store.dispatch({type: 'UNDO_ACTIVATE'});
+
+// if (History.checkTreeChange(state())!==undefined){
+//     History.undoLog(state());
+// }
+
+            // add an event listener to emulate doubleclick on touch devices
+            if(eType==='touchend'){
+                // check if doubletouch still exists
+                if(state().mouse.doubleTouch){
+                    store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
+                    Events.sendEvent({
+                        theEvent:'dblclick',
+                        e:e
+                    });
+
+                } else {
+                    store.dispatch({
+                        type:'MOUSE_DOUBLETOUCH',
+                        val:{
+                            e:e,
+                            timeout:self.setTimeout(function(){
+                                store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
+                            },500)
+                        }
+                    })
+                }
+            }
+            // register the coordinates
+            console.log(xyo);
+            store.dispatch({
+                type:'MOUSE_REGISTER_UP',
+                val:{
+                    up:{
+                        x:xy.x,
+                        y:xy.y
+                    },
+                    offsetUp:{
+                        x:xyo.x,
+                        y:xyo.y
+                    }
+                }
+            });
+        }
+
+        store.dispatch({
+            type:'MOUSE_EVENT',
+            val:eType
+        });
+
+        // mousedown and touchstart we send differently to check that is not a longpress
+        if(eType!=='mousedown'&&eType!=='touchstart'){
+
+            Events.sendEvent({
+                theEvent:eType,
+                e:e
+            });
+        }
     }
+
+
+
     logMove = function(e){
-        //console.log('move');
+        // if the mouse is down, but i moved before the longpress timeout means i am not doing longpress, so clear the timeout
+		if(state().mouse.isDown){
+			clearTimeout(state().mouse.longPressTimeout);
+            //then send the mouse down event, cause it means we are dragging so we should start it
+			Events.sendEvent({
+				theEvent:'mousedown',
+				e:state().mouse.mouseDownEvent //which is the mouse down event we saved
+			});
+
+            // i guess i nullify the down for the next time we come here
+			store.dispatch({
+                type:'MOUSE_IS_DOWN',
+                val:null
+            });
+		}
+
+		let so = state().screen.offset;
+		var xy = CoordFilters({
+			x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX),
+			y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY)
+		});
+        store.dispatch({
+            type:'MOUSE_POSITION',
+            val:xy
+        });
+        store.dispatch({
+            type:'MOUSE_OFFSET',
+            val:xy
+        });
+        store.dispatch({
+            type:'MOUSE_CANVAS_OFFSET',
+            val:{
+                x:xy.x - so.left,
+                y:xy.y - so.top
+            }
+        });
+		if(state().mouse.mouseEvent==='mousedown'||state().mouse.mouseEvent==='touchstart'){
+            let downCoords = state().mouse.down;
+            store.dispatch({
+                type:'MOUSE_DRAG_DELTA',
+                val:{
+                    x:xy.x - downCoords.x,
+                    y:xy.y - downCoords.y
+                }
+            });
+		}
+		Tools[state().tools.current][e.type](e);
     }
     render() {
         return (

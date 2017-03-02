@@ -1,23 +1,27 @@
 const defaultState = {
-    down:{
-        x:0,
-        y:0
-    },
-    offset:{
-        x:0,
-        y:0
-    },
-    dragDelta:{
-        x:0,
-        y:0
-    },
-    mouseDown:null,
-    longPress:null,
-    isDown:false
+    x:0,
+    y:0,
+    up:{x:0,y:0},
+    down:{x:0,y:0},
+    offset:{x:0,y:0},
+    offsetUp:{x:0,y:0},
+    dragDelta:{x:0,y:0},
+    canvasOffset:{x:0,y:0},
+    mouseDownEvent:null,
+    longPressTimeout:null,
+    isDown:false,
+    doubleTouch:false,
+    mouseEvent:null,
 };
 const mouseReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
+    case 'MOUSE_CANVAS_OFFSET':
+        return Object.assign({}, state, {
+            canvasOffset:action.val
+        });
+    case 'MOUSE_POSITION':
+        return Object.assign({},state,action.val);
     case 'MOUSE_DOWN':
         return Object.assign({}, state, {
             down:{
@@ -27,12 +31,10 @@ const mouseReducer = (state = defaultState, action) => {
         });
     case 'MOUSE_OFFSET':
         return Object.assign({}, state, {
-            offset:{
-                x:action.val.x,
-                y:action.val.y
-            }
+            offset:action.val
         });
     case 'MOUSE_DRAG_DELTA':
+        console.log('dragdelta');
         return Object.assign({}, state, {
             dragDelta:{
                 x:action.val.x,
@@ -40,17 +42,17 @@ const mouseReducer = (state = defaultState, action) => {
             }
         });
     case 'MOUSE_DOWN_EVENT':
-        return Object.assign({}, state, {
-            mouseDown:action.val
-        });
-    case 'MOUSE_LONGPRESS':
-        return Object.assign({}, state, {
-            longPress:action.val
-        });
+        return Object.assign({}, state, {mouseDownEvent:action.val});
+    case 'MOUSE_LONGPRESS_TIMEOUT':
+        return Object.assign({}, state, {longPressTimeout:action.val});
     case 'MOUSE_IS_DOWN':
-        return Object.assign({}, state, {
-            isDown:action.val
-        });
+        return Object.assign({}, state, {isDown:action.val});
+    case 'MOUSE_DOUBLETOUCH_NULL':
+        return Object.assign({}, state, {doubleTouch:null});
+    case 'MOUSE_REGISTER_UP':
+        return Object.assign({},state,action.val);
+    case 'MOUSE_EVENT':
+        return Object.assign({},state,{mouseEvent:action.val});
     default:
         return state;
   }

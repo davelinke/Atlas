@@ -7,13 +7,7 @@ const treeReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
     // case 'ADD_TODO':
-    //   return {
-    //     todos: [{
-    //       label: state.newTodoLabel,
-    //       done: false
-    //     }].concat(state.todos),
-    //     newTodoLabel: ''
-    //   };
+    // break;
     default:
         return state;
   }

@@ -8,6 +8,10 @@ const undosReducer = (state = defaultState, action) => {
             return Object.assign({}, state, {
                 active: false
             })
+        case 'UNDO_ACTIVATE':
+            return Object.assign({}, state, {
+                active: true
+            })
         default:
             return state;
     }
