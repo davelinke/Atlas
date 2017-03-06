@@ -34,7 +34,6 @@ const mouseReducer = (state = defaultState, action) => {
             offset:action.val
         });
     case 'MOUSE_DRAG_DELTA':
-        console.log('dragdelta');
         return Object.assign({}, state, {
             dragDelta:{
                 x:action.val.x,
@@ -43,8 +42,6 @@ const mouseReducer = (state = defaultState, action) => {
         });
     case 'MOUSE_DOWN_EVENT':
         return Object.assign({}, state, {mouseDownEvent:action.val});
-    case 'MOUSE_LONGPRESS_TIMEOUT':
-        return Object.assign({}, state, {longPressTimeout:action.val});
     case 'MOUSE_IS_DOWN':
         return Object.assign({}, state, {isDown:action.val});
     case 'MOUSE_DOUBLETOUCH_NULL':

@@ -9,6 +9,5 @@ export default {
         if (typeof(Tools[state().tools.current][args.theEvent])==='function') Tools[state().tools.current][args.theEvent]({
             event:args.e
         });
-        console.log(store.getState());
     }
 }

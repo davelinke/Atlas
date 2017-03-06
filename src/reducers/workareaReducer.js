@@ -15,7 +15,6 @@ const workareaReducer = (state = defaultState, action) => {
           gridSize: action.val
         });
     case 'WORKAREA_CLASS':
-        console.log('workareaclasdispatch');
         return Object.assign({}, state, {
           elementClass: action.val
         });
