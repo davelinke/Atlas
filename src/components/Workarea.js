@@ -88,7 +88,7 @@ class Workarea extends Component {
 				});
 				//check what do we need so that we dont'save the full event
 				// set the timeout for that will verify thel longpress
-				this.longPressTimeout = self.setTimeout(function() {
+				this.longPressTimeout = setTimeout(function() {
 					// of we get here, the it's a longpress
 					Events.sendEvent({
 						theEvent:'longpress',
@@ -140,22 +140,17 @@ class Workarea extends Component {
 				if(eType==='touchend'){
 					// check if doubletouch still exists
 					if(state().mouse.doubleTouch){
+						clearTimeout(this.doubleTouchTimeout);
 						store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
 						Events.sendEvent({
 							theEvent:'dblclick',
 							e:e
 						});
-
 					} else {
-						store.dispatch({
-							type:'MOUSE_DOUBLETOUCH',
-							val:{
-								e:e,
-								timeout:self.setTimeout(function(){
-									store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
-								},500)
-							}
-						})
+						this.doubleTouchTimeout = setTimeout(function(){
+							store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
+						},500);
+						store.dispatch({ype:'MOUSE_DOUBLETOUCH'});
 					}
 				}
 				// register the coordinates
@@ -181,7 +176,6 @@ class Workarea extends Component {
 
 			// mousedown and touchstart we send differently to check that is not a longpress
 			if(eType!=='mousedown'&&eType!=='touchstart'){
-
 				Events.sendEvent({
 					theEvent:eType,
 					e:e
