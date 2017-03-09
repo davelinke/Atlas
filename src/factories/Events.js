@@ -9,5 +9,6 @@ export default {
         if (typeof(Tools[state().tools.current][args.theEvent])==='function') Tools[state().tools.current][args.theEvent]({
             event:args.e
         });
+        if (args.e.type!=='mousemove') console.log(args.e.type, state());
     }
 }

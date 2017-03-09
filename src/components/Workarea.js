@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import CoordFilters from '../factories/CoordFilters';
 import store from '../store';
 import Events from '../factories/Events';
-import Tools from '../factories/Tools';
-//import History from '../factories/History';
+import InputLogger from './InputLogger'
 
 import './Workarea.css';
 
@@ -12,199 +11,108 @@ const state = store.getState;
 class Workarea extends Component {
 	constructor(){
 		super();
-		this.logEvent = function(e){
-			e.persist();
-			e.preventDefault();
-			let xy, xyo, eType = e.type;
-			if(eType==='touchstart'||eType==='touchend'){
-				let rect = e.target.getBoundingClientRect();
-				if(eType==='touchstart'){
-					xy = CoordFilters({
-						x:e.originalEvent.touches[0].pageX,
-						y:e.originalEvent.touches[0].pageY
-					});
-					xyo = CoordFilters({
-						x:e.originalEvent.touches[0].pageX - rect.left,
-						y:e.originalEvent.touches[0].pageY - rect.top
-					});
-
-				} else {
-					xy = CoordFilters({
-						x:state().mouse.x,
-						y:state().mouse.y
-					});
-					xyo = CoordFilters({
-						x:state().mouse.offset.x,
-						y:state().mouse.offset.y
-					});
+		this.eventReceptorFunction = function(args){
+			//console.log(args.e);
+			store.dispatch({
+				type: 'MOUSE_EVENT',
+				val:args.e
+			});
+			Events.sendEvent(args);
+		};
+		this.mouseInfo = function(){
+			return state().mouse
+		};
+		this.mouseDownFunction = function(e,xy,xyo){
+			store.dispatch({
+				type: 'WORKAREA_CLASS',
+				val:'mouse-down'
+			});
+			//disable undus till we mouseup
+			store.dispatch({
+				type: 'UNDO_DEACTIVATE'
+			});
+			// blur inputs
+			document.activeElement.blur();
+			// register mousedown coordinates
+			store.dispatch({
+				type: 'MOUSE_DOWN',
+				val: xy
+			});
+			store.dispatch({
+				type: 'MOUSE_OFFSET',
+				val: xyo
+			});
+			store.dispatch({
+				type: 'MOUSE_DRAG_DELTA',
+				val: {
+					x:0,
+					y:0
 				}
-			} else {
-				// else is a mouse, so register the coordinates normally
-				xy = CoordFilters({
-					x:e.pageX,
-					y:e.pageY
-				});
-				xyo = CoordFilters({
-					x:e.nativeEvent.offsetX,
-					y:e.nativeEvent.offsetY
-				});
-			}
-			if(eType==='mousedown'||eType==='touchstart'){
+			});
+			// save the mousedown event to a variable so we can pick it up in case it is not a longpress
+			store.dispatch({
+				type: 'MOUSE_DOWN_EVENT',
+				val: e
+			});
+			store.dispatch({
+				type: 'MOUSE_IS_DOWN',
+				val: true
+			});
+		};
+		this.mouseDownClearingFunction = function(){
+			store.dispatch({
+				type: 'MOUSE_DOWN_EVENT',
+				val: null
+			});
+			store.dispatch({
+				type: 'MOUSE_IS_DOWN',
+				val: false
+			});
+		};
+		this.mouseUpFunction = function(e,xy,xyo){
+			store.dispatch({
+				type: 'WORKAREA_CLASS',
+				val:''
+			});
 
-				store.dispatch({
-					type: 'WORKAREA_CLASS',
-					val:'mouse-down'
-				});
-				//disable undus till we mouseup
-				store.dispatch({
-					type: 'UNDO_DEACTIVATE'
-				});
-				// blur inputs
-				document.activeElement.blur();
-				// register mousedown coordinates
-				store.dispatch({
-					type: 'MOUSE_DOWN',
-					val: xy
-				});
-				store.dispatch({
-					type: 'MOUSE_OFFSET',
-					val: xyo
-				});
-				store.dispatch({
-					type: 'MOUSE_DRAG_DELTA',
-					val: {
-						x:0,
-						y:0
-					}
-				});
-				// save the mousedown event to a variable so we can pick it up in case it is not a longpress
-				store.dispatch({
-					type: 'MOUSE_DOWN_EVENT',
-					val: e
-				});
-				store.dispatch({
-					type: 'MOUSE_IS_DOWN',
-					val: true
-				});
-				//check what do we need so that we dont'save the full event
-				// set the timeout for that will verify thel longpress
-				this.longPressTimeout = setTimeout(function() {
-					// of we get here, the it's a longpress
-					Events.sendEvent({
-						theEvent:'longpress',
-						e:e
-					});
-					// clear the mousedown event (cause we just fired the longpress event)
-					store.dispatch({
-						type: 'MOUSE_IS_DOWN',
-						val: false
-					});
-				},1000);
-			}
+			// enable undos
+			store.dispatch({type: 'UNDO_ACTIVATE'});
+
+			// if (History.checkTreeChange(state())!==undefined){
+			//     History.undoLog(state());
+			// }
 
 
-			if(eType==='mouseup'||eType==='touchend'){
-				//$(this).removeClass('mouse-down');
-				store.dispatch({
-					type: 'WORKAREA_CLASS',
-					val:''
-				});
-				// check if the mousedown event still exists
-				if(state().mouse.isDown){
-					// if it exists then longpress didn't fire
-					clearTimeout(this.longPressTimeout);
-					// send the mousedown event before the mouseup one
-					Events.sendEvent({
-						theEvent:'mousedown',
-						e:state().mouse.mouseDownEvent
-					});
-					//clear the event from the variable
-					store.dispatch({
-						type: 'MOUSE_DOWN_EVENT',
-						val: null
-					});
-					store.dispatch({
-						type:'MOUSE_IS_DOWN',
-						val:false
-					});
-				}
+			// register the coordinates
 
-				// enable undos
-				store.dispatch({type: 'UNDO_ACTIVATE'});
-
-				// if (History.checkTreeChange(state())!==undefined){
-				//     History.undoLog(state());
-				// }
-
-				// add an event listener to emulate doubleclick on touch devices
-				if(eType==='touchend'){
-					// check if doubletouch still exists
-					if(state().mouse.doubleTouch){
-						clearTimeout(this.doubleTouchTimeout);
-						store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
-						Events.sendEvent({
-							theEvent:'dblclick',
-							e:e
-						});
-					} else {
-						this.doubleTouchTimeout = setTimeout(function(){
-							store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
-						},500);
-						store.dispatch({ype:'MOUSE_DOUBLETOUCH'});
+			store.dispatch({
+				type:'MOUSE_REGISTER_UP',
+				val:{
+					up:{
+						x:xy.x,
+						y:xy.y
+					},
+					offsetUp:{
+						x:xyo.x,
+						y:xyo.y
 					}
 				}
-				// register the coordinates
-				store.dispatch({
-					type:'MOUSE_REGISTER_UP',
-					val:{
-						up:{
-							x:xy.x,
-							y:xy.y
-						},
-						offsetUp:{
-							x:xyo.x,
-							y:xyo.y
-						}
-					}
-				});
-			}
-
+			});
+		};
+		this.doubleTouchClear = function(){
+			store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
+		};
+		this.doubleTouchSet = function(){
+			store.dispatch({type:'MOUSE_DOUBLETOUCH'});
+		};
+		this.registerMouseEventType = function(eType){
 			store.dispatch({
 				type:'MOUSE_EVENT',
 				val:eType
 			});
-
-			// mousedown and touchstart we send differently to check that is not a longpress
-			if(eType!=='mousedown'&&eType!=='touchstart'){
-				Events.sendEvent({
-					theEvent:eType,
-					e:e
-				});
-			}
-		}.bind(this);
-
-		this.logMove = function(e){
-			// if the mouse is down, but i moved before the longpress timeout means i am not doing longpress, so clear the timeout
-			if(state().mouse.isDown){
-				clearTimeout(this.longPressTimeout);
-				//then send the mouse down event, cause it means we are dragging so we should start it
-				Events.sendEvent({
-					theEvent:'mousedown',
-					e:state().mouse.mouseDownEvent //which is the mouse down event we saved
-				});
-
-				// i guess i nullify the down for the next time we come here
-				store.dispatch({
-					type:'MOUSE_IS_DOWN',
-					val:null
-				});
-			}
-
+		};
+		this.mouseMoveFunction = function(xy){
 			let so = state().screen.offset;
-			var xy = CoordFilters({
-				x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX),
-				y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY)
-			});
 			store.dispatch({
 				type:'MOUSE_POSITION',
 				val:xy
@@ -220,31 +128,35 @@ class Workarea extends Component {
 					y:xy.y - so.top
 				}
 			});
-			if(state().mouse.mouseEvent==='mousedown'||state().mouse.mouseEvent==='touchstart'){
-				let downCoords = state().mouse.down;
-				store.dispatch({
-					type:'MOUSE_DRAG_DELTA',
-					val:{
-						x:xy.x - downCoords.x,
-						y:xy.y - downCoords.y
-					}
-				});
-			}
-			Tools[state().tools.current][e.type](e);
-		}.bind(this);
+		};
+		this.mouseDeltaFunction = function(xy){
+			//console.log('woot');
+			let downCoords = state().mouse.down;
+			store.dispatch({
+				type:'MOUSE_DRAG_DELTA',
+				val:{
+					x:xy.x - downCoords.x,
+					y:xy.y - downCoords.y
+				}
+			});
+		};
 	}
 	render() {
 		return (
-			<div
-			className="workarea"
-			onMouseDown={this.logEvent}
-			onMouseUp={this.logEvent}
-			onTouchStart={this.logEvent}
-			onTouchEnd={this.logEvent}
-			onDoubleClick={this.logEvent}
-			onMouseMove={this.logMove}
-			onTouchMove={this.logMove}
-			></div>
+			<InputLogger
+				eventReceptorFunction={this.eventReceptorFunction}
+				filterFunction={CoordFilters}
+				doubleTouchSet={this.doubleTouchSet}
+				doubleTouchClear={this.doubleTouchClear}
+				mouseInfo={this.mouseInfo}
+				mouseDownFunction={this.mouseDownFunction}
+				mouseDownClearingFunction={this.mouseDownClearingFunction}
+				mouseDownEventStore={this.mouseDownEventStore}
+				mouseDeltaFunction={this.mouseDeltaFunction}
+				mouseUpFunction={this.mouseUpFunction}
+				mouseMoveFunction={this.mouseMoveFunction}
+				registerMouseEventType={this.registerMouseEventType}
+			/>
 		);
 	}
 };
