@@ -143,7 +143,7 @@ class InputLogger extends Component {
     			onDoubleClick={this.logEvent}
     			onMouseMove={this.logMove}
     			onTouchMove={this.logMove}
-			></div>
+			>{ this.props.children }</div>
 		);
 	}
 };

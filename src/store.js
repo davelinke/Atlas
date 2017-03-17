@@ -4,6 +4,7 @@ import keyboardReducer from  './reducers/keyboardReducer';
 import mouseReducer from  './reducers/mouseReducer';
 import todosReducer from  './reducers/todosReducer';
 import toolsReducer from  './reducers/toolsReducer';
+import treeReducer from './reducers/treeReducer';
 import undosReducer from  './reducers/undosReducer';
 import workareaReducer from  './reducers/workareaReducer';
 import screenReducer from  './reducers/screenReducer';
@@ -18,6 +19,7 @@ const combinedReducers = combineReducers({
   mouse:mouseReducer,
   undos:undosReducer,
   tools:toolsReducer,
+  tree:treeReducer,
   history:historyReducer,
   screen:screenReducer
 });
