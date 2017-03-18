@@ -14,9 +14,14 @@ class Element extends Component {
                 }
             )
         };
+        this.getClassString = () => {
+            let classArray = this.stateObject.classes;
+            let classString = classArray.join(' ');
+            return classString;
+        };
     }
     render(){
-        return (<div style={this.stateObject.style}>{this.stateObject.text}{this.renderChildren()}</div>);
+        return (<div className={this.getClassString()} style={this.stateObject.style}>{this.stateObject.text}{this.renderChildren()}</div>);
     }
 }
 

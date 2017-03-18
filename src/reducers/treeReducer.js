@@ -13,8 +13,8 @@ const defaultState = {
             states:[
                 {
                     label:'base',
-                    classes:[],
-                    text:'hello',
+                    classes:['image1'],
+                    text:'',
                     style:{
                         marginLeft:25,
                         marginTop:35,
