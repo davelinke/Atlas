@@ -16,8 +16,7 @@ class Element extends Component {
         };
         this.getClassString = () => {
             let classArray = this.stateObject.classes;
-            let classString = classArray.join(' ');
-            return classString;
+            return classArray.join(' ');
         };
     }
     render(){

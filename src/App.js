@@ -30,11 +30,7 @@ class App extends Component {
         let classes = state().library.classes;
         let styleSheet = cssTools.getStylesheet('dynamicStylesheet');
         if (styleSheet) {
-            for (let i=0; i < classes.length;i++){
-                let ruleContents = cssTools.objectToCss(classes[i].style);
-                let rule = '.'+classes[i].label+'{'+ruleContents+'}';
-                styleSheet.insertRule(rule,i);
-            }
+            cssTools.initializeSheet(styleSheet,classes);
         }
     }
 
