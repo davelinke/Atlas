@@ -6,22 +6,20 @@ import InputLogger from './InputLogger'
 
 import './Workarea.css';
 
-const state = store.getState;
-
 class Workarea extends Component {
-	constructor(){
-		super();
+	constructor(props){
+		super(props);
 		this.eventReceptorFunction = function(args){
 			//console.log(args.e);
 			store.dispatch({
 				type: 'MOUSE_EVENT',
 				val:args.e
 			});
-			Events.sendEvent(args);
-		};
+			Events.sendEvent(args,this.props.tools.current);
+		}.bind(this);
 		this.mouseInfo = function(){
-			return state().mouse
-		};
+			return this.props.mouse
+		}.bind(this);
 		this.mouseDownFunction = function(e,xy,xyo){
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
@@ -112,7 +110,7 @@ class Workarea extends Component {
 			});
 		};
 		this.mouseMoveFunction = function(xy){
-			let so = state().screen.offset;
+			let so = this.props.screen.offset;
 			store.dispatch({
 				type:'MOUSE_POSITION',
 				val:xy
@@ -128,10 +126,10 @@ class Workarea extends Component {
 					y:xy.y - so.top
 				}
 			});
-		};
+		}.bind(this);
 		this.mouseDeltaFunction = function(xy){
 			//console.log('woot');
-			let downCoords = state().mouse.down;
+			let downCoords = this.props.mouse.down;
 			store.dispatch({
 				type:'MOUSE_DRAG_DELTA',
 				val:{
@@ -145,6 +143,7 @@ class Workarea extends Component {
 		return (
 			<InputLogger
 				eventReceptorFunction={this.eventReceptorFunction}
+				mouseData={this.props}
 				filterFunction={CoordFilters}
 				doubleTouchSet={this.doubleTouchSet}
 				doubleTouchClear={this.doubleTouchClear}

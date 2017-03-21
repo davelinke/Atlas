@@ -11,7 +11,16 @@ import './index.css';
 const mapStateToProps = function(store) {
   //return store.main;
   return {
-    main:store.main
+    main:store.main,
+    workarea:store.workarea,
+    keyboard:store.keyboard,
+    library:store.library,
+    mouse:store.mouse,
+    undos:store.undos,
+    tools:store.tools,
+    tree:store.tree,
+    history:store.history,
+    screen:store.screen
   };
 }
 
