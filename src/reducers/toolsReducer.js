@@ -1,5 +1,7 @@
+import Tools from '../factories/Tools'
 const defaultState = {
-    current:'selection'
+    current:'selection',
+    set:Tools
 }
 const toolsReducer = (state = defaultState, action) => {
   switch (action.type) {

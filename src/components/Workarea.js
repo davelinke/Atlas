@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import CoordFilters from '../factories/CoordFilters';
-import store from '../store';
 import Events from '../factories/Events';
-import InputLogger from './InputLogger'
+import InputLogger from './InputLogger';
+import store from '../store'
 
 import './Workarea.css';
 
@@ -15,7 +16,7 @@ class Workarea extends Component {
 				type: 'MOUSE_EVENT',
 				val:args.e
 			});
-			Events.sendEvent(args,this.props.tools.current);
+			Events.sendEvent(args,this.props.tools);
 		}.bind(this);
 		this.mouseInfo = function(){
 			return this.props.mouse
@@ -56,7 +57,7 @@ class Workarea extends Component {
 				type: 'MOUSE_IS_DOWN',
 				val: true
 			});
-		};
+		}.bind(this);
 		this.mouseDownClearingFunction = function(){
 			store.dispatch({
 				type: 'MOUSE_DOWN_EVENT',
@@ -66,7 +67,7 @@ class Workarea extends Component {
 				type: 'MOUSE_IS_DOWN',
 				val: false
 			});
-		};
+		}.bind(this);
 		this.mouseUpFunction = function(e,xy,xyo){
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
@@ -96,19 +97,19 @@ class Workarea extends Component {
 					}
 				}
 			});
-		};
+		}.bind(this);
 		this.doubleTouchClear = function(){
 			store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
-		};
+		}.bind(this);
 		this.doubleTouchSet = function(){
 			store.dispatch({type:'MOUSE_DOUBLETOUCH'});
-		};
+		}.bind(this);
 		this.registerMouseEventType = function(eType){
 			store.dispatch({
 				type:'MOUSE_EVENT',
 				val:eType
 			});
-		};
+		}.bind(this);
 		this.mouseMoveFunction = function(xy){
 			let so = this.props.screen.offset;
 			store.dispatch({
@@ -137,14 +138,20 @@ class Workarea extends Component {
 					y:xy.y - downCoords.y
 				}
 			});
-		};
+		}.bind(this);
+		this.filterFunction = function(coords){
+			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard);
+		}.bind(this);
+	}
+	componentDidUpdate(){
+		console.log('workarea update');
 	}
 	render() {
+		console.log('workarea rendering')
 		return (
 			<InputLogger
 				eventReceptorFunction={this.eventReceptorFunction}
-				mouseData={this.props}
-				filterFunction={CoordFilters}
+				filterFunction={this.filterFunction}
 				doubleTouchSet={this.doubleTouchSet}
 				doubleTouchClear={this.doubleTouchClear}
 				mouseInfo={this.mouseInfo}
@@ -160,4 +167,18 @@ class Workarea extends Component {
 	}
 };
 
-export default Workarea;
+
+
+const mapStateToProps = function(store) {
+  //return store.main;
+  return {
+    mouse:store.mouse,
+    tools:store.tools,
+    screen:store.screen,
+	workarea:store.workarea,
+	keyboard:store.keyboard
+  };
+}
+const SmartWorkarea = connect(mapStateToProps)(Workarea);
+
+export default SmartWorkarea;

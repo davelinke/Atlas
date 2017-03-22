@@ -20,6 +20,7 @@ class Element extends Component {
         };
     }
     render(){
+        console.log('element rendering');
         return (<div className={this.getClassString()} style={this.stateObject.style}>{this.stateObject.text}{this.renderChildren()}</div>);
     }
 }

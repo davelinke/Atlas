@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Workarea from './components/Workarea';
 import Artboard from './components/Artboard';
 import cssTools from './factories/Css';
+import Toolbar from './components/Toolbar';
 //import { Link } from 'react-router';
-//import Todo from './components/Todo';
-//import AddTodo from './components/AddTodo';
 
 import './App.css';
 
@@ -36,8 +36,8 @@ class App extends Component {
                 <style id="dynamicStylesheet" type="text/css"></style>
                 <div className="menubar">File</div>
                 <div className="main">
-                    <div className="toolbar">A</div>
-                    <Workarea mouse={this.props.mouse} screen={this.props.screen} tools={this.props.tools}>{this.renderArtboards()}</Workarea>
+                    <Toolbar></Toolbar>
+                    <Workarea>{this.renderArtboards()}</Workarea>
                     <div className="sidebar">sidebar</div>
                 </div>
             </div>
@@ -45,4 +45,12 @@ class App extends Component {
     }
 };
 
-export default App;
+const mapStateToProps = function(store) {
+  return {
+    tree:store.tree,
+    library:store.library
+  };
+};
+const SmartApp = connect(mapStateToProps)(App);
+
+export default SmartApp;
