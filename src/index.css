@@ -3,3 +3,8 @@ html,#root,body{
     overflow: hidden;
     margin: 0;
 }
+.sr-only{
+    position:absolute;
+    opacity: 0;
+    pointer-events: none;
+}

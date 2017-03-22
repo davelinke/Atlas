@@ -57,7 +57,7 @@ class Workarea extends Component {
 				type: 'MOUSE_IS_DOWN',
 				val: true
 			});
-		}.bind(this);
+		};
 		this.mouseDownClearingFunction = function(){
 			store.dispatch({
 				type: 'MOUSE_DOWN_EVENT',
@@ -67,7 +67,7 @@ class Workarea extends Component {
 				type: 'MOUSE_IS_DOWN',
 				val: false
 			});
-		}.bind(this);
+		};
 		this.mouseUpFunction = function(e,xy,xyo){
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
@@ -97,19 +97,19 @@ class Workarea extends Component {
 					}
 				}
 			});
-		}.bind(this);
+		};
 		this.doubleTouchClear = function(){
 			store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
-		}.bind(this);
+		};
 		this.doubleTouchSet = function(){
 			store.dispatch({type:'MOUSE_DOUBLETOUCH'});
-		}.bind(this);
+		};
 		this.registerMouseEventType = function(eType){
 			store.dispatch({
 				type:'MOUSE_EVENT',
 				val:eType
 			});
-		}.bind(this);
+		};
 		this.mouseMoveFunction = function(xy){
 			let so = this.props.screen.offset;
 			store.dispatch({
@@ -143,8 +143,8 @@ class Workarea extends Component {
 			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard);
 		}.bind(this);
 	}
-	componentDidUpdate(){
-		console.log('workarea update');
+	shouldComponentUpdate(nextProps, nextState) {
+		return false; //gold
 	}
 	render() {
 		console.log('workarea rendering')

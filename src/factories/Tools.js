@@ -1,5 +1,6 @@
 export default {
     selection:{
+        iconClass:'fa fa-mouse-pointer',
         longpress:function(){
             //console.log('selection longpress');
         },
@@ -17,6 +18,7 @@ export default {
         }
     },
     box:{
+        iconClass:'fa fa-square-o',
         longpress:function(){
             //console.log('box longpress');
         },
