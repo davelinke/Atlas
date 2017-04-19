@@ -9,6 +9,7 @@ import treeReducer from './reducers/treeReducer';
 import undosReducer from  './reducers/undosReducer';
 import workareaReducer from  './reducers/workareaReducer';
 import screenReducer from  './reducers/screenReducer';
+import pickReducer from  './reducers/pickReducer';
 
 
 // combine reducers - Although we have one only,
@@ -23,7 +24,8 @@ const combinedReducers = combineReducers({
     tools:toolsReducer,
     tree:treeReducer,
     history:historyReducer,
-    screen:screenReducer
+    screen:screenReducer,
+    pick:pickReducer
 });
 
 // create the holy grail of truth... The Store

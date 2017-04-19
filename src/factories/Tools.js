@@ -1,3 +1,4 @@
+//import Elements from './Elements';
 export default {
     selection:{
         iconClass:'fa fa-mouse-pointer',
@@ -7,14 +8,21 @@ export default {
         mousemove:function(){
             //console.log('selection mousemove');
         },
-        mousedown:function(){
-            //console.log('selection mousedown');
+        mousedown:function(args){
+            console.log(args.keys);
+            var target = args.event.target;
+            //if shift is pressed
+
+            //if shift is not pressed
+            args.pick.clear();
+            args.pick.add(target.dataset.elementId);
+            console.log(target.parentNode);
         },
         mouseup:function(){
             //console.log('selection mouseup');
         },
         mousedrag:function(){
-            console.log('selection mousedrag');
+            //console.log('selection mousedrag');
         }
     },
     box:{
@@ -25,7 +33,8 @@ export default {
         mousemove:function(){
             //console.log('box mousemove');
         },
-        mousedown:function(){
+        mousedown:function(args){
+            console.log(args);
             //console.log('box mousedown');
         },
         mouseup:function(){

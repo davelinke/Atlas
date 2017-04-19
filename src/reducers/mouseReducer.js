@@ -44,10 +44,6 @@ const mouseReducer = (state = defaultState, action) => {
         return Object.assign({}, state, {mouseDownEvent:action.val});
     case 'MOUSE_IS_DOWN':
         return Object.assign({}, state, {isDown:action.val});
-    case 'MOUSE_DOUBLETOUCH_NULL':
-        return Object.assign({}, state, {doubleTouch:false});
-    case 'MOUSE_DOUBLETOUCH':
-        return Object.assign({},state,{doubleTouch:true});
     case 'MOUSE_REGISTER_UP':
         return Object.assign({},state,action.val);
     case 'MOUSE_EVENT':

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CoordFilters from '../factories/CoordFilters';
-import Events from '../factories/Events';
+//import Events from '../factories/Events';
 import InputLogger from './InputLogger';
 import store from '../store'
 
@@ -10,16 +10,40 @@ import './Workarea.css';
 class Workarea extends Component {
 	constructor(props){
 		super(props);
+		this.pick = {
+			add:function(elementId){
+				store.dispatch({
+					type:'PICK_ADD',
+					val:elementId
+				});
+			},
+			remove:function(elementId){
+				store.dispatch({
+					type:'PICK_REMOVE',
+					val:elementId
+				});
+			},
+			clear:function(){
+				store.dispatch({
+					type:'PICK_CLEAR'
+				});
+			}
+		};
 		this.eventReceptorFunction = function(args){
-			//console.log(args.e);
 			store.dispatch({
 				type: 'MOUSE_EVENT',
 				val:args.e
 			});
-			Events.sendEvent(args,this.props.tools);
-		}.bind(this);
-		this.mouseInfo = function(){
-			return this.props.mouse
+			let tools = this.props.tools;
+			let toolFn = tools.set[tools.current][args.e.type];
+
+			if (typeof(toolFn)==='function'){
+				toolFn({
+					pick:this.pick,
+					keys:this.props.keyboard,
+					event:args.e
+				});
+			}
 		}.bind(this);
 		this.mouseDownFunction = function(e,xy,xyo){
 			store.dispatch({
@@ -58,16 +82,6 @@ class Workarea extends Component {
 				val: true
 			});
 		};
-		this.mouseDownClearingFunction = function(){
-			store.dispatch({
-				type: 'MOUSE_DOWN_EVENT',
-				val: null
-			});
-			store.dispatch({
-				type: 'MOUSE_IS_DOWN',
-				val: false
-			});
-		};
 		this.mouseUpFunction = function(e,xy,xyo){
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
@@ -98,12 +112,6 @@ class Workarea extends Component {
 				}
 			});
 		};
-		this.doubleTouchClear = function(){
-			store.dispatch({type: 'MOUSE_DOUBLETOUCH_NULL'});
-		};
-		this.doubleTouchSet = function(){
-			store.dispatch({type:'MOUSE_DOUBLETOUCH'});
-		};
 		this.registerMouseEventType = function(eType){
 			store.dispatch({
 				type:'MOUSE_EVENT',
@@ -128,17 +136,6 @@ class Workarea extends Component {
 				}
 			});
 		}.bind(this);
-		this.mouseDeltaFunction = function(xy){
-			//console.log('woot');
-			let downCoords = this.props.mouse.down;
-			store.dispatch({
-				type:'MOUSE_DRAG_DELTA',
-				val:{
-					x:xy.x - downCoords.x,
-					y:xy.y - downCoords.y
-				}
-			});
-		}.bind(this);
 		this.filterFunction = function(coords){
 			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard);
 		}.bind(this);
@@ -152,13 +149,7 @@ class Workarea extends Component {
 			<InputLogger
 				eventReceptorFunction={this.eventReceptorFunction}
 				filterFunction={this.filterFunction}
-				doubleTouchSet={this.doubleTouchSet}
-				doubleTouchClear={this.doubleTouchClear}
-				mouseInfo={this.mouseInfo}
 				mouseDownFunction={this.mouseDownFunction}
-				mouseDownClearingFunction={this.mouseDownClearingFunction}
-				mouseDownEventStore={this.mouseDownEventStore}
-				mouseDeltaFunction={this.mouseDeltaFunction}
 				mouseUpFunction={this.mouseUpFunction}
 				mouseMoveFunction={this.mouseMoveFunction}
 				registerMouseEventType={this.registerMouseEventType}
@@ -176,7 +167,8 @@ const mapStateToProps = function(store) {
     tools:store.tools,
     screen:store.screen,
 	workarea:store.workarea,
-	keyboard:store.keyboard
+	keyboard:store.keyboard,
+	pick:store.pick
   };
 }
 const SmartWorkarea = connect(mapStateToProps)(Workarea);

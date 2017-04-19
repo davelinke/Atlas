@@ -21,7 +21,7 @@ class Element extends Component {
     }
     render(){
         console.log('element rendering');
-        return (<div className={this.getClassString()} style={this.stateObject.style}>{this.stateObject.text}{this.renderChildren()}</div>);
+        return (<div data-element-id={this.props.specs.id} className={this.getClassString()} style={this.stateObject.style}>{this.stateObject.text}{this.renderChildren()}</div>);
     }
 }
 
