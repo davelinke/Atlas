@@ -9,8 +9,10 @@ const pickReducer = (state = defaultState, action) => {
           elements: [].concat(state.elements,action.val)
         });
     case 'PICK_REMOVE':
+        var elements = [].concat(state.elements);
+        elements.splice(elements.indexOf(action.val),1);
         return Object.assign({}, state, {
-          gridSize: action.val
+          elements: elements
         });
     case 'PICK_CLEAR':
         return Object.assign({}, state, {

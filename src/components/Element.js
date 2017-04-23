@@ -10,12 +10,15 @@ class Element extends Component {
         this.renderChildren = () => {
             return this.props.specs.children.map(
                 (child, i) => {
-                    return (<Element key={i} specs={child} />);
+                    return (<Element key={i} specs={child} pick={this.props.pick} />);
                 }
             )
         };
         this.getClassString = () => {
-            let classArray = this.stateObject.classes;
+            let classArray = [].concat(this.stateObject.classes);
+            if(this.props.pick.elements.indexOf(this.props.specs.id)>-1) {
+                classArray.push('selected');
+            }
             return classArray.join(' ');
         };
     }

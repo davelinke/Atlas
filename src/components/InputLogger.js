@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 class InputLogger extends Component {
 	constructor(props){
 		super(props);
+		this.mouseDown = false;
 		this.logEvent = function(e){
 			e.persist();
 			e.preventDefault();
@@ -20,9 +21,11 @@ class InputLogger extends Component {
 
 			switch (eType) {
 				case 'mousedown':
+					this.mouseDown = true;
 					this.props.mouseDownFunction(e,xy,xyo);
 					break;
 				case 'mouseup':
+					this.mouseDown = false;
 					this.props.mouseUpFunction(e,xy,xyo);
 					break;
 				default:
@@ -37,15 +40,18 @@ class InputLogger extends Component {
 		}.bind(this);
 
 		this.logMove = function(e){
-			let xy = this.props.filterFunction({
-				x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX),
-				y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY)
-			});
-            this.props.mouseMoveFunction(xy);
-            this.props.eventReceptorFunction({
-                theEvent:'mousemove',
-                e:e
-            });
+			if (this.mouseDown){
+				//console.log(e);
+				let xy = this.props.filterFunction({
+					x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX),
+					y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY)
+				});
+	            this.props.mouseMoveFunction(xy);
+	            this.props.eventReceptorFunction({
+	                theEvent:'mousemove',
+	                e:e
+	            });
+			}
 		}.bind(this);
 	}
 	render() {

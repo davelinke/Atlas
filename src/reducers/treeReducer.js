@@ -2,11 +2,11 @@
 
 // create the default state of the model
 const defaultState = {
-    id:0,
+    id:'root',
     label:'Artboard 1',
     children:[
         {
-            id:1,
+            id:'el1',
             label:'Element 1',
             children:[],
             currentState:0,
@@ -16,8 +16,31 @@ const defaultState = {
                     classes:['image1'],
                     text:'',
                     style:{
-                        marginLeft:25,
-                        marginTop:35,
+                        position:'absolute',
+                        left:25,
+                        top:35,
+                        width:35,
+                        height:35,
+                        backgroundColor:'#fff',
+                        color:'#c00'
+                    }
+                }
+            ]
+        },
+        {
+            id:'el2',
+            label:'Element 2',
+            children:[],
+            currentState:0,
+            states:[
+                {
+                    label:'base',
+                    classes:[],
+                    text:'',
+                    style:{
+                        position:'absolute',
+                        left:65,
+                        top:95,
                         width:35,
                         height:35,
                         backgroundColor:'#fff',
@@ -32,8 +55,9 @@ const defaultState = {
         {
             label:'base',
             classes:[],
-            text:'woot',
+            text:'',
             style:{
+                position:'relative',
                 width:240,
                 height:320,
                 backgroundColor:'#c00',

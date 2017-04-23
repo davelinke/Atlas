@@ -4,9 +4,9 @@ const defaultState = {
 const keyboardReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
-    case 'SHIFT':
+    case 'KEYBOARD_SHIFT':
         return Object.assign({}, state, {
-          shift: !state.shift
+          shift: action.val
         });
     default:
         return state;

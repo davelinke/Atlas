@@ -16,17 +16,20 @@ class Workarea extends Component {
 					type:'PICK_ADD',
 					val:elementId
 				});
+				//console.log(store.getState().pick.elements);
 			},
 			remove:function(elementId){
 				store.dispatch({
 					type:'PICK_REMOVE',
 					val:elementId
 				});
+				//console.log(store.getState().pick.elements);
 			},
 			clear:function(){
 				store.dispatch({
 					type:'PICK_CLEAR'
 				});
+				//console.log(store.getState().pick.elements);
 			}
 		};
 		this.eventReceptorFunction = function(args){
@@ -36,12 +39,17 @@ class Workarea extends Component {
 			});
 			let tools = this.props.tools;
 			let toolFn = tools.set[tools.current][args.e.type];
-
 			if (typeof(toolFn)==='function'){
 				toolFn({
-					pick:this.pick,
-					keys:this.props.keyboard,
+					pick: Object.assign(
+						{},
+						this.pick,
+						{
+							elements:store.getState().pick.elements
+						}
+					),
 					event:args.e
+					//keys:this.props.keyboard
 				});
 			}
 		}.bind(this);
@@ -139,9 +147,36 @@ class Workarea extends Component {
 		this.filterFunction = function(coords){
 			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard);
 		}.bind(this);
+		// listen to keyboard
+		this.listenToKeydown = function(event){
+			// console.log('keydown',event);
+			if (event.keyCode === 16){
+				store.dispatch({
+					type:'KEYBOARD_SHIFT',
+					val:true
+				});
+			}
+		};
+		this.listenToKeyup = function(event){
+			// console.log('keyup',event);
+			if (event.keyCode === 16){
+				store.dispatch({
+					type:'KEYBOARD_SHIFT',
+					val:false
+				});
+			}
+		};
 	}
 	shouldComponentUpdate(nextProps, nextState) {
 		return false; //gold
+	}
+	componentWillMount(){
+		window.addEventListener("keydown", this.listenToKeydown, false);
+		window.addEventListener("keyup", this.listenToKeyup, false);
+	}
+	componentWillUnmount() {
+		window.removeEventListener("keydown", this.listenToKeydown, false);
+		window.removeEventListener("keyup", this.listenToKeyup, false);
 	}
 	render() {
 		console.log('workarea rendering')
