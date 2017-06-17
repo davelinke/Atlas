@@ -1,0 +1,7 @@
+div[data-element-id].selected:after{
+    content:" ";
+    position:absolute;
+    width:calc(100% - 2px);
+    height: calc(100% - 2px);
+    border:1px solid blue;
+}

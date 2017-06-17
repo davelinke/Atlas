@@ -12,10 +12,6 @@ export default {
             let target = args.event.target;
             let elementId = target.dataset.elementId;
             let shiftKey = args.event.shiftKey;
-
-            if (!shiftKey){ //if shift is not pressed
-                args.pick.clear(); // then clear selections cause we are to pick something new
-            }
             // if what's clicked is not the artboard
             if (elementId!=='root'){
                 // let's see if it's already selected
@@ -28,8 +24,13 @@ export default {
                     }
                 } else { // if shif is not pressed
                     if (!isInPick){ // and the element is not selected/active
+                        args.pick.clear();
                         args.pick.add(elementId); //then select it
                     }
+                }
+            } else {
+                if (!shiftKey){ //if shift is not pressed
+                    args.pick.clear(); // it is the root element, so let's clear
                 }
             }
         },
