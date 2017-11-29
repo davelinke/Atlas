@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Workarea from './components/Workarea';
-import Artboard from './components/Artboard';
-import cssTools from './factories/Css';
-import Toolbar from './components/Toolbar';
-import store from './store';
+import Workarea from '../Workarea/Workarea';
+import Artboard from '../Artboard/Artboard';
+import cssTools from '../../factories/Css';
+import Toolbar from '../Toolbar/Toolbar';
+import store from '../../store';
 //import { Link } from 'react-router';
 
 import './App.css';

@@ -1,0 +1,29 @@
+@import "./scss-imports/variables";
+.wrap{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+}
+.menubar{
+    height:32px;
+    background-color:$bgColorWorkspace;
+}
+.main{
+    display:flex;
+    flex-grow: 1;
+}
+.toolbar{
+    width:32px;
+    background-color:$bgColorToolbars;
+}
+.sidebar{
+    width:700px;
+    background-color:$bgColorToolbars;
+
+    textarea{
+        width:100%;
+        height:100%;
+        font-family: monospace;
+        font-size: 14px;
+    }
+}

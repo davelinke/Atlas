@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import ToolbarButton from './ToolbarButton';
-import store from '../store';
+import ToolbarButton from '../ToolbarButton/ToolbarButton';
+import store from '../../store';
 
 import './Toolbar.css';
 

@@ -1,0 +1,25 @@
+.wrap {
+  height: 100%;
+  display: flex;
+  flex-direction: column; }
+
+.menubar {
+  height: 32px;
+  background-color: #fafafa; }
+
+.main {
+  display: flex;
+  flex-grow: 1; }
+
+.toolbar {
+  width: 32px;
+  background-color: #efefef; }
+
+.sidebar {
+  width: 700px;
+  background-color: #efefef; }
+  .sidebar textarea {
+    width: 100%;
+    height: 100%;
+    font-family: monospace;
+    font-size: 14px; }

@@ -1,0 +1,10 @@
+html,#root,body{
+    height:100%;
+    overflow: hidden;
+    margin: 0;
+}
+.sr-only{
+    position:absolute;
+    opacity: 0;
+    pointer-events: none;
+}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Element from './Element';
+import Element from '../Element/Element';
 
 import './Artboard.css';
 
