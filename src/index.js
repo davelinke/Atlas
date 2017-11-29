@@ -2,10 +2,11 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { Router, Route, browserHistory  } from 'react-router';
 import ReactDOM from 'react-dom';
-import App from './components/App/App';
+import App from './components/App/';
 import registerServiceWorker from './registerServiceWorker';
-import store from './store'
-import './index.css';
+import store from './store';
+
+import './styles.css';
 
 // create the constant that maps the sate to a variable for connection
 // const mapStateToProps = function(store) {

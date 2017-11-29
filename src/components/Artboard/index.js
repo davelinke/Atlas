@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Element from '../Element/Element';
+import Element from '../Element/';
 
-import './Artboard.css';
+import './styles.css';
 
 class Artboard extends Component {
     render(){

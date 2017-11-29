@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import './ToolbarButton.css';
+import './styles.css';
 
 class ToolbarButton extends Component {
     constructor(props){

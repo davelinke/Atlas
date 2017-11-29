@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import Workarea from '../Workarea/Workarea';
-import Artboard from '../Artboard/Artboard';
+import Workarea from '../Workarea/';
+import Artboard from '../Artboard/';
 import cssTools from '../../factories/Css';
-import Toolbar from '../Toolbar/Toolbar';
+import Toolbar from '../Toolbar/';
 import store from '../../store';
 //import { Link } from 'react-router';
 
-import './App.css';
+import './styles.css';
 
 class App extends Component {
     renderArtboards(){

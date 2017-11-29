@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CoordFilters from '../../factories/CoordFilters';
 //import Events from '../factories/Events';
-import InputLogger from '../InputLogger/InputLogger';
+import InputLogger from '../InputLogger/';
 import store from '../../store'
 
-import './Workarea.css';
+import './styles.css';
 
 class Workarea extends Component {
 	constructor(props){
