@@ -6,7 +6,7 @@ import './Artboard.css';
 
 class Artboard extends Component {
     render(){
-        console.log('artboard rendering');
+        console.log('new tree');
         return (<Element specs={this.props.tree} pick={this.props.pick}/>);
     }
 }

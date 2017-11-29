@@ -23,7 +23,35 @@ const defaultState = {
                         height:35,
                         backgroundColor:'#fff',
                         color:'#c00'
-                    }
+                    },
+                    behaviors:[
+                        {
+                            input:'click',
+                            target:"el1",
+                            state:1
+                        }
+                    ]
+                },
+                {
+                    label:'second',
+                    classes:['image1'],
+                    text:'',
+                    style:{
+                        position:'absolute',
+                        left:85,
+                        top:95,
+                        width:35,
+                        height:35,
+                        backgroundColor:'#f00',
+                        color:'#c00'
+                    },
+                    behaviors:[
+                        {
+                            input:'click',
+                            target:"el1",
+                            state:0
+                        }
+                    ]
                 }
             ]
         },

@@ -10,9 +10,6 @@ import store from './store';
 import './App.css';
 
 class App extends Component {
-    // constructor(){
-    //     super();
-    // }
     renderArtboards(){
         const artboards = [this.props.tree];
         return artboards.map((tree, i) => {

@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { Router, Route, browserHistory  } from 'react-router';
 import ReactDOM from 'react-dom';
 import App from './App';
-import InfoPage from './components/InfoPage'
+import registerServiceWorker from './registerServiceWorker';
 import store from './store'
 import './index.css';
 
@@ -32,7 +32,6 @@ const initialize = () => ReactDOM.render(
   <Provider store={store}>
     <Router history={browserHistory}>
       <Route path="/" component={App} />
-      <Route path="/info" component={InfoPage} />
     </Router>
   </Provider>,
   document.getElementById('root')
@@ -40,3 +39,4 @@ const initialize = () => ReactDOM.render(
 
 // initialize
 initialize();
+registerServiceWorker();
