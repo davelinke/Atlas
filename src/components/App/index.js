@@ -5,9 +5,12 @@ import Artboard from '../Artboard/';
 import cssTools from '../../factories/Css';
 import Toolbar from '../Toolbar/';
 import store from '../../store';
-//import { Link } from 'react-router';
+
+import CodeMirror from 'react-codemirror';
 
 import './styles.css';
+
+import "../../../node_modules/codemirror/lib/codemirror.css";
 
 class App extends Component {
     renderArtboards(){
@@ -35,6 +38,11 @@ class App extends Component {
     }
 
     render() {
+        let codeMirrorOptions = {
+            mode:'javascript',
+            indentWithTabs:true,
+            lineNumbers:true
+        };
         return (
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
@@ -43,7 +51,7 @@ class App extends Component {
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
                     <div className="sidebar">
-                        <textarea onChange={e=>this.updateTree(e.target.value)} value={JSON.stringify(this.props.tree, null, 2)} />
+                        <CodeMirror value={JSON.stringify(this.props.tree, null, 2)} onChange={this.updateTree} options={codeMirrorOptions} />
                     </div>
                 </div>
             </div>
