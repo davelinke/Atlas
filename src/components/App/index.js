@@ -4,6 +4,7 @@ import Workarea from '../Workarea/';
 import Artboard from '../Artboard/';
 import cssTools from '../../factories/Css';
 import Toolbar from '../Toolbar/';
+import MenuBar from '../MenuBar/';
 import store from '../../store';
 
 import CodeMirror from 'react-codemirror';
@@ -20,10 +21,19 @@ class App extends Component {
         });
     }
     updateTree(val){
-        store.dispatch({
-            type:'TREE_FULL',
-            val:JSON.parse(val)
-        });
+        let ob = null;
+        try {
+           ob =  JSON.parse(val)
+        }
+        catch (e) {
+           console.log('oops');
+        }
+        if (ob) {
+            store.dispatch({
+                type:'TREE_FULL',
+                val:ob
+            });
+        }
     }
     componentWillMount(){
         // initialize stuff
@@ -46,7 +56,7 @@ class App extends Component {
         return (
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
-                <div className="menubar">File</div>
+                <MenuBar />
                 <div className="main">
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>

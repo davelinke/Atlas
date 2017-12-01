@@ -3,10 +3,6 @@
   display: flex;
   flex-direction: column; }
 
-.menubar {
-  height: 32px;
-  background-color: #fafafa; }
-
 .main {
   display: flex;
   flex-grow: 1; }
