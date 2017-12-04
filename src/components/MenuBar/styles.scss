@@ -1,5 +1,58 @@
 @import "../../scss-imports/variables";
-.menu-bar{
-    height:32px;
+
+$itemsPadding:0.125rem 0.5rem;
+
+.menu{
     background-color:$bgColorWorkspace;
+    display:flex;
+    font-size: 0.75rem;
+    flex: 0 0 auto;
+    &__sub{
+        &.menu__sub--visible{
+            .menu{
+                &__label{
+                    background-color: $bgColorToolbarsActive;
+                }
+                &__backdrop{
+                    display: block;
+                }
+                &__dropdown{
+                    opacity: 1;
+                    pointer-events: all;
+                }
+            }
+        }
+    }
+    &__label{
+        padding: $itemsPadding;
+        text-transform: capitalize;
+        border:0;
+        margin:0;
+        background: none;
+        font-size: 0.75rem;
+        border-radius: 0;
+        &:focus{
+            outline: 0;
+        }
+    }
+    &__backdrop{
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        z-index: 9;
+        display: none;
+        left:0;
+    }
+    &__dropdown{
+        position: absolute;
+        opacity:0;
+        pointer-events: none;
+        background-color:$bgColorWorkspace;
+        box-shadow: $shadowRegular;
+        z-index:10;
+        &-item{
+            min-width: 12rem;
+            padding:$itemsPadding;
+        }
+    }
 }

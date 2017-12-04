@@ -3,6 +3,9 @@ html,#root,body{
     overflow: hidden;
     margin: 0;
 }
+body,button{
+    font-family: 'Roboto', sans-serif;
+}
 .sr-only{
     position:absolute;
     opacity: 0;
