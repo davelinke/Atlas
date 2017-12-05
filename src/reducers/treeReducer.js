@@ -97,9 +97,6 @@ const defaultState = {
 
 const treeReducer = (state = defaultState, action) => {
   switch (action.type) {
-    // remember not to mutate the state
-    // case 'ADD_TODO':
-    // break;
     case 'TREE_FULL':
         return Object.assign({},action.val);
     default:

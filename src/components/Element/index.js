@@ -19,8 +19,13 @@ class Element extends Component {
         return classArray.join(' ');
     }
     render(){
-        let specs =  this.props.specs.states[this.props.specs.currentState];
-        return (<div data-element-id={this.props.specs.id} className={this.getClassString()} style={specs.style}>{specs.text}{this.renderChildren()}</div>);
+        console.log(this.props.specs.states);
+        if (this.props.specs.states){
+            let specs =  this.props.specs.states[this.props.specs.currentState];
+            return (<div data-element-id={this.props.specs.id} className={this.getClassString()} style={specs.style}>{specs.text}{this.renderChildren()}</div>);
+        } else {
+            return null;
+        }
     }
 }
 

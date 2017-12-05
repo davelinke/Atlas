@@ -4,19 +4,12 @@ const defaultState = {
             'visible':false,
             'items':{
                 'new':{
-                    label:'New',
-                    component:'MenuFileNew'
+                    tag:'MenuFileNew'
                 }
             }
         },
         'edit':{
-            'visible':false,
-            'items':{
-                'copy':{
-                    label:'Copy',
-                    component:'MenuEditCopy'
-                }
-            }
+            'visible':false
         },
         'object':{
             'visible':false
@@ -33,12 +26,19 @@ const defaultState = {
         'help':{
             'visible':false
         }
-    }
+    },
+    helperData:{}
 };
-
 const menuReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
+    case 'MENU_ADD_HELPER':
+        let mahState = Object.assign({},state);
+        mahState.helperData[action.key]=action.value;
+        return mahState;
+    case 'MENU_ADD_ITEM':
+        let maiState = Object.assign({},state);
+        return maiState;
     case 'MENU_TOGGLE_SUB':
         let nuState = Object.assign({},state);
         // iterate through menu objects to see if there's any thats open

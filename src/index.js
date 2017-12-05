@@ -8,6 +8,23 @@ import store from './store';
 
 import './styles.css';
 
+// expose API to global in order to admit plugins
+window.Atlas = function(){
+    return {
+        setTree:(tree)=>{
+            store.dispatch({
+                type:'TREE_FULL',
+                val:tree
+            })
+        },
+        addMenuItem:(menuItem)=>{
+            store.dispatch({
+
+            });
+        }
+    }
+};
+
 // init and render to DOM function
 const initialize = () => ReactDOM.render(
   <Provider store={store}>

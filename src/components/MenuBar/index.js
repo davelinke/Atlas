@@ -14,7 +14,8 @@ class MenuSub extends Component{
     buildMenuDropdown(ddData){
         let output = [];
         for (const item in ddData) {
-            output.push(<div key={item} className="menu__dropdown-item {}">{ddData[item].label}</div>);
+            let Component = require('./SingleComponents/'+ddData[item].tag+'/').MenuItem;
+            output.push(<Component key={ddData[item].tag} />);
         }
         return output;
     }
@@ -30,8 +31,28 @@ class MenuSub extends Component{
 }
 
 class MenuBar extends Component {
+    renderMenuHelpers(){
+        return Object.entries(this.props.menu.menus).map((sub, key)=>{
+            let output = [];
+            let items = sub[1].items;
+            for (const item in items) {
+                let Component = require('./SingleComponents/'+items[item].tag+'/').MenuHelper;
+                output.push(<Component key={items[item].tag} />);
+            }
+            return output;
+        });
+    }
     render(){
-        return (<div className="menu">{Object.entries(this.props.menu.menus).map((sub, key)=>{return <MenuSub key={key} sub={sub} />})}</div>);
+        return (
+            <div className="top-header">
+                <div className="menu">
+                    {Object.entries(this.props.menu.menus).map((sub, key)=>{return <MenuSub key={key} sub={sub} />})}
+                </div>
+                <div className="menu__helpers">
+                    {this.renderMenuHelpers()}
+                </div>
+            </div>
+        );
     }
 }
 

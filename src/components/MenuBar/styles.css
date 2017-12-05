@@ -1,8 +1,11 @@
-.menu {
+.top-header {
   background-color: #fafafa;
-  display: flex;
+  flex: 0 0 auto;
   font-size: 0.75rem;
-  flex: 0 0 auto; }
+  display: flex; }
+
+.menu {
+  display: flex; }
   .menu__sub.menu__sub--visible .menu__label {
     background-color: #ccc; }
   .menu__sub.menu__sub--visible .menu__backdrop {
@@ -35,5 +38,12 @@
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
     z-index: 10; }
     .menu__dropdown-item {
+      display: block;
+      background: none;
+      border: 0;
+      text-align: left;
+      font-size: 0.75rem;
       min-width: 12rem;
       padding: 0.125rem 0.5rem; }
+      .menu__dropdown-item:focus {
+        outline: 0; }

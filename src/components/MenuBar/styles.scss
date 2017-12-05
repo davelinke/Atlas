@@ -1,12 +1,14 @@
 @import "../../scss-imports/variables";
 
 $itemsPadding:0.125rem 0.5rem;
-
-.menu{
+.top-header{
     background-color:$bgColorWorkspace;
-    display:flex;
-    font-size: 0.75rem;
     flex: 0 0 auto;
+    font-size: 0.75rem;
+    display:flex;
+}
+.menu{
+    display:flex;
     &__sub{
         &.menu__sub--visible{
             .menu{
@@ -51,8 +53,16 @@ $itemsPadding:0.125rem 0.5rem;
         box-shadow: $shadowRegular;
         z-index:10;
         &-item{
+            display:block;
+            background: none;
+            border:0;
+            text-align: left;
+            font-size: 0.75rem;
             min-width: 12rem;
             padding:$itemsPadding;
+            &:focus{
+                outline: 0;
+            }
         }
     }
 }
