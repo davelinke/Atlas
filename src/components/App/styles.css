@@ -16,6 +16,7 @@
   background-color: #efefef;
   border-left: 2px solid #efefef; }
   .sidebar .ReactCodeMirror,
-  .sidebar .CodeMirror {
+  .sidebar .CodeMirror,
+  .sidebar .react-codemirror2 {
     width: 100%;
     height: 100%; }

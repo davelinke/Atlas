@@ -7,7 +7,7 @@ import Toolbar from '../Toolbar/';
 import MenuBar from '../MenuBar/';
 import store from '../../store';
 
-import CodeMirror from 'react-codemirror';
+import {Controlled as CodeMirror} from 'react-codemirror2';
 
 import './styles.css';
 
@@ -53,6 +53,8 @@ class App extends Component {
             indentWithTabs:true,
             lineNumbers:true
         };
+        console.log('app update');
+        console.log(this.props.tree);
         return (
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
