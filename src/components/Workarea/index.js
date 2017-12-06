@@ -179,7 +179,6 @@ class Workarea extends Component {
 		window.removeEventListener("keyup", this.listenToKeyup, false);
 	}
 	render() {
-		console.log('workarea rendering')
 		return (
 			<InputLogger
 				eventReceptorFunction={this.eventReceptorFunction}

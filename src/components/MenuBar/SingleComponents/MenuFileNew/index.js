@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import store from '../../../../store';
+import layouts from './PredefinedLayouts';
 
 import './styles.css';
 
@@ -40,6 +41,17 @@ export class DumbMenuHelper extends Component{
         this.setHeight = function(e){
             let nuData = Object.assign({},this.props.menu.helperData.menuFileNew);
             nuData.height=e.target.value;
+            store.dispatch({
+                type:'MENU_ADD_HELPER',
+                key:'menuFileNew',
+                value:nuData
+            })
+        }.bind(this);
+        this.setLayout = function(e){
+            let nuData = Object.assign({},this.props.menu.helperData.menuFileNew);
+            let wha = e.target.value.split('x');
+            nuData.width=parseInt(wha[0],10);
+            nuData.height=parseInt(wha[1],10);
             store.dispatch({
                 type:'MENU_ADD_HELPER',
                 key:'menuFileNew',
@@ -97,6 +109,16 @@ export class DumbMenuHelper extends Component{
             value:false
         })
     }
+    renderLayouts(){
+        let renderSizes = function(los){
+            return los.map((lo,j)=>{
+                return <option key={j} value={lo.width+'x'+lo.height}>{lo.name} - ({lo.width}x{lo.height}){lo.unit}</option>
+            });
+        }
+        return layouts.map((type, i)=>{
+            return <optgroup key={i} label={type.name}>{renderSizes(type.layouts)}</optgroup>
+        });
+    }
     render(){
         let selfData = this.props.menu.helperData.menuFileNew?this.props.menu.helperData.menuFileNew:this.defaultData;
         let visible = this.props.menu.helperData.menuFileNewVisible;
@@ -104,8 +126,20 @@ export class DumbMenuHelper extends Component{
             <div className={visible?'nfo visible':'nfo'}>
                 <div className="nfo__backdrop"></div>
                 <div className="nfo__layer">
-                    <div>width<input type="number" onChange={this.setWidth} value={selfData.width} />px</div>
-                    <div>height<input type="number" onChange={this.setHeight} value={selfData.height}/>px</div>
+                    <div>
+                        <label>Predefined Layout</label>
+                        <select onChange={this.setLayout}>
+                            {this.renderLayouts()}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Width</label>
+                        <input type="number" onChange={this.setWidth} value={selfData.width} />px
+                    </div>
+                    <div>
+                        <label>Height</label>
+                        <input type="number" onChange={this.setHeight} value={selfData.height}/>px
+                    </div>
                     <div><button onClick={this.cancel}>Cancel</button> <button onClick={this.createNewFile}>Go</button></div>
                 </div>
             </div>

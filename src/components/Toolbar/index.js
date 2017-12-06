@@ -11,7 +11,6 @@ class Toolbar extends Component {
     constructor(props){
         super(props);
         this.activateTool = function(theTool){
-            console.log('activating tool ' + theTool)
             store.dispatch({
 				type:'TOOLS_CURRENT',
 				val:theTool
@@ -29,7 +28,6 @@ class Toolbar extends Component {
         }.bind(this);
     }
     render(){
-        console.log('rendering tools')
         return (<div className="toolbar">{this.renderTools()}</div>);
     }
 }

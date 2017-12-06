@@ -53,8 +53,6 @@ class App extends Component {
             indentWithTabs:true,
             lineNumbers:true
         };
-        console.log('app update');
-        console.log(this.props.tree);
         return (
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
