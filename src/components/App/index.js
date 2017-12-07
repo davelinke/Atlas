@@ -20,7 +20,7 @@ class App extends Component {
             return (<Artboard key={i} tree={tree}></Artboard>);
         });
     }
-    updateTree(val){
+    updateTree(editor,data,val){
         let ob = null;
         try {
            ob =  JSON.parse(val)
@@ -61,7 +61,7 @@ class App extends Component {
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
                     <div className="sidebar">
-                        <CodeMirror value={JSON.stringify(this.props.tree, null, 2)} onChange={this.updateTree} options={codeMirrorOptions} />
+                        <CodeMirror value={JSON.stringify(this.props.tree, null, 2)} onBeforeChange={this.updateTree} options={codeMirrorOptions} />
                     </div>
                 </div>
             </div>

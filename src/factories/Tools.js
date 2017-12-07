@@ -1,17 +1,31 @@
 //import Elements from './Elements';
+import {workareaSettings as settings } from '../structures/Config';
 export default {
     selection:{
         iconClass:'fa fa-mouse-pointer',
         longpress:function(){
             //console.log('selection longpress');
         },
-        mousemove:function(){
-            //console.log('selection mousemove');
+        mousemove:function(args){
+            console.log(args);
+            let e = args.event;
+            let target = e.target;
+            let pick = args.pick.elements;
+            let pickLength = pick.length;
+            let pickEmpty = (pickLength===0);
+            let noLayers = true;
+            let downFlag = true;
+
+            if (!pickEmpty) {
+                // resize or move
+                let resizeFlag = false;
+            }
         },
         mousedown:function(args){
             let target = args.event.target;
-            let elementId = target.dataset.elementId;
+            let elementId = target.dataset.id;
             let shiftKey = args.event.shiftKey;
+
             // if what's clicked is not the artboard
             if (elementId!=='root'){
                 // let's see if it's already selected

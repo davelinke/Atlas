@@ -1,7 +1,64 @@
-div[data-element-id].selected:after{
-    content:" ";
-    position:absolute;
-    width:calc(100% - 2px);
-    height: calc(100% - 2px);
-    border:1px solid blue;
+@import "../../scss-imports/variables";
+.element{
+    &__contents{
+        @include absFull;
+        pointer-events: none;
+    }
+    &__tools{
+        //@include hidden;
+    }
+    &__tools{
+        @include absFull;
+        pointer-events: all;
+        display:grid;
+        grid-template-columns: 5px auto 5px;
+        grid-template-rows: 5px auto 5px;
+    }
+    &__tool{
+        &:hover{
+            background-color: rgba(0, 255, 0, 0.3);
+        }
+        &--top-left,
+        &--bottom-right{
+            cursor: nwse-resize;
+        }
+        &--top,
+        &--bottom{
+            cursor: ns-resize;
+        }
+        &--top-right,
+        &--bottom-left{
+            cursor: nesw-resize;
+        }
+        &--left,
+        &--right{
+            cursor:ew-resize;
+        }
+    }
+    &.selected{
+        &-multiple{
+            .element{
+                &__tool{
+                    background-color: rgba(0, 255, 0, 0.3);
+                    &:hover{
+                        background-color: none;
+                    }
+                    &--top-left,
+                    &--bottom-right,&--top,
+                    &--bottom,&--top-right,
+                    &--bottom-left,&--left,
+                    &--right{
+                        cursor:default;
+                    }
+                }
+            }
+        }
+        .element{
+            &__tools{
+                width: calc(100% - 2px);
+                height: calc(100% - 2px);
+                border:1px solid rgba(0,0,255,0.5);
+            }
+        }
+    }
 }
