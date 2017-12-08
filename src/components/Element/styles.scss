@@ -38,18 +38,12 @@
     &.selected{
         &-multiple{
             .element{
+                &__tools{
+                    grid-template-columns: 0 auto 0;
+                    grid-template-rows: 0 auto 0;
+                }
                 &__tool{
                     background-color: rgba(0, 255, 0, 0.3);
-                    &:hover{
-                        background-color: none;
-                    }
-                    &--top-left,
-                    &--bottom-right,&--top,
-                    &--bottom,&--top-right,
-                    &--bottom-left,&--left,
-                    &--right{
-                        cursor:default;
-                    }
                 }
             }
         }

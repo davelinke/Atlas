@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import store from '../../store';
+import ObjectTools from '../../factories/ObjectTools';
 
 import './styles.css';
 
@@ -13,30 +15,53 @@ class Element extends Component {
     getClassString(){
         let classes = this.props.specs.states[this.props.specs.currentState].classes;
         let classArray = ['element'].concat(classes);
-        if(this.props.pick.elements.indexOf(this.props.specs.id)>-1) {
+        if(ObjectTools.objectAvailableByKey('id',this.props.specs.id,this.props.pick.elements)) {
             classArray.push('selected');
             if(this.props.pick.elements.length>1){
                 classArray.push('selected-multiple');
             }
         }
+        if(this.props.specs.id === "root") {
+            classArray.push("element--root");
+        }
         return classArray.join(' ');
+    }
+    renderTools(){
+        if(this.props.specs.id !== "root") {
+            return (<div className="element__tools">
+                <div data-id={this.props.specs.id} data-resize='nw' data-move='0' className="element__tool element__tool--top-left"></div>
+                <div data-id={this.props.specs.id} data-resize='n' data-move='0' className="element__tool element__tool--top"></div>
+                <div data-id={this.props.specs.id} data-resize='ne' data-move='0' className="element__tool element__tool--top-right"></div>
+                <div data-id={this.props.specs.id} data-resize='w' data-move='0' className="element__tool element__tool--left"></div>
+                <div data-id={this.props.specs.id} data-resize='' data-move='1' className="element__tool element__tool--center"></div>
+                <div data-id={this.props.specs.id} data-resize='e' data-move='0' className="element__tool element__tool--right"></div>
+                <div data-id={this.props.specs.id} data-resize='sw' data-move='0' className="element__tool element__tool--bottom-left"></div>
+                <div data-id={this.props.specs.id} data-resize='s' data-move='0' className="element__tool element__tool--bottom"></div>
+                <div data-id={this.props.specs.id} data-resize='se' data-move='0' className="element__tool element__tool--bottom-right"></div>
+            </div>);
+        }
+        return null;
+    }
+    componentDidMount(){
+        if (typeof(this.refs.root)!=='undefined'){
+            let offset = function(el) {
+                var rect = el.getBoundingClientRect(),
+                scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+                scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+            }
+            store.dispatch({
+                type:'SCREEN_OFFSET',
+                val:offset(this.refs.root)
+            })
+        }
     }
     render(){
         if (this.props.specs.states){
             let specs =  this.props.specs.states[this.props.specs.currentState];
             return (
-                <div className={this.getClassString()} style={specs.style}>
-                    <div className="element__tools">
-                        <div data-id={this.props.specs.id} data-resize='nw' data-move='0' className="element__tool element__tool--top-left"></div>
-                        <div data-id={this.props.specs.id} data-resize='n' data-move='0' className="element__tool element__tool--top"></div>
-                        <div data-id={this.props.specs.id} data-resize='ne' data-move='0' className="element__tool element__tool--top-right"></div>
-                        <div data-id={this.props.specs.id} data-resize='w' data-move='0' className="element__tool element__tool--left"></div>
-                        <div data-id={this.props.specs.id} data-resize='' data-move='1' className="element__tool element__tool--center"></div>
-                        <div data-id={this.props.specs.id} data-resize='e' data-move='0' className="element__tool element__tool--right"></div>
-                        <div data-id={this.props.specs.id} data-resize='sw' data-move='0' className="element__tool element__tool--bottom-left"></div>
-                        <div data-id={this.props.specs.id} data-resize='s' data-move='0' className="element__tool element__tool--bottom"></div>
-                        <div data-id={this.props.specs.id} data-resize='se' data-move='0' className="element__tool element__tool--bottom-right"></div>
-                    </div>
+                <div className={this.getClassString()} style={{...specs.style}} ref={this.props.specs.id}>
+                    {this.renderTools()}
                     <div className="element__contents">
                         {specs.text}
                         {this.renderChildren()}

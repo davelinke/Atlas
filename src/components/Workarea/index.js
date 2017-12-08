@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import CoordFilters from '../../factories/CoordFilters';
-//import Events from '../factories/Events';
 import InputLogger from '../InputLogger/';
 import store from '../../store'
 
@@ -11,25 +10,22 @@ class Workarea extends Component {
 	constructor(props){
 		super(props);
 		this.pick = {
-			add:function(elementId){
+			add:function(elementObject){
 				store.dispatch({
 					type:'PICK_ADD',
-					val:elementId
+					val:elementObject
 				});
-				//console.log(store.getState().pick.elements);
 			},
 			remove:function(elementId){
 				store.dispatch({
 					type:'PICK_REMOVE',
 					val:elementId
 				});
-				//console.log(store.getState().pick.elements);
 			},
 			clear:function(){
 				store.dispatch({
 					type:'PICK_CLEAR'
 				});
-				//console.log(store.getState().pick.elements);
 			}
 		};
 		this.eventReceptorFunction = function(args){
@@ -40,12 +36,14 @@ class Workarea extends Component {
 			let tools = this.props.tools;
 			let toolFn = tools.set[tools.current][args.e.type];
 			if (typeof(toolFn)==='function'){
+				let currentPick = store.getState().pick;
 				toolFn({
 					pick: Object.assign(
 						{},
 						this.pick,
 						{
-							elements:store.getState().pick.elements
+							elements:currentPick.elements,
+							initialStates:currentPick.initialStates
 						}
 					),
 					event:args.e
@@ -89,7 +87,7 @@ class Workarea extends Component {
 				type: 'MOUSE_IS_DOWN',
 				val: true
 			});
-		};
+		}
 		this.mouseUpFunction = function(e,xy,xyo){
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
@@ -187,6 +185,7 @@ class Workarea extends Component {
 				mouseUpFunction={this.mouseUpFunction}
 				mouseMoveFunction={this.mouseMoveFunction}
 				registerMouseEventType={this.registerMouseEventType}
+				ref="inputLogger"
 			>{this.props.children}</InputLogger>
 		);
 	}

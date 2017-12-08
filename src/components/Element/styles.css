@@ -32,12 +32,12 @@
 .element__tool--left, .element__tool--right {
   cursor: ew-resize; }
 
+.element.selected-multiple .element__tools {
+  grid-template-columns: 0 auto 0;
+  grid-template-rows: 0 auto 0; }
+
 .element.selected-multiple .element__tool {
   background-color: rgba(0, 255, 0, 0.3); }
-  .element.selected-multiple .element__tool:hover {
-    background-color: none; }
-  .element.selected-multiple .element__tool--top-left, .element.selected-multiple .element__tool--bottom-right, .element.selected-multiple .element__tool--top, .element.selected-multiple .element__tool--bottom, .element.selected-multiple .element__tool--top-right, .element.selected-multiple .element__tool--bottom-left, .element.selected-multiple .element__tool--left, .element.selected-multiple .element__tool--right {
-    cursor: default; }
 
 .element.selected .element__tools {
   width: calc(100% - 2px);

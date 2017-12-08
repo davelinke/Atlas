@@ -97,6 +97,14 @@ const defaultState = {
 
 const treeReducer = (state = defaultState, action) => {
   switch (action.type) {
+    // case 'ELEMENT_STATE':
+    //     var nuState = Object.assign({},state);
+    //     let objectId = action.objectId;
+    //     let objectState = action.objectState;
+    case 'TREE_ELEMENTS':
+        let nuTree = Object.assign({},state.tree);
+        
+        return nuTree;
     case 'TREE_FULL':
         return Object.assign({},action.val);
     default:
