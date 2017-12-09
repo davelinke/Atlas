@@ -1,7 +1,7 @@
 .box .element--root * {
   pointer-events: none; }
 
-.mouse-down .element:not(.selected) .element__tools {
+.mouse-down .element:not(.element.selected) .element__tools {
   pointer-events: none;
   opacity: 0; }
 

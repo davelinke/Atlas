@@ -1,3 +1,4 @@
+import ElementStructures from '../structures/Element';
 const TreeFactory = {
     getElementDataById:function(where,id){
         let searchTree = function(so){
@@ -22,27 +23,17 @@ const TreeFactory = {
         return text;
     },
     generateElement:function(where,label,style){
-        let nuStyle = Object.assign({
-            position:'absolute',
-            width:0,
-            height:0,
-            backgroundColor:'#fff',
-            borderColor:'#000',
-            borderStyle:'solid',
-            borderWidth:1
-        },style);
-        return {
+        let baseStyle = Object.assign({},ElementStructures.style,style);
+        let baseState = Object.assign({},ElementStructures.state,{
+            id:this.makeId(),
+            style:baseStyle
+        });
+        let baseElement = Object.assign({},ElementStructures.element,{
             id:this.makeId(),
             label:this.newLayerName(label,where),
-            children:[],
-            currentState:0,
-            states:[{
-                label:'base',
-                classes:[],
-                text:'',
-                style:nuStyle
-            }]
-        };
+            states:[baseState]
+        });
+        return baseElement;
     },
     checkLayerName:function(name,so){
         for (var j=0;j<so.length; j++) {

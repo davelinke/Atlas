@@ -10,7 +10,7 @@
 }
 .mouse-down{
     .element{
-        &:not(.selected){
+        &:not(.element.selected){
             .element__tools{
                 pointer-events: none;
                 opacity: 0;

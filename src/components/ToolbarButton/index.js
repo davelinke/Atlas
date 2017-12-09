@@ -15,7 +15,7 @@ class ToolbarButton extends Component {
             this.props.activateTool(this.toolName);
         }.bind(this);
         this.theClass = function(){
-            return (this.props.toolName===this.props.currentTool?'toolbar-button active':'toolbar-button')
+            return 'toolbar__button'+(this.props.toolName===this.props.currentTool?' active':'')
         }.bind(this);
     }
     render(){
