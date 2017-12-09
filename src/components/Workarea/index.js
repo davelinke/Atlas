@@ -51,11 +51,15 @@ class Workarea extends Component {
 				});
 			}
 		}.bind(this);
-		this.mouseDownFunction = function(e,xy,xyo){
-			store.dispatch({
-				type: 'WORKAREA_CLASS',
-				val:'mouse-down'
-			});
+		this.mouseDownFunction = function(e,xy){
+
+			let so = store.getState().screen.offset;
+			let xyo = {
+				x:xy.x - so.left,
+				y:xy.y - so.top
+			}
+			xy = this.filterFunction(xy);
+			xyo = this.filterFunction(xyo);
 			//disable undus till we mouseup
 			store.dispatch({
 				type: 'UNDO_DEACTIVATE'
@@ -65,11 +69,20 @@ class Workarea extends Component {
 			// register mousedown coordinates
 			store.dispatch({
 				type: 'MOUSE_DOWN',
-				val: xy
+				val:{
+					down:{
+						x:xy.x,
+						y:xy.y
+					},
+					offsetDown:{
+						x:xyo.x,
+						y:xyo.y
+					}
+				}
 			});
 			store.dispatch({
-				type: 'MOUSE_OFFSET',
-				val: xyo
+				type:'WORKAREA_CLASS',
+				val:['mouse-down']
 			});
 			store.dispatch({
 				type: 'MOUSE_DRAG_DELTA',
@@ -88,10 +101,18 @@ class Workarea extends Component {
 				val: true
 			});
 		}
-		this.mouseUpFunction = function(e,xy,xyo){
+		this.mouseUpFunction = function(e,xy){
+
+			let so = store.getState().screen.offset;
+			let xyo = {
+				x:xy.x - so.left,
+				y:xy.y - so.top
+			}
+			xy = this.filterFunction(xy);
+			xyo = this.filterFunction(xyo);
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
-				val:''
+				val:[]
 			});
 
 			// enable undos
@@ -105,7 +126,7 @@ class Workarea extends Component {
 			// register the coordinates
 
 			store.dispatch({
-				type:'MOUSE_REGISTER_UP',
+				type:'MOUSE_UP',
 				val:{
 					up:{
 						x:xy.x,
@@ -126,20 +147,26 @@ class Workarea extends Component {
 		};
 		this.mouseMoveFunction = function(xy){
 			let so = this.props.screen.offset;
+			let xyo = {
+				x:xy.x - so.left,
+				y:xy.y - so.top
+			}
+			xy = this.filterFunction(xy);
+			xyo = this.filterFunction(xyo);
 			store.dispatch({
 				type:'MOUSE_POSITION',
-				val:xy
-			});
-			store.dispatch({
-				type:'MOUSE_OFFSET',
-				val:xy
-			});
-			store.dispatch({
-				type:'MOUSE_CANVAS_OFFSET',
 				val:{
-					x:xy.x - so.left,
-					y:xy.y - so.top
+					x:xy.x,
+					y:xy.y,
+					offset:{
+						x:xyo.x,
+						y:xyo.y
+					}
 				}
+			});
+			store.dispatch({
+				type:'WORKAREA_CLASS',
+				val:['mouse-down','mouse-move']
 			});
 		}.bind(this);
 		this.filterFunction = function(coords){

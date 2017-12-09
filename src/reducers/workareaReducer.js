@@ -1,7 +1,7 @@
 const defaultState = {
-    snapToGrid:false,
+    snapToGrid:true,
     gridSize:10,
-    elementClass:''
+    elementClass:[]
 };
 const workareaReducer = (state = defaultState, action) => {
   switch (action.type) {

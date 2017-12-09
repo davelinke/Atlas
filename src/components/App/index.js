@@ -58,7 +58,7 @@ class App extends Component {
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
                 <MenuBar />
-                <div className={"main "+this.props.tools.current}>
+                <div className={"main "+this.props.tools.current+' '+this.props.workarea.elementClass.join(' ')}>
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
                     <div className="sidebar">
@@ -74,7 +74,8 @@ const mapStateToProps = function(store) {
   return {
     tree:store.tree,
     library:store.library,
-    tools:store.tools
+    tools:store.tools,
+    workarea:store.workarea
   };
 };
 const SmartApp = connect(mapStateToProps)(App);

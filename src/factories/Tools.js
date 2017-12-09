@@ -180,12 +180,10 @@ export default {
             let where = state.tree.children;
             // lets get the coordinates
             let mouse = state.mouse;
-            // lets get the position of the workarea
-            let screen = state.screen;
             // calculate x and y in respect to workarea
             let offset = {
-                top:mouse.down.y-screen.offset.top,
-                left:mouse.down.x-screen.offset.left
+                top:mouse.offsetDown.y,
+                left:mouse.offsetDown.x
             }
             // lets generate the element structure with the help of the tree functions
             let newElement = treeHelpers.generateElement(where,'Box',offset);
@@ -226,13 +224,12 @@ export default {
                 width:nuTree.states[nuTree.currentState].style.width,
                 height:nuTree.states[nuTree.currentState].style.height
             }
-            // we get the screen offset values
-            let screen = state.screen;
+
             // and we calculate the coordinates of the element
             if(delta.y<=0){ // this means the delta is positive (somehow)
                 // we fix the top side and make it grow with the delta value
                 ess.height = delta.y*-1;
-                ess.top = mouse.down.y-screen.offset.top;
+                ess.top = mouse.offsetDown.y;
                 delete ess.bottom;
                 this.a.box.needsCleanup.bottom = false;
             } else {
@@ -240,7 +237,7 @@ export default {
                 // you might ask yourself why, well, if we modified top pos and height it got all wobbly on screen
                 // so it is better modify only one value and have one fixed.
                 delete ess.top;
-                ess.bottom = artboardDimensions.height - (mouse.down.y - screen.offset.top);
+                ess.bottom = artboardDimensions.height - mouse.offsetDown.y;
                 ess.height = delta.y;
                 this.a.box.needsCleanup.bottom = true;
             }
@@ -248,14 +245,14 @@ export default {
             if(delta.x<=0){ // this means the delta is positive (somehow)
                 // we fix the left side and make it grow with the delta value
                 ess.width = delta.x*-1;
-                ess.left = mouse.down.x-screen.offset.left;
+                ess.left = mouse.offsetDown.x;
                 delete ess.right
                 this.a.box.needsCleanup.right = false;
             } else {
                 // we fix the right side and make it grow with the delta value
                 // you might ask yourself why, well, if we modified left pos and width it got all wobbly on screen
                 // so it is better modify only one value and have one fixed.
-                ess.right = artboardDimensions.width - (mouse.down.x - screen.offset.left);
+                ess.right = artboardDimensions.width - mouse.offsetDown.x;
                 delete ess.left;
                 ess.width = delta.x;
                 this.a.box.needsCleanup.right = true;

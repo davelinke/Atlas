@@ -8,25 +8,19 @@ class InputLogger extends Component {
 			e.persist();
 			e.preventDefault();
 			let xy;
-            let xyo;
             let eType = e.type;
-            xy = this.props.filterFunction({
+            xy = {
 				x:e.pageX,
 				y:e.pageY
-			});
-			xyo = this.props.filterFunction({
-				x:e.nativeEvent.offsetX,
-				y:e.nativeEvent.offsetY
-			});
-
+			};
 			switch (eType) {
 				case 'mousedown':
 					this.mouseDown = true;
-					this.props.mouseDownFunction(e,xy,xyo);
+					this.props.mouseDownFunction(e,xy);
 					break;
 				case 'mouseup':
 					this.mouseDown = false;
-					this.props.mouseUpFunction(e,xy,xyo);
+					this.props.mouseUpFunction(e,xy);
 					break;
 				default:
 					console.log('woot');
@@ -42,10 +36,10 @@ class InputLogger extends Component {
 		this.logMove = function(e){
 			if (this.mouseDown){
 				//console.log(e);
-				let xy = this.props.filterFunction({
+				let xy = {
 					x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX),
 					y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY)
-				});
+				};
 	            this.props.mouseMoveFunction(xy);
 	            this.props.eventReceptorFunction({
 	                theEvent:'mousemove',
