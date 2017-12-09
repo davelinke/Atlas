@@ -10,13 +10,18 @@ import './styles.css';
 class Toolbar extends Component {
     constructor(props){
         super(props);
-        this.activateTool = function(theTool){
-            store.dispatch({
-				type:'TOOLS_CURRENT',
-				val:theTool
-			});
+        this.activateTool = (theTool)=>{
+            if (this.props.tools.current!==theTool){
+                store.dispatch({
+    				type:'TOOLS_CURRENT',
+    				val:theTool
+    			});
+                store.dispatch({
+                    type:'PICK_CLEAR'
+                });
+            }
         };
-        this.renderTools = function(){
+        this.renderTools = ()=>{
             let toolArray = [];
             let tools = this.props.tools.set;
             for (let tool in tools){
@@ -25,7 +30,7 @@ class Toolbar extends Component {
                 }
             }
             return toolArray;
-        }.bind(this);
+        };
     }
     render(){
         return (<div className="toolbar">{this.renderTools()}</div>);

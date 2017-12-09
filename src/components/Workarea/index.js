@@ -34,21 +34,23 @@ class Workarea extends Component {
 				val:args.e
 			});
 			let tools = this.props.tools;
-			let toolFn = tools.set[tools.current][args.e.type];
-			if (typeof(toolFn)==='function'){
-				let currentPick = store.getState().pick;
-				toolFn({
-					pick: Object.assign(
-						{},
-						this.pick,
-						{
-							elements:currentPick.elements,
-							initialStates:currentPick.initialStates
-						}
-					),
-					event:args.e
-					//keys:this.props.keyboard
-				});
+			if (tools.current && (tools.set[tools.current]!==undefined)){
+				let toolFn = tools.set[tools.current][args.e.type];
+				if (typeof(toolFn)==='function'){
+					let currentPick = store.getState().pick;
+					toolFn({
+						pick: Object.assign(
+							{},
+							this.pick,
+							{
+								elements:currentPick.elements,
+								initialStates:currentPick.initialStates
+							}
+						),
+						event:args.e
+						//keys:this.props.keyboard
+					});
+				}
 			}
 		}.bind(this);
 		this.mouseDownFunction = function(e,xy){

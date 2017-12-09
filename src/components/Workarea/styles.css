@@ -1,2 +1,5 @@
 .input-logger {
   flex-grow: 1; }
+
+.box .input-logger {
+  cursor: crosshair; }
