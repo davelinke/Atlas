@@ -185,7 +185,6 @@ class Workarea extends Component {
 				mouseUpFunction={this.mouseUpFunction}
 				mouseMoveFunction={this.mouseMoveFunction}
 				registerMouseEventType={this.registerMouseEventType}
-				ref="inputLogger"
 			>{this.props.children}</InputLogger>
 		);
 	}

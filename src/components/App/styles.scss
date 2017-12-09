@@ -3,6 +3,7 @@
     height:100%;
     display:flex;
     flex-direction:column;
+    background-color: #232323;
 }
 .main{
     display:flex;
@@ -10,7 +11,7 @@
 }
 .toolbar{
     width:32px;
-    background-color:$bgColorToolbars;
+    background-color: rgba(255,255,255,0.1);
 }
 .sidebar{
     width:350px;

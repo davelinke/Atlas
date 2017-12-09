@@ -3,8 +3,11 @@ html, #root, body {
   overflow: hidden;
   margin: 0; }
 
-body, button {
-  font-family: 'Roboto', sans-serif; }
+body, button, input {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always; }
 
 .sr-only {
   position: absolute;

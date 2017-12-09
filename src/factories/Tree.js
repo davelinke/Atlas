@@ -13,6 +13,58 @@ const TreeFactory = {
             return false;
         };
         return searchTree(where);
+    },
+    makeId:function(){
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        for (var i = 0; i < 5; i++) text += possible.charAt(Math.floor(Math.random() * possible.length));
+        text+= '_'+new Date().getTime();
+        return text;
+    },
+    generateElement:function(where,label,style){
+        let nuStyle = Object.assign({
+            position:'absolute',
+            width:0,
+            height:0,
+            backgroundColor:'#fff',
+            borderColor:'#000',
+            borderStyle:'solid',
+            borderWidth:1
+        },style);
+        return {
+            id:this.makeId(),
+            label:this.newLayerName(label,where),
+            children:[],
+            currentState:0,
+            states:[{
+                label:'base',
+                classes:[],
+                text:'',
+                style:nuStyle
+            }]
+        };
+    },
+    checkLayerName:function(name,so){
+        for (var j=0;j<so.length; j++) {
+            var io = so[j];
+            if (io.label===name){
+                return true;
+            } else {
+                if ((io.children.length > 0) && (this.checkLayerName(name,io.children))) return true;
+            }
+        }
+        return false;
+    },
+    newLayerName:function(pre, data){
+        var
+            i = 1,
+            finalname
+        ;
+        while (i) {
+            finalname = pre + ' ' + i;
+            if (!this.checkLayerName(finalname,data)) return finalname;
+            i++;
+        }
     }
 };
 

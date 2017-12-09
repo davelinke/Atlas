@@ -26,7 +26,8 @@ class App extends Component {
            ob =  JSON.parse(val)
         }
         catch (e) {
-           console.log('oops');
+           console.log('oops',e);
+
         }
         if (ob) {
             store.dispatch({
@@ -57,7 +58,7 @@ class App extends Component {
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
                 <MenuBar />
-                <div className="main">
+                <div className={"main "+this.props.tools.current}>
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
                     <div className="sidebar">
@@ -72,7 +73,8 @@ class App extends Component {
 const mapStateToProps = function(store) {
   return {
     tree:store.tree,
-    library:store.library
+    library:store.library,
+    tools:store.tools
   };
 };
 const SmartApp = connect(mapStateToProps)(App);

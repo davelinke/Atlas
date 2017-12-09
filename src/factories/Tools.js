@@ -6,13 +6,55 @@ export default {
         iconClass:'fa fa-mouse-pointer',
         willMove:false,
         resizeDirection:false,
-        longpress:()=>{
-            //console.log('selection longpress');
+        mousedown:(args)=>{
+            let target = args.event.target;
+            let elementId = target.dataset.id;
+            let shiftKey = args.event.shiftKey;
+            let state = store.getState();
+            let pick = args.pick.elements;
+
+            this.a.selection.willMove = target.dataset.move;
+            this.a.selection.resizeDirection = target.dataset.resize;
+
+
+            // if what's clicked is not the artboard
+            if (elementId && elementId!=='root'){
+
+                // element initial MOUSE_POSITION
+                let elementData = treeHelpers.getElementDataById(state.tree.children,elementId);
+                let elementState = elementData.currentState;
+                let stateStyle = elementData.states[elementState].style;
+
+                let pickObject = {
+                    id: elementId,
+                    top:stateStyle.top,
+                    left:stateStyle.left,
+                    width:stateStyle.width,
+                    height:stateStyle.height,
+                }
+
+
+                // let's see if it's already selected
+                let isInPick = ObjectTools.objectAvailableByKey('id',elementId,pick);
+                if (shiftKey){ // if shift is pressed
+                    if (isInPick){ // and the element is already selected
+                        args.pick.remove(elementId); // deselect it
+                    } else { // and the element is not selected
+                        args.pick.add(pickObject);// then select it too
+                    }
+                } else { // if shif is not pressed
+                    if (!isInPick){ // and the element is not selected/active
+                        args.pick.clear();
+                        args.pick.add(pickObject); //then select it
+                    }
+                }
+            } else {
+                if (!shiftKey){ //if shift is not pressed
+                    args.pick.clear(); // it is the root element, so let's clear
+                }
+            }
         },
         mousemove:(args)=>{
-            //console.log(args);
-            let e = args.event;
-            let target = e.target;
             let state = store.getState();
 
             let pick = args.pick.elements;
@@ -98,56 +140,7 @@ export default {
                 })
             }
         },
-        mousedown:(args)=>{
-            let target = args.event.target;
-            let elementId = target.dataset.id;
-            let shiftKey = args.event.shiftKey;
-            let state = store.getState();
-            let pick = args.pick.elements;
-
-            this.a.selection.willMove = target.dataset.move;
-            this.a.selection.resizeDirection = target.dataset.resize;
-
-
-            // if what's clicked is not the artboard
-            if (elementId && elementId!=='root'){
-
-                // element initial MOUSE_POSITION
-                let elementData = treeHelpers.getElementDataById(state.tree.children,elementId);
-                let elementState = elementData.currentState;
-                let stateStyle = elementData.states[elementState].style;
-
-                let pickObject = {
-                    id: elementId,
-                    top:stateStyle.top,
-                    left:stateStyle.left,
-                    width:stateStyle.width,
-                    height:stateStyle.height,
-                }
-
-
-                // let's see if it's already selected
-                let isInPick = ObjectTools.objectAvailableByKey('id',elementId,pick);
-                if (shiftKey){ // if shift is pressed
-                    if (isInPick){ // and the element is already selected
-                        args.pick.remove(elementId); // deselect it
-                    } else { // and the element is not selected
-                        args.pick.add(pickObject);// then select it too
-                    }
-                } else { // if shif is not pressed
-                    if (!isInPick){ // and the element is not selected/active
-                        args.pick.clear();
-                        args.pick.add(pickObject); //then select it
-                    }
-                }
-            } else {
-                if (!shiftKey){ //if shift is not pressed
-                    args.pick.clear(); // it is the root element, so let's clear
-                }
-            }
-        },
         mouseup:(args)=>{
-            //console.log('selection mouseup');
             // refresh pick
             let state = store.getState();
 
@@ -170,28 +163,171 @@ export default {
                     val:pick
                 })
             }
-        },
-        mousedrag:()=>{
-            //console.log('selection mousedrag');
         }
     },
     box:{
         iconClass:'fa fa-square-o',
-        longpress:function(){
-            //console.log('box longpress');
+        willMove:false,
+        activeElement:null,
+        needsCleanup:{
+            right:false,
+            bottom:false,
         },
-        mousemove:function(){
-            //console.log('box mousemove');
+        mousedown:(args)=>{
+            // lets have a look on how things are at this point
+            let state = store.getState();
+            // where are we storing the new elemwnt?
+            let where = state.tree.children;
+            // lets get the coordinates
+            let mouse = state.mouse;
+            // lets get the position of the workarea
+            let screen = state.screen;
+            // calculate x and y in respect to workarea
+            let offset = {
+                top:mouse.down.y-screen.offset.top,
+                left:mouse.down.x-screen.offset.left
+            }
+            // lets generate the element structure with the help of the tree functions
+            let newElement = treeHelpers.generateElement(where,'Box',offset);
+            // we dupe the state not to interefere with the current one
+            let newTree = Object.assign({},state.tree);
+            // we push the new element to the tree children.
+            newTree.children.push(newElement);
+            // lets save the element id for resizing while creating
+            this.a.box.activeElement = newElement.id;
+            // now we send the new tree to be re-rendered
+            store.dispatch({
+                type:'TREE_FULL',
+                val:newTree
+            });
         },
-        mousedown:function(args){
-            console.log(args);
-            //console.log('box mousedown');
+        mousemove:(args)=>{
+            // lets get the element id of what we created
+            let elementId = this.a.box.activeElement;
+            // current state of things
+            let state = store.getState();
+            // we get the crrent state of the cursor
+            let mouse = state.mouse;
+            // calculate the delta
+            let delta = {
+                x:mouse.down.x - mouse.x,
+                y:mouse.down.y - mouse.y
+            };
+            // we create a new tree to prevent mutating the current one
+            let nuTree = Object.assign({},state.tree);
+            // lets get the element data by it's id
+            let currentElement = treeHelpers.getElementDataById(nuTree.children,elementId);
+            // we get the current state of the element
+            let currentState = currentElement.currentState;
+            // we get the styles of the element
+            let ess = currentElement.states[currentState].style;
+            // lets get the arboard dimensions for if we have to calculate negative values (you'll see)
+            let artboardDimensions = {
+                width:nuTree.states[nuTree.currentState].style.width,
+                height:nuTree.states[nuTree.currentState].style.height
+            }
+            // we get the screen offset values
+            let screen = state.screen;
+            // and we calculate the coordinates of the element
+            if(delta.y<=0){ // this means the delta is positive (somehow)
+                // we fix the top side and make it grow with the delta value
+                ess.height = delta.y*-1;
+                ess.top = mouse.down.y-screen.offset.top;
+                delete ess.bottom;
+                this.a.box.needsCleanup.bottom = false;
+            } else {
+                // we fix the bottom side and make it grow with the delta value
+                // you might ask yourself why, well, if we modified top pos and height it got all wobbly on screen
+                // so it is better modify only one value and have one fixed.
+                delete ess.top;
+                ess.bottom = artboardDimensions.height - (mouse.down.y - screen.offset.top);
+                ess.height = delta.y;
+                this.a.box.needsCleanup.bottom = true;
+            }
+
+            if(delta.x<=0){ // this means the delta is positive (somehow)
+                // we fix the left side and make it grow with the delta value
+                ess.width = delta.x*-1;
+                ess.left = mouse.down.x-screen.offset.left;
+                delete ess.right
+                this.a.box.needsCleanup.right = false;
+            } else {
+                // we fix the right side and make it grow with the delta value
+                // you might ask yourself why, well, if we modified left pos and width it got all wobbly on screen
+                // so it is better modify only one value and have one fixed.
+                ess.right = artboardDimensions.width - (mouse.down.x - screen.offset.left);
+                delete ess.left;
+                ess.width = delta.x;
+                this.a.box.needsCleanup.right = true;
+            }
+            // we send our new lovely tree to the dispatcher
+            store.dispatch({
+                type:'TREE_FULL',
+                val:nuTree
+            })
+
         },
-        mouseup:function(){
-            //console.log('box mouseup');
-        },
-        mousedrag:function(){
-            console.log('box mousedrag');
+        mouseup:(args)=>{
+            let elementId = this.a.box.activeElement;
+            // current state of things
+            let state = store.getState();
+            // we create a new tree to prevent mutating the current one
+            let nuTree = Object.assign({},state.tree);
+            // lets get the element data by it's id
+            let currentElement = treeHelpers.getElementDataById(nuTree.children,elementId);
+            // we get the current state of the element
+            let currentState = currentElement.currentState;
+            // we get the styles of the element
+            let ess = currentElement.states[currentState].style;
+
+
+            //is the width and height 0?
+            // if so we erase
+            if ((ess.width===0) && (ess.height ===0)){
+                // find element index
+                let elementIndex = nuTree.children.indexOf(currentElement);
+                nuTree.children.splice(elementIndex,1);
+
+                // we send our new lovely tree to the dispatcher
+                store.dispatch({
+                    type:'TREE_FULL',
+                    val:nuTree
+                })
+
+            } else {
+                // did we create elements by fixing bottom or right?
+                // if so, lets fix that here (you know, for consistency)
+                // lets get the element id of what we created
+
+                if (this.a.box.needsCleanup.right || this.a.box.needsCleanup.bottom){
+
+                    // lets get the arboard dimensions
+                    let artboardDimensions = {
+                        width:nuTree.states[nuTree.currentState].style.width,
+                        height:nuTree.states[nuTree.currentState].style.height
+                    }
+                    // calculate the border sigma
+                    let bordersigma = 0;
+                    if (ess.borderWidth!==undefined){
+                        bordersigma = ess.borderWidth * 2;
+                    }
+                    // we clean up
+                    if (this.a.box.needsCleanup.right){
+                        ess.left = artboardDimensions.width - ess.width - ess.right - bordersigma;
+                        delete ess.right;
+                    }
+                    if (this.a.box.needsCleanup.bottom){
+                        ess.top = artboardDimensions.height - ess.height - ess.bottom - bordersigma;
+                        delete ess.bottom;
+                    }
+
+                    // we send our new lovely tree to the dispatcher
+                    store.dispatch({
+                        type:'TREE_FULL',
+                        val:nuTree
+                    })
+                }
+            }
         }
     }
 };

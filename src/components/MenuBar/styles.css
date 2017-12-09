@@ -1,5 +1,5 @@
 .top-header {
-  background-color: #fafafa;
+  background-color: rgba(255, 255, 255, 0.1);
   flex: 0 0 auto;
   font-size: 0.75rem;
   display: flex; }
@@ -20,7 +20,10 @@
     margin: 0;
     background: none;
     font-size: 0.75rem;
-    border-radius: 0; }
+    border-radius: 0;
+    color: #aaa; }
+    .menu__label:hover {
+      color: #fff; }
     .menu__label:focus {
       outline: 0; }
   .menu__backdrop {
