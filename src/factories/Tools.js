@@ -4,13 +4,15 @@ import store from '../store'
 export default {
     selection:{
         iconClass:'fa fa-mouse-pointer',
-        longpress:function(){
+        willMove:false,
+        resizeDirection:false,
+        longpress:()=>{
             //console.log('selection longpress');
         },
-        mousemove:function(args){
+        mousemove:(args)=>{
             //console.log(args);
-            //let e = args.event;
-            //let target = e.target;
+            let e = args.event;
+            let target = e.target;
             let state = store.getState();
 
             let pick = args.pick.elements;
@@ -25,11 +27,70 @@ export default {
                 };
                 let nuTree = Object.assign({},state.tree);
                 for (let pickElement of pick){
-                    // calculate new coords
                     let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
                     let currentState = currentElement.currentState;
-                    currentElement.states[currentState].style.left = pickElement.left - delta.x;
-                    currentElement.states[currentState].style.top = pickElement.top - delta.y;
+                    let ess = currentElement.states[currentState].style;
+                    if (this.a.selection.willMove==='1'){
+                        // calculate new coords
+                        ess.left = pickElement.left - delta.x;
+                        ess.top = pickElement.top - delta.y;
+                    } else {
+                        let resizeDir = this.a.selection.resizeDirection;
+                        let nextWidth,nextHeight;
+                        switch (resizeDir) {
+                            case('nw'):
+                                nextWidth = pickElement.width + delta.x;
+                                if (nextWidth>0){
+                                    ess.left = pickElement.left - delta.x;
+                                    ess.width = nextWidth;
+                                }
+                                nextHeight = pickElement.height + delta.y;
+                                if (nextHeight>0){
+                                    ess.top = pickElement.top - delta.y;
+                                    ess.height = nextHeight;
+                                }
+                                break;
+                            case('n'):
+                                nextHeight = pickElement.height + delta.y;
+                                if (nextHeight>0){
+                                    ess.top = pickElement.top - delta.y;
+                                    ess.height = nextHeight;
+                                }
+                                break;
+                            case('ne'):
+                                nextHeight = pickElement.height + delta.y;
+                                if (nextHeight>0){
+                                    ess.top = pickElement.top - delta.y;
+                                    ess.height = nextHeight;
+                                }
+                                ess.width = pickElement.width - delta.x;
+                                break;
+                            case('w'):
+                                nextWidth = pickElement.width + delta.x;
+                                if (nextWidth>0){
+                                    ess.left = pickElement.left - delta.x;
+                                    ess.width = nextWidth;
+                                }
+                                break;
+                            case('e'): //resize eastbound
+                                ess.width = pickElement.width - delta.x;
+                                break;
+                            case('sw'):
+                                ess.height = pickElement.height - delta.y;
+                                nextWidth = pickElement.width + delta.x;
+                                if (nextWidth>0){
+                                    ess.left = pickElement.left - delta.x;
+                                    ess.width = nextWidth;
+                                }
+                                break;
+                            case('s'): //resize southbound
+                                ess.height = pickElement.height - delta.y;
+                                break;
+                            default: //resize southeast
+                                ess.height = pickElement.height - delta.y;
+                                ess.width = pickElement.width - delta.x;
+                        }
+                    }
                 }
                 store.dispatch({
                     type:'TREE_FULL',
@@ -37,12 +98,15 @@ export default {
                 })
             }
         },
-        mousedown:function(args){
+        mousedown:(args)=>{
             let target = args.event.target;
             let elementId = target.dataset.id;
             let shiftKey = args.event.shiftKey;
             let state = store.getState();
             let pick = args.pick.elements;
+
+            this.a.selection.willMove = target.dataset.move;
+            this.a.selection.resizeDirection = target.dataset.resize;
 
 
             // if what's clicked is not the artboard
@@ -82,7 +146,7 @@ export default {
                 }
             }
         },
-        mouseup:function(args){
+        mouseup:(args)=>{
             //console.log('selection mouseup');
             // refresh pick
             let state = store.getState();
@@ -107,7 +171,7 @@ export default {
                 })
             }
         },
-        mousedrag:function(){
+        mousedrag:()=>{
             //console.log('selection mousedrag');
         }
     },
