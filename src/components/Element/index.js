@@ -42,8 +42,8 @@ class Element extends Component {
         }
         return null;
     }
-    componentDidMount(){
-        if (typeof(this.refs.root)!=='undefined'){
+    storeDimensions(){
+        if (this.refs.root!==undefined){
             let offset = function(el) {
                 var rect = el.getBoundingClientRect(),
                 scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
@@ -53,7 +53,19 @@ class Element extends Component {
             store.dispatch({
                 type:'SCREEN_OFFSET',
                 val:offset(this.refs.root)
-            })
+            });
+        }
+    }
+    componentDidMount(){
+        if (this.refs.root!==undefined){
+            this.storeDimensions();
+            window.addEventListener("resize",this.storeDimensions.bind(this));
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.refs.root!==undefined){
+            window.removeEventListener("resize", this.updateDimensions.bind(this));
         }
     }
     render(){

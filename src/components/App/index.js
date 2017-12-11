@@ -7,11 +7,7 @@ import Toolbar from '../Toolbar/';
 import MenuBar from '../MenuBar/';
 import store from '../../store';
 
-import {Controlled as CodeMirror} from 'react-codemirror2';
-
 import './styles.css';
-
-import "../../../node_modules/codemirror/lib/codemirror.css";
 
 class App extends Component {
     renderArtboards(){
@@ -47,7 +43,6 @@ class App extends Component {
             cssTools.initializeSheet(styleSheet,classes);
         }
     }
-
     render() {
         let codeMirrorOptions = {
             mode:'javascript',
@@ -61,9 +56,7 @@ class App extends Component {
                 <div className={"main "+this.props.tools.current+' '+this.props.workarea.elementClass.join(' ')}>
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
-                    <div className="sidebar">
-                        <CodeMirror value={JSON.stringify(this.props.tree, null, 2)} onBeforeChange={this.updateTree} options={codeMirrorOptions} />
-                    </div>
+                    <div className="sidebar"></div>
                 </div>
             </div>
         );
