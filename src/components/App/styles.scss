@@ -10,9 +10,8 @@
     flex-grow: 1;
 }
 .sidebar{
-    width:350px;
-    background-color:$bgColorToolbars;
-    border-left:2px solid $bgColorToolbars;
+    width:250px;
+    background-color: rgba(255, 255, 255, 0.1);
     .ReactCodeMirror,
     .CodeMirror,
     .react-codemirror2{

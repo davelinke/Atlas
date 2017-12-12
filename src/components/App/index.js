@@ -5,6 +5,7 @@ import Artboard from '../Artboard/';
 import cssTools from '../../factories/Css';
 import Toolbar from '../Toolbar/';
 import MenuBar from '../MenuBar/';
+import ElementsSidebar from '../ElementsSidebar/';
 import store from '../../store';
 
 import './styles.css';
@@ -44,11 +45,6 @@ class App extends Component {
         }
     }
     render() {
-        let codeMirrorOptions = {
-            mode:'javascript',
-            indentWithTabs:true,
-            lineNumbers:true
-        };
         return (
             <div className="wrap">
                 <style id="dynamicStylesheet" type="text/css"></style>
@@ -56,7 +52,9 @@ class App extends Component {
                 <div className={"main "+this.props.tools.current+' '+this.props.workarea.elementClass.join(' ')}>
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
-                    <div className="sidebar"></div>
+                    <div className="sidebar">
+                        <ElementsSidebar />
+                    </div>
                 </div>
             </div>
         );

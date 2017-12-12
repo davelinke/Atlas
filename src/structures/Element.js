@@ -14,7 +14,7 @@ export default{
                     width:240,
                     height:320,
                     backgroundColor:'#ffffff',
-                    color:'#000'
+                    color:'#000000'
                 }
             }
         ]
@@ -40,8 +40,8 @@ export default{
         position:'absolute',
         width:0,
         height:0,
-        backgroundColor:'#fff',
-        borderColor:'#000',
+        backgroundColor:'#ffffff',
+        borderColor:'#000000',
         borderStyle:'solid',
         borderWidth:1,
         boxSizing:'border-box'
