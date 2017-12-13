@@ -19,9 +19,7 @@
     }
 }
 .element{
-    &--root{
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAHdElNRQffCh8PKzLYjbDmAAAAHWlUWHRDb21tZW50AAAAAABDcmVhdGVkIHdpdGggR0lNUGQuZQcAAAA9SURBVDhPY/wPBAxEgDNnzkBZ+AETlKYaGDWQcjBqIOWA8fTp00TlFBMTEygLPxiNFMrBqIGUAyobyMAAAObqCoP0uRPJAAAAAElFTkSuQmCC);
-    }
+    &--root{}
     &__contents{
         @include absFull;
         pointer-events: none;

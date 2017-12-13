@@ -7,9 +7,10 @@ class ToolbarButton extends Component {
         super(props);
         this.toolName = this.props.toolName;
         this.tool = this.props.tool;
-        this.toolIcon = this.tool.iconClass
+        this.toolIcon = this.tool.iconClass;
+        this.iconString = this.tool.iconString;
         this.renderIcon = function(){
-            if (this.toolIcon) return <span className={this.toolIcon}></span>;
+            if (this.toolIcon) return <span className={this.toolIcon}>{this.iconString}</span>;
         };
         this.activateTool = function(){
             this.props.activateTool(this.toolName);

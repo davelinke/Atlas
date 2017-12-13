@@ -3,7 +3,8 @@ import ObjectTools from './ObjectTools';
 import store from '../store'
 export default {
     selection:{
-        iconClass:'fa fa-mouse-pointer',
+        iconClass:'custom_icons selection',
+        iconString:'',
         willMove:false,
         resizeDirection:false,
         mousedown:(args)=>{
@@ -166,7 +167,8 @@ export default {
         }
     },
     box:{
-        iconClass:'fa fa-square-o',
+        iconClass:'material-icons',
+        iconString:'crop_square',
         willMove:false,
         activeElement:null,
         needsCleanup:{

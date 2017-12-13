@@ -1,0 +1,18 @@
+.element-sidebar {
+  font-size: 0.75rem;
+  color: #aaa; }
+  .element-sidebar .material-icons {
+    font-size: 0.875rem; }
+  .element-sidebar h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+    color: #ccc; }
+  .element-sidebar label {
+    min-width: 1rem;
+    margin-right: 0.125rem;
+    font-size: 0.625rem;
+    text-align: center; }
+  .element-sidebar__group {
+    border-bottom: 1px solid #000;
+    padding: 0.5rem; }

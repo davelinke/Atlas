@@ -14,7 +14,8 @@ export default{
                     width:240,
                     height:320,
                     backgroundColor:'#ffffff',
-                    color:'#000000'
+                    color:'#000000',
+                    transform:'rotate(0deg)'
                 }
             }
         ]
@@ -44,6 +45,8 @@ export default{
         borderColor:'#000000',
         borderStyle:'solid',
         borderWidth:1,
-        boxSizing:'border-box'
+        borderRadius:0,
+        boxSizing:'border-box',
+        transform:'rotate(0deg)'
     }
 }
