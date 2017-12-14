@@ -87,7 +87,6 @@ class ElementsSidebar extends Component {
         });
     }
     rotateFunc(str = 'rotate(0deg)'){
-        console.log(str);
         return parseInt(str.split('(')[1].split('deg')[0],10);
     };
     rotateChange(e){
@@ -117,21 +116,21 @@ class ElementsSidebar extends Component {
                         </div>
                         <div className="flex-loose">
                             <div className="flex-row">
-                                <label className="flex-static">W</label>
+                                <label title="Width" className="flex-static">W</label>
                                 <InputNumeric which="width" value={this.getValue(elementValues,'width')} change={this.updateValue.bind(this)} />
                             </div>
                             <div className="flex-row">
-                                <label className="flex-static">H</label>
+                                <label title="Height" className="flex-static">H</label>
                                 <InputNumeric which="height" value={this.getValue(elementValues,'height')} change={this.updateValue.bind(this)} />
                             </div>
                         </div>
                         <div className="flex-loose">
                             <div className="flex-row">
-                                <label className="flex-static"><i className="material-icons">rotate_left</i></label>
+                                <label title="Rotation" className="flex-static"><i className="material-icons">rotate_left</i></label>
                                 <InputNumeric which="transform" disabled={pickLength<1?"disabled":""} value={this.rotateFunc(this.getValue(elementValues,'transform'))} change={this.rotateChange.bind(this)} />
                             </div>
                             <div className="flex-row">
-                                <label className="flex-static"><i className="material-icons">rounded_corner</i></label>
+                                <label title="Border Radius" className="flex-static"><i className="material-icons">rounded_corner</i></label>
                                 <InputNumeric which="borderRadius" disabled={pickLength<1?"disabled":""} value={this.getValue(elementValues,'borderRadius')} change={this.updateValue.bind(this)} />
                             </div>
                         </div>
@@ -143,11 +142,18 @@ class ElementsSidebar extends Component {
                         <div className="flex-row">
                             <div className="flex-loose">
                                 <div className="flex-row">
-                                    <label>Bg.</label>
+                                    <label title="Fill Style"><i className='material-icons'>format_color_fill</i></label>
                                     <InputColor which="backgroundColor" value={this.getValue(elementValues,'backgroundColor')} change={this.updateValue.bind(this)} />
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="element-sidebar__group">
+                        <h3>Border</h3>
+                        <div className="flex-row">
+                            <div className="flex-loose">
                                 <div className="flex-row">
-                                    <label>Bdr.</label>
+                                    <label title="Border Style"><i className='material-icons'>border_style</i></label>
                                     <InputColor disabled={pickLength<1?"disabled":""} which="borderColor" value={this.getValue(elementValues,'borderColor')} change={this.updateValue.bind(this)} />
                                 </div>
                             </div>
