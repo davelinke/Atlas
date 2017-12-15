@@ -1,5 +1,8 @@
 .input-color {
-  position: relative; }
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px; }
   .input-color.disabled {
     opacity: 0.5; }
   .input-color__backdrop {
@@ -13,14 +16,15 @@
     .input-color__backdrop.visible {
       display: block; }
   .input-color__swatch-wrap {
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%;
+    width: 100%;
+    height: 20px;
+    border-radius: 2px;
+    overflow: hidden;
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAAHdElNRQffCh8PKzLYjbDmAAAAHWlUWHRDb21tZW50AAAAAABDcmVhdGVkIHdpdGggR0lNUGQuZQcAAAA9SURBVDhPY/wPBAxEgDNnzkBZ+AETlKYaGDWQcjBqIOWA8fTp00TlFBMTEygLPxiNFMrBqIGUAyobyMAAAObqCoP0uRPJAAAAAElFTkSuQmCC); }
   .input-color__swatch {
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 50%; }
+    width: 100%;
+    height: 20px;
+    border-radius: 2px; }
   .input-color .chrome-picker {
     position: absolute;
     opacity: 0;

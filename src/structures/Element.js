@@ -15,7 +15,9 @@ export default{
                     height:320,
                     backgroundColor:'#ffffff',
                     color:'#000000',
-                    transform:'rotate(0deg)'
+                    transform:'rotate(0deg)',
+                    opacity:1,
+                    mixBlendMode:'normal'
                 }
             }
         ]
@@ -47,6 +49,8 @@ export default{
         borderWidth:1,
         borderRadius:0,
         boxSizing:'border-box',
-        transform:'rotate(0deg)'
+        transform:'rotate(0deg)',
+        opacity:1,
+        mixBlendMode:'normal'
     }
 }

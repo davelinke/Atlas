@@ -1,6 +1,21 @@
 .element-sidebar {
     font-size: 0.75rem;
     color: #aaa;
+    position:relative;
+    .element-sidebar-easy{
+        display:block;
+    }
+    .element-sidebar-geek{
+        display:none;
+    }
+    &.geek-mode{
+        .element-sidebar-easy{
+            display:none;
+        }
+        .element-sidebar-geek{
+            display:block;
+        }
+    }
     .material-icons{
         font-size: 0.875rem;
     }
@@ -9,15 +24,64 @@
         font-size: 0.75rem;
         line-height: 0.75rem;
         color: #ccc;
+        .tip{
+            font-weight: normal;
+            font-size:0.675rem;
+            color:#aaa;
+        }
     }
     label {
         min-width: 1rem;
-        margin-right: 0.125rem;
         font-size: 0.625rem;
         text-align: center;
     }
     &__group {
         border-bottom: 1px solid #000;
         padding: 0.5rem;
+    }
+}
+.geek-mode-switch{
+    background:#000;
+    width:18px;
+    height:18px;
+    border-radius:10px;
+    color:#fff;
+    border:none;
+    padding:0;
+    margin:0;
+    position:absolute;
+    top:3px;
+    right:8px;
+    font-size:12px !important;
+    cursor:pointer;
+    opacity:0.60;
+    &:focus,
+    &:hover{
+        opacity: 1;
+        outline:0;
+    }
+}
+.sidebar__grid{
+    display: grid;
+    grid-template-columns: 18px 51px 18px 51px 18px 51px;
+    grid-template-rows: 20px;
+    grid-column-gap: 5px;
+    grid-row-gap: 0.5rem;
+    justify-items:center;
+    align-items:center;
+    .span-2{
+        grid-column-start: span 2;
+    }
+    .span-3{
+        grid-column-start: span 3;
+    }
+    .span-4{
+        grid-column-start: span 4;
+    }
+    .span-5{
+        grid-column-start: span 5;
+    }
+    .span-6{
+        grid-column-start: span 6;
     }
 }
