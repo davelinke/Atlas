@@ -7,6 +7,7 @@ import InputColor from '../Inputs/InputColor/';
 import InputRange from '../Inputs/InputRange/';
 import InputSelect from '../Inputs/InputSelect/';
 import CssNavigator from '../CssNavigator/';
+import FilterComposer from '../FilterComposer/';
 import './styles.css';
 
 class ElementsSidebar extends Component {
@@ -268,6 +269,10 @@ class ElementsSidebar extends Component {
                             </InputSelect>
                             <InputNumeric disabled={pickLength<1?"disabled":""} min={0} which="borderWidth" value={this.getValue(elementValues,'borderWidth')} change={this.updateValue.bind(this)} />
                         </div>
+                    </div>
+                    <div className="element-sidebar__group">
+                        <h3>Filters</h3>
+                        <FilterComposer disabled={pickLength<1?"disabled":""} which="filter" value={this.getValue(elementValues,'filter')} change={this.updateValue.bind(this)}  />
                     </div>
                 </div>
                 <div className="element-sidebar-geek">

@@ -28,7 +28,8 @@ class Element extends Component {
     }
     renderTools(){
         if(this.props.specs.id !== "root") {
-            return (<div className="element__tools">
+            return (
+            <div className="element__tools">
                 <div data-id={this.props.specs.id} data-resize='nw' data-move='0' className="element__tool element__tool--top-left"></div>
                 <div data-id={this.props.specs.id} data-resize='n' data-move='0' className="element__tool element__tool--top"></div>
                 <div data-id={this.props.specs.id} data-resize='ne' data-move='0' className="element__tool element__tool--top-right"></div>
@@ -38,7 +39,8 @@ class Element extends Component {
                 <div data-id={this.props.specs.id} data-resize='sw' data-move='0' className="element__tool element__tool--bottom-left"></div>
                 <div data-id={this.props.specs.id} data-resize='s' data-move='0' className="element__tool element__tool--bottom"></div>
                 <div data-id={this.props.specs.id} data-resize='se' data-move='0' className="element__tool element__tool--bottom-right"></div>
-            </div>);
+            </div>
+            );
         }
         return null;
     }

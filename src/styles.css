@@ -55,6 +55,12 @@ body, button, input {
   margin: 0;
   cursor: pointer; }
 
+.text-left {
+  text-align: left !important; }
+
+.js-start {
+  justify-self: start; }
+
 input {
   text-rendering: auto;
   color: initial;
