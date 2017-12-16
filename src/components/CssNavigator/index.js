@@ -62,15 +62,21 @@ class CssNavigator extends Component {
     }
     renderProperties(){
         let output = [];
-        let props = this.props.elementValues;
+        let styles = this.props.elementValues;
         let toCss = (myStr)=>{
             return myStr.replace( /([a-z])([A-Z])/g, '$1-$2' ).toLowerCase();
         }
-        for (let prop in props){
+        // lets see first an expanded array of pros in the whole pick
+        let propObject = {};
+        for (let element of styles){
+            Object.assign(propObject,element);
+        }
+
+        for (let prop in propObject){
             output.push(
                 <div className="css-prop" key={prop}>
                     <label className="css-prop-label">{toCss(prop)}</label>
-                    <input className="css-prop-val" type="text" data-prop={prop} value={props[prop]} onChange={this.changeProp.bind(this)} />
+                    <input className="css-prop-val" type="text" data-prop={prop} value={this.props.getValue(styles,prop)} onChange={this.changeProp.bind(this)} />
                     <button className="button button-icon material-icons" data-prop={prop} onClick={this.deleteProp.bind(this)}>close</button>
                 </div>
             );

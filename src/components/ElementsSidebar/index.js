@@ -25,35 +25,60 @@ class ElementsSidebar extends Component {
         // let's get the pick
         let pick = this.props.pick.elements;
 
+
         // let's handle the pick
         if (pick.length===0){
             // nothings selected, thus we present the arboard props
             let elementData = this.props.tree;
             let elementState = elementData.currentState;
             let stateStyle = elementData.states[elementState].style;
-            return stateStyle;
+            return [stateStyle];
 
-        } else if (pick.length===1){
+        } else {
             // just one element, have fun
             // lets get that element's props
-            let pickElement = pick[0];
-            let elementId = pickElement.id;
-            let elementData = TreeHelpers.getElementDataById(this.props.tree.children,elementId);
-            let elementState = elementData.currentState;
-            let stateStyle = elementData.states[elementState].style;
-            return stateStyle;
-        } else {
-            // multiple elements! superfun!
+            let output = [];
+            for (let pickElement of pick){
+                let elementId = pickElement.id;
+                let elementData = TreeHelpers.getElementDataById(this.props.tree.children,elementId);
+                let elementState = elementData.currentState;
+                let stateStyle = elementData.states[elementState].style;
 
+                output.push(stateStyle);
+
+            }
+
+            return output;
         }
     }
     shouldComponentUpdate(){
         //return (this.props.pick.elements.length>0?true:false);
         return this.props.tools.current === 'selection';
     }
-    getValue(style,prop){
-        if (style && (style[prop]!==undefined)){
-            return style[prop];
+    getValue(styles,prop){
+        if (styles.length < 2) {
+            let style = styles[0];
+            if (style && (style[prop]!==undefined)){
+                return style[prop];
+            }
+        } else {
+            let baseStyle;
+            let style = styles[0];
+            if (style && (style[prop]!==undefined)){
+                baseStyle = style[prop];
+            }
+            // multiple elements! superfun!
+            // default behavior is that for elements that have the same values at the same properties
+            // we show the value, otherwise we show blank!
+            for (let i=1;i<styles.length;i++){
+                style = styles[i];
+                if (style && (style[prop]!==undefined) && (style[prop]===baseStyle)){
+                    // life's good,  let's move forward
+                } else {
+                    return '';
+                }
+            }
+            return baseStyle;
         }
         return '';
     }
@@ -81,19 +106,18 @@ class ElementsSidebar extends Component {
             let stateStyle = elementData.states[elementState].style;
             stateStyle[which] = zeValue;
 
-        } else if (pick.length===1){
+        } else {
             // just one element, have fun
             // lets get that element's props
-            let pickElement = pick[0];
-            let elementId = pickElement.id;
+            for (let pickElement of pick){
+                let elementId = pickElement.id;
 
-            let elementData = TreeHelpers.getElementDataById(nuTree.children,elementId);
-            let elementState = elementData.currentState;
-            let stateStyle = elementData.states[elementState].style;
-            stateStyle[which] = zeValue;
-        } else {
-            // multiple elements! superfun!
+                let elementData = TreeHelpers.getElementDataById(nuTree.children,elementId);
+                let elementState = elementData.currentState;
+                let stateStyle = elementData.states[elementState].style;
 
+                stateStyle[which] = zeValue;
+            }
         }
         store.dispatch({
             type:'TREE_FULL',
@@ -249,7 +273,7 @@ class ElementsSidebar extends Component {
                 <div className="element-sidebar-geek">
                     <div className="element-sidebar__group">
                         <h3>Advanced <span className="tip">(It&#39;s just CSS)</span></h3>
-                        <CssNavigator addProp={this.addProp.bind(this)} deleteProp={this.deleteProp.bind(this)} elementValues={elementValues} updateValue={this.updateValue.bind(this)} />
+                        <CssNavigator addProp={this.addProp.bind(this)} deleteProp={this.deleteProp.bind(this)} elementValues={elementValues} getValue={this.getValue.bind(this)} updateValue={this.updateValue.bind(this)} />
                     </div>
                 </div>
             </div>
