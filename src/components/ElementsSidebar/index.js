@@ -272,7 +272,7 @@ class ElementsSidebar extends Component {
                     </div>
                     <div className="element-sidebar__group">
                         <h3>Filters</h3>
-                        <FilterComposer disabled={pickLength<1?"disabled":""} which="filter" value={this.getValue(elementValues,'filter')} change={this.updateValue.bind(this)}  />
+                        <FilterComposer disabled={pickLength<1?"disabled":""} elements={this.props.pick.elements} which="filter" value={this.getValue(elementValues,'filter')} change={this.updateValue.bind(this)}  />
                     </div>
                 </div>
                 <div className="element-sidebar-geek">

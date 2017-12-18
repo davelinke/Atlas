@@ -19,6 +19,9 @@
     }
 }
 .element{
+    // &:hover{
+    //     filter:none !important;
+    // }
     &--root{}
     &__contents{
         @include absFull;
