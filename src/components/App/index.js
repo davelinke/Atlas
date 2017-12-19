@@ -52,9 +52,7 @@ class App extends Component {
                 <div className={"main "+this.props.tools.current+' '+this.props.workarea.elementClass.join(' ')}>
                     <Toolbar></Toolbar>
                     <Workarea>{this.renderArtboards()}</Workarea>
-                    <div className="sidebar">
-                        <ElementsSidebar />
-                    </div>
+                    <ElementsSidebar />
                 </div>
             </div>
         );

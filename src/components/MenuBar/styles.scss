@@ -14,7 +14,7 @@ $itemsPadding:0.125rem 0.5rem;
         &.menu__sub--visible{
             .menu{
                 &__label{
-                    background-color: $bgColorToolbarsActive;
+                    background-color: rgba(255,255,255,0.1);
                 }
                 &__backdrop{
                     display: block;
@@ -54,19 +54,22 @@ $itemsPadding:0.125rem 0.5rem;
         position: absolute;
         opacity:0;
         pointer-events: none;
-        background-color:$bgColorWorkspace;
+        background-color:#232323;
         box-shadow: $shadowRegular;
         z-index:10;
         &-item{
             display:block;
-            background: none;
+            background-color:rgba(255,255,255,0.2);
             border:0;
             text-align: left;
             font-size: 0.75rem;
             min-width: 12rem;
             padding:$itemsPadding;
+            &:hover,
             &:focus{
                 outline: 0;
+                background-color: rgba(0,0,0,0.05);
+                color:#eee;
             }
         }
     }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import store from '../../../../store';
 import layouts from './PredefinedLayouts';
+import structures from '../../../../structures/Element';
 
 import './styles.css';
 
@@ -60,28 +61,12 @@ export class DumbMenuHelper extends Component{
         }.bind(this);
         this.createNewFile = function(){
             let size = this.props.menu.helperData.menuFileNew;
+            let nuTree = Object.assign({},structures.artboard);
+            nuTree.states[0].style.width = size.width;
+            nuTree.states[0].style.height = size.height;
             store.dispatch({
                 type:'TREE_FULL',
-                val:{
-                    id:"root",
-                    label:"Artboard 1",
-                    children:[],
-                    currentState:0,
-                    states:[
-                        {
-                    		label:"base",
-                            classes:[],
-                            text:"hello",
-                            style:{
-                            	position:"relative",
-                                width:size.width,
-                                height:size.height,
-                                backgroundColor:"#fff",
-                                color:"#000"
-                            }
-                    	}
-                    ]
-                }
+                val:nuTree
             });
             store.dispatch({
                 type:'MENU_ADD_HELPER',
