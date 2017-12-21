@@ -9,9 +9,10 @@ class InputLogger extends Component {
 			e.preventDefault();
 			let xy;
             let eType = e.type;
+			let il = this.refs.inputLogger;
             xy = {
-				x:e.pageX,
-				y:e.pageY
+				x:e.pageX + il.scrollLeft,
+				y:e.pageY + il.scrollTop
 			};
 			switch (eType) {
 				case 'mousedown':
@@ -36,9 +37,10 @@ class InputLogger extends Component {
 		this.logMove = function(e){
 			if (this.mouseDown){
 				//console.log(e);
+				let il = this.refs.inputLogger;
 				let xy = {
-					x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX),
-					y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY)
+					x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX) + il.scrollLeft,
+					y:(e.type==='touchmove'?e.originalEvent.touches[0].pageY:e.pageY) + il.scrollTop
 				};
 	            this.props.mouseMoveFunction(xy);
 	            this.props.eventReceptorFunction({
@@ -50,7 +52,7 @@ class InputLogger extends Component {
 	}
 	render() {
 		return (
-			<div
+			<div ref="inputLogger"
     			className="input-logger"
     			onMouseDown={this.logEvent}
     			onMouseUp={this.logEvent}

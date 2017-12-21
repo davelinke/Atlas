@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {merge} from 'lodash';
 import InputNumeric from '../Inputs/InputNumeric/';
 import ShadowHandler from '../ShadowHandler/';
 
@@ -8,7 +9,7 @@ class FilterComposer extends Component {
     toggle(e,props){
         console.log(props);
         let what = e.target.dataset.what;
-        let nuState = Object.assign({},props);
+        let nuState = merge({},props);
         nuState[what].on = !nuState[what].on
         this.zap(nuState);
     }
@@ -34,7 +35,7 @@ class FilterComposer extends Component {
     }
     updateFilter(e,props){
         let value = e.target.value;
-        let nuState = Object.assign({},props);
+        let nuState = merge({},props);
         let which = e.target.dataset.which;
         nuState[which].value = value;
         this.zap(nuState);

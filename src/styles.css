@@ -21,17 +21,6 @@ button {
   button:hover, button:focus {
     outline: none; }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 0;
-  background-color: rgba(0, 0, 0, 0.2); }
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2); }
-
-::-webkit-scrollbar-track {
-  background-color: transparent; }
-
 .flex-row {
   display: flex;
   margin: 0.5rem 0; }

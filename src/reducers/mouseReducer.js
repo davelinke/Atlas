@@ -1,3 +1,4 @@
+import {merge} from 'lodash';
 const defaultState = {
     x:0,
     y:0,
@@ -17,24 +18,24 @@ const mouseReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
     case 'MOUSE_POSITION':
-        return Object.assign({},state,action.val);
+        return merge({},state,action.val);
     case 'MOUSE_DOWN':
-        return Object.assign({},state,action.val);
+        return merge({},state,action.val);
     case 'MOUSE_UP':
-        return Object.assign({},state,action.val);
+        return merge({},state,action.val);
     case 'MOUSE_DRAG_DELTA':
-        return Object.assign({}, state, {
+        return merge({}, state, {
             dragDelta:{
                 x:action.val.x,
                 y:action.val.y
             }
         });
     case 'MOUSE_DOWN_EVENT':
-        return Object.assign({}, state, {mouseDownEvent:action.val});
+        return merge({}, state, {mouseDownEvent:action.val});
     case 'MOUSE_IS_DOWN':
-        return Object.assign({}, state, {isDown:action.val});
+        return merge({}, state, {isDown:action.val});
     case 'MOUSE_EVENT':
-        return Object.assign({},state,{mouseEvent:action.val});
+        return merge({},state,{mouseEvent:action.val});
     default:
         return state;
   }

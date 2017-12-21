@@ -1,3 +1,4 @@
+import {merge} from 'lodash';
 const defaultState = {
     'menus':{
         'file':{
@@ -33,14 +34,14 @@ const menuReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
     case 'MENU_ADD_HELPER':
-        let mahState = Object.assign({},state);
+        let mahState = merge({},state);
         mahState.helperData[action.key]=action.value;
         return mahState;
     case 'MENU_ADD_ITEM':
-        let maiState = Object.assign({},state);
+        let maiState = merge({},state);
         return maiState;
     case 'MENU_TOGGLE_SUB':
-        let nuState = Object.assign({},state);
+        let nuState = merge({},state);
         // iterate through menu objects to see if there's any thats open
         for (const sub in nuState.menus) {
             if (sub!==action.value && nuState.menus[sub].visible===true){

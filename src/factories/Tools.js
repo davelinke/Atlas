@@ -1,4 +1,5 @@
 import treeHelpers from './Tree';
+import {merge} from 'lodash';
 import ObjectTools from './ObjectTools';
 import store from '../store'
 export default {
@@ -68,7 +69,7 @@ export default {
                     x:mouse.down.x - mouse.x,
                     y:mouse.down.y - mouse.y
                 };
-                let nuTree = Object.assign({},state.tree);
+                let nuTree = merge({},state.tree);
                 for (let pickElement of pick){
                     let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
                     let currentState = currentElement.currentState;
@@ -190,7 +191,7 @@ export default {
             // lets generate the element structure with the help of the tree functions
             let newElement = treeHelpers.generateElement(where,'Box',offset);
             // we dupe the state not to interefere with the current one
-            let newTree = Object.assign({},state.tree);
+            let newTree = merge({},state.tree);
             // we push the new element to the tree children.
             newTree.children.push(newElement);
             // lets save the element id for resizing while creating
@@ -214,7 +215,7 @@ export default {
                 y:mouse.down.y - mouse.y
             };
             // we create a new tree to prevent mutating the current one
-            let nuTree = Object.assign({},state.tree);
+            let nuTree = merge({},state.tree);
             // lets get the element data by it's id
             let currentElement = treeHelpers.getElementDataById(nuTree.children,elementId);
             // we get the current state of the element
@@ -271,7 +272,7 @@ export default {
             // current state of things
             let state = store.getState();
             // we create a new tree to prevent mutating the current one
-            let nuTree = Object.assign({},state.tree);
+            let nuTree = merge({},state.tree);
             // lets get the element data by it's id
             let currentElement = treeHelpers.getElementDataById(nuTree.children,elementId);
             // we get the current state of the element

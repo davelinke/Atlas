@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {merge} from 'lodash';
 
 import './styles.css';
 
@@ -69,7 +70,7 @@ class CssNavigator extends Component {
         // lets see first an expanded array of pros in the whole pick
         let propObject = {};
         for (let element of styles){
-            Object.assign(propObject,element);
+            merge(propObject,element);
         }
 
         for (let prop in propObject){

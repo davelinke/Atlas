@@ -70,7 +70,11 @@ class Element extends Component {
             window.removeEventListener("resize", this.updateDimensions.bind(this));
         }
     }
+    conponentWillUpdate(){
+        console.log(this.props.specs.id);
+    }
     render(){
+
         if (this.props.specs.states){
             let specs =  this.props.specs.states[this.props.specs.currentState];
             return (

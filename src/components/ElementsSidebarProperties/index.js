@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import {merge} from 'lodash';
 import TreeHelpers from '../../factories/Tree';
 import store from '../../store';
 import InputNumeric from '../Inputs/InputNumeric/';
@@ -88,7 +89,7 @@ class ElementsSidebarProperties extends Component {
             }
         };
         let pick = this.props.pick.elements;
-        let nuTree = Object.assign({},this.props.tree);
+        let nuTree = merge({},this.props.tree);
         let zeInput = e.target;
         let which = zeInput.dataset.which;
         let zeValue = (altValue?altValue:dataType(zeInput.value,zeInput.dataset.type));
@@ -121,7 +122,7 @@ class ElementsSidebarProperties extends Component {
     }
     deleteProp(e){
         let pick = this.props.pick.elements;
-        let nuTree = Object.assign({},this.props.tree);
+        let nuTree = merge({},this.props.tree);
         let zeInput = e.target;
         let which = zeInput.dataset.which;
 
@@ -143,7 +144,7 @@ class ElementsSidebarProperties extends Component {
     }
     addProp(args){
         let pick = this.props.pick.elements;
-        let nuTree = Object.assign({},this.props.tree);
+        let nuTree = merge({},this.props.tree);
         let elementData;
 
         if (pick.length>0){

@@ -1,4 +1,5 @@
 import ObjectTools from '../factories/ObjectTools';
+import {merge} from 'lodash';
 
 const defaultState = {
     elements:[]
@@ -7,9 +8,9 @@ const pickReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
     case 'PICK_FULL':
-        return Object.assign({}, state, {elements:action.val})
+        return merge({}, state, {elements:action.val})
     case 'PICK_ADD':
-        return Object.assign({}, state, {
+        return merge({}, state, {
           elements: [].concat(state.elements,action.val)
         });
     case 'PICK_REMOVE':
@@ -17,11 +18,11 @@ const pickReducer = (state = defaultState, action) => {
         let removalPosition = ObjectTools.getElementPosition('id',action.val,elements);
         elements.splice(removalPosition,1);
 
-        return Object.assign({}, state, {
+        return merge({}, state, {
           elements: elements
         });
     case 'PICK_CLEAR':
-        return Object.assign({}, state, {
+        return merge({}, state, {
           elements: []
         });
     default:

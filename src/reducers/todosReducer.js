@@ -1,3 +1,4 @@
+import {merge} from 'lodash';
 // create the default state of the model
 const defaultState = {
   todos: [{
@@ -31,11 +32,11 @@ const todosReducer = (state = defaultState, action) => {
     case 'TOGGLE_TODO':
       let nooDoos = state.todos.slice(0);
       nooDoos[action.index].done = !state.todos[action.index].done;
-      return Object.assign({}, state, {
+      return merge({}, state, {
         todos: nooDoos
       });
     case 'NU_LABEL':
-      return Object.assign({}, state, {
+      return merge({}, state, {
         newTodoLabel:action.label
       });
     default:

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import {merge} from 'lodash';
 import store from '../../../../store';
 import layouts from './PredefinedLayouts';
 import structures from '../../../../structures/Element';
@@ -31,7 +32,7 @@ export class DumbMenuHelper extends Component{
             height:360
         };
         this.setWidth = function(e){
-            let nuData = Object.assign({},this.props.menu.helperData.menuFileNew);
+            let nuData = merge({},this.props.menu.helperData.menuFileNew);
             nuData.width=e.target.value;
             store.dispatch({
                 type:'MENU_ADD_HELPER',
@@ -40,7 +41,7 @@ export class DumbMenuHelper extends Component{
             })
         }.bind(this);
         this.setHeight = function(e){
-            let nuData = Object.assign({},this.props.menu.helperData.menuFileNew);
+            let nuData = merge({},this.props.menu.helperData.menuFileNew);
             nuData.height=e.target.value;
             store.dispatch({
                 type:'MENU_ADD_HELPER',
@@ -49,7 +50,7 @@ export class DumbMenuHelper extends Component{
             })
         }.bind(this);
         this.setLayout = function(e){
-            let nuData = Object.assign({},this.props.menu.helperData.menuFileNew);
+            let nuData = merge({},this.props.menu.helperData.menuFileNew);
             let wha = e.target.value.split('x');
             nuData.width=parseInt(wha[0],10);
             nuData.height=parseInt(wha[1],10);
@@ -61,7 +62,7 @@ export class DumbMenuHelper extends Component{
         }.bind(this);
         this.createNewFile = function(){
             let size = this.props.menu.helperData.menuFileNew;
-            let nuTree = Object.assign({},structures.artboard);
+            let nuTree = merge({},structures.artboard);
             nuTree.states[0].style.width = size.width;
             nuTree.states[0].style.height = size.height;
             store.dispatch({

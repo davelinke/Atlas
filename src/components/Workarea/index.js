@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import {merge} from 'lodash';
 import CoordFilters from '../../factories/CoordFilters';
 import InputLogger from '../InputLogger/';
 import store from '../../store'
@@ -39,7 +40,7 @@ class Workarea extends Component {
 				if (typeof(toolFn)==='function'){
 					let currentPick = store.getState().pick;
 					toolFn({
-						pick: Object.assign(
+						pick: merge(
 							{},
 							this.pick,
 							{
