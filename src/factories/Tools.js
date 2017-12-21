@@ -34,8 +34,6 @@ export default {
                     width:stateStyle.width,
                     height:stateStyle.height,
                 }
-
-
                 // let's see if it's already selected
                 let isInPick = ObjectTools.objectAvailableByKey('id',elementId,pick);
                 if (shiftKey){ // if shift is pressed
@@ -58,7 +56,7 @@ export default {
         },
         mousemove:(args)=>{
             let state = store.getState();
-
+            let screen = state.screen;
             let pick = args.pick.elements;
             let pickLength = pick.length;
             let pickEmpty = (pickLength===0);
@@ -66,8 +64,8 @@ export default {
                 // calculate the delta
                 let mouse = state.mouse;
                 let delta = {
-                    x:mouse.down.x - mouse.x,
-                    y:mouse.down.y - mouse.y
+                    x:(mouse.down.x - mouse.x)/screen.zoom,
+                    y:(mouse.down.y - mouse.y)/screen.zoom
                 };
                 let nuTree = merge({},state.tree);
                 for (let pickElement of pick){
@@ -209,10 +207,11 @@ export default {
             let state = store.getState();
             // we get the crrent state of the cursor
             let mouse = state.mouse;
+            let screen = state.screen;
             // calculate the delta
             let delta = {
-                x:mouse.down.x - mouse.x,
-                y:mouse.down.y - mouse.y
+                x:(mouse.down.x - mouse.x)/screen.zoom,
+                y:(mouse.down.y - mouse.y)/screen.zoom
             };
             // we create a new tree to prevent mutating the current one
             let nuTree = merge({},state.tree);

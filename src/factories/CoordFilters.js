@@ -1,12 +1,12 @@
 import FilterTools from './FilterTools';
-export default (coords, wc=true, workarea, mouse, keyboard) => {
+export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
     let finalCoords = coords;
 
     //filter all you want
     if (workarea.snapToGrid){
 		finalCoords = {
-			x:FilterTools.roundToMultiple(coords.x, workarea.gridSize),
-			y:FilterTools.roundToMultiple(coords.y, workarea.gridSize)
+			x:FilterTools.roundToMultiple(coords.x, (workarea.gridSize*screen.zoom)),
+			y:FilterTools.roundToMultiple(coords.y, (workarea.gridSize*screen.zoom))
 		};
     }
     if(keyboard.shift && wc){

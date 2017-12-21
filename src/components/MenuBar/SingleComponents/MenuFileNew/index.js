@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {merge} from 'lodash';
+import { merge } from 'lodash';
+import { Artboard } from '../../../../structures/Element';
 import store from '../../../../store';
 import layouts from './PredefinedLayouts';
-import structures from '../../../../structures/Element';
 
 import './styles.css';
 
@@ -62,7 +62,7 @@ export class DumbMenuHelper extends Component{
         }.bind(this);
         this.createNewFile = function(){
             let size = this.props.menu.helperData.menuFileNew;
-            let nuTree = merge({},structures.artboard);
+            let nuTree = merge({},Artboard);
             nuTree.states[0].style.width = size.width;
             nuTree.states[0].style.height = size.height;
             store.dispatch({

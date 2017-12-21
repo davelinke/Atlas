@@ -1,7 +1,7 @@
-import ElementStructures from '../structures/Element';
-import {merge} from 'lodash';
+import { Artboard } from '../structures/Element';
+import { merge } from 'lodash';
 // create the default state of the model
-const defaultState = merge({},ElementStructures.artboard);
+const defaultState = merge({},Artboard);
 
 const treeReducer = (state = defaultState, action) => {
   switch (action.type) {

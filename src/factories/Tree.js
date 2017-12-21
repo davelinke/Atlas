@@ -1,5 +1,5 @@
-import ElementStructures from '../structures/Element';
-import {merge} from 'lodash';
+import { Style, State, Element } from '../structures/Element';
+import { merge } from 'lodash';
 const TreeFactory = {
     getElementDataById:function(where,id){
         let searchTree = function(so){
@@ -24,12 +24,12 @@ const TreeFactory = {
         return text;
     },
     generateElement:function(where,label,style){
-        let baseStyle = merge({},ElementStructures.style,style);
-        let baseState = merge({},ElementStructures.state,{
+        let baseStyle = merge({},Style,style);
+        let baseState = merge({},State,{
             id:this.makeId(),
             style:baseStyle
         });
-        let baseElement = merge({},ElementStructures.element,{
+        let baseElement = merge({},Element,{
             id:this.makeId(),
             label:this.newLayerName(label,where),
             states:[baseState]

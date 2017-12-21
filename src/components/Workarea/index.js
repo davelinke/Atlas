@@ -55,11 +55,11 @@ class Workarea extends Component {
 			}
 		}.bind(this);
 		this.mouseDownFunction = function(e,xy){
-
-			let so = store.getState().screen.offset;
+			let screen = store.getState().screen;
+			let so = screen.offset;
 			let xyo = {
-				x:xy.x - so.left,
-				y:xy.y - so.top
+				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
+				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
 			xy = this.filterFunction(xy);
 			xyo = this.filterFunction(xyo);
@@ -105,11 +105,11 @@ class Workarea extends Component {
 			});
 		}
 		this.mouseUpFunction = function(e,xy){
-
-			let so = store.getState().screen.offset;
+			let screen = store.getState().screen;
+			let so = screen.offset;
 			let xyo = {
-				x:xy.x - so.left,
-				y:xy.y - so.top
+				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
+				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
 			xy = this.filterFunction(xy);
 			xyo = this.filterFunction(xyo);
@@ -149,10 +149,11 @@ class Workarea extends Component {
 			});
 		};
 		this.mouseMoveFunction = function(xy){
-			let so = this.props.screen.offset;
+			let screen = this.props.screen;
+			let so = screen.offset;
 			let xyo = {
-				x:xy.x - so.left,
-				y:xy.y - so.top
+				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
+				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
 			xy = this.filterFunction(xy);
 			xyo = this.filterFunction(xyo);
@@ -173,7 +174,7 @@ class Workarea extends Component {
 			});
 		}.bind(this);
 		this.filterFunction = function(coords){
-			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard);
+			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard,this.props.screen);
 		}.bind(this);
 		// listen to keyboard
 		this.listenToKeydown = function(event){
@@ -209,6 +210,7 @@ class Workarea extends Component {
 	render() {
 		return (
 			<InputLogger
+				zoom={this.props.screen.zoom}
 				eventReceptorFunction={this.eventReceptorFunction}
 				filterFunction={this.filterFunction}
 				mouseDownFunction={this.mouseDownFunction}

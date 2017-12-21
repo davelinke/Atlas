@@ -22,9 +22,7 @@ const pickReducer = (state = defaultState, action) => {
           elements: elements
         });
     case 'PICK_CLEAR':
-        return merge({}, state, {
-          elements: []
-        });
+        return merge({}, defaultState);
     default:
         return state;
   }

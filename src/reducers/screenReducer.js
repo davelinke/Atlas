@@ -3,7 +3,8 @@ const defaultState = {
     offset:{
 		left:0,
 		top:0
-	}
+	},
+    zoom:1
 }
 const screenReducer = (state = defaultState, action) => {
   switch (action.type) {
