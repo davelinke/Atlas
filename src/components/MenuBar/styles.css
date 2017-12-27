@@ -42,14 +42,18 @@
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.5);
     z-index: 10; }
     .menu__dropdown-item {
-      display: block;
+      display: flex;
       background-color: rgba(255, 255, 255, 0.2);
       border: 0;
       text-align: left;
       font-size: 0.75rem;
       min-width: 12rem;
-      padding: 0.125rem 0.5rem; }
+      padding: 0.125rem 0.5rem;
+      align-items: center; }
       .menu__dropdown-item:hover, .menu__dropdown-item:focus {
         outline: 0;
         background-color: rgba(0, 0, 0, 0.05);
         color: #eee; }
+  .menu .material-icons {
+    font-size: 14px;
+    color: #fff; }

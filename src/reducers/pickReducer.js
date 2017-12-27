@@ -10,17 +10,15 @@ const pickReducer = (state = defaultState, action) => {
     case 'PICK_FULL':
         return merge({}, state, {elements:action.val})
     case 'PICK_ADD':
-        return merge({}, state, {
-          elements: [].concat(state.elements,action.val)
-        });
+        let nspa = merge({}, state);
+        nspa.elements.push(action.val);
+        return nspa;
     case 'PICK_REMOVE':
-        let elements = [].concat(state.elements);
-        let removalPosition = ObjectTools.getElementPosition('id',action.val,elements);
-        elements.splice(removalPosition,1);
+        let nuState = merge({}, state);
+        let removalPosition = ObjectTools.getElementPosition('id',action.val,nuState.elements);
+        nuState.elements.splice(removalPosition,1);
 
-        return merge({}, state, {
-          elements: elements
-        });
+        return nuState;
     case 'PICK_CLEAR':
         return merge({}, defaultState);
     default:

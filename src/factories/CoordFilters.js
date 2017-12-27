@@ -9,6 +9,7 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
 			y:FilterTools.roundToMultiple(coords.y, (workarea.gridSize*screen.zoom))
 		};
     }
+    let fc = Object.assign({},finalCoords);
     if(keyboard.shift && wc){
         let dd = {
 			x:finalCoords.x - mouse.down.x,
@@ -18,8 +19,10 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
 		angle = Math.floor(angle < 0 ? 360 + angle : angle);
 		let quadrant = Math.floor((angle-15)/45);
 		let lower;
+        console.log(quadrant);
 		switch(quadrant){
-			case 0: //(45deg)
+            /*
+			case 0: //(45deg) NE
 				lower = dd.x<Math.abs(dd.y)?dd.x:Math.abs(dd.y);
 				finalCoords = {
 					x:mouse.down.x + lower,
@@ -47,18 +50,20 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
 					y:mouse.down.y + lower
 				};
 				break;
-			case 1: //(90)
-			case 5: //270px
+            */
+			case (1||5): //270px
 				finalCoords = {
 					x: mouse.down.x,
 					y:finalCoords.y
 				};
 				break;
-			default: //(-1 and 7 and 3)
+			case(-1||7||3): //(-1 and 7 and 3)
 				finalCoords = {
 					x: finalCoords.x,
 					y: mouse.down.y
 				};
+                break;
+            default:;
 		}
 	}
     return finalCoords;

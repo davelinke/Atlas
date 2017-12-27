@@ -18,7 +18,6 @@ export default {
             this.a.selection.willMove = target.dataset.move;
             this.a.selection.resizeDirection = target.dataset.resize;
 
-
             // if what's clicked is not the artboard
             if (elementId && elementId!=='root'){
 
@@ -128,9 +127,11 @@ export default {
                             case('s'): //resize southbound
                                 ess.height = pickElement.height - delta.y;
                                 break;
-                            default: //resize southeast
+                            case('se'): //resize southeast
                                 ess.height = pickElement.height - delta.y;
                                 ess.width = pickElement.width - delta.x;
+                                break;
+                            default:;
                         }
                     }
                 }

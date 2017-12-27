@@ -19,7 +19,12 @@ const defaultState = {
             'visible':false
         },
         'workspace':{
-            'visible':false
+            'visible':false,
+            'items':{
+                'snapToGrid':{
+                    tag:'WorkspaceSnapToGrid'
+                }
+            }
         },
         'window':{
             'visible':false

@@ -2,7 +2,8 @@ import {merge} from 'lodash';
 const defaultState = {
     snapToGrid:true,
     gridSize:10,
-    elementClass:[]
+    elementClass:[],
+    rootElement:null
 };
 const workareaReducer = (state = defaultState, action) => {
   switch (action.type) {

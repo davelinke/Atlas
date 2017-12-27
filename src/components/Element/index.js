@@ -17,12 +17,12 @@ class Element extends Component {
         let classArray = ['element'].concat(classes);
         if(ObjectTools.objectAvailableByKey('id',this.props.specs.id,this.props.pick.elements)) {
             classArray.push('selected');
-            if(this.props.pick.elements.length>1){
-                classArray.push('selected-multiple');
-            }
         }
         if(this.props.specs.id === "root") {
             classArray.push("element--root");
+            if(this.props.pick.elements.length>1){
+                classArray.push('selected-multiple');
+            }
         }
         return classArray.join(' ');
     }

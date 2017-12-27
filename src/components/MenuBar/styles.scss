@@ -58,13 +58,14 @@ $itemsPadding:0.125rem 0.5rem;
         box-shadow: $shadowRegular;
         z-index:10;
         &-item{
-            display:block;
+            display:flex;
             background-color:rgba(255,255,255,0.2);
             border:0;
             text-align: left;
             font-size: 0.75rem;
             min-width: 12rem;
             padding:$itemsPadding;
+            align-items: center;
             &:hover,
             &:focus{
                 outline: 0;
@@ -72,5 +73,9 @@ $itemsPadding:0.125rem 0.5rem;
                 color:#eee;
             }
         }
+    }
+    .material-icons{
+        font-size: 14px;
+        color:#fff;
     }
 }

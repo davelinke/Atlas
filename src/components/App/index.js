@@ -5,6 +5,7 @@ import Artboard from '../Artboard/';
 import cssTools from '../../factories/Css';
 import Toolbar from '../Toolbar/';
 import MenuBar from '../MenuBar/';
+import LeftBar from '../LeftBar/';
 import ElementsSidebar from '../ElementsSidebar/';
 import store from '../../store';
 
@@ -51,6 +52,7 @@ class App extends Component {
                 <MenuBar />
                 <div className={"main "+this.props.tools.current+' '+this.props.workarea.elementClass.join(' ')}>
                     <Toolbar></Toolbar>
+                    <LeftBar />
                     <Workarea>{this.renderArtboards()}</Workarea>
                     <ElementsSidebar />
                 </div>

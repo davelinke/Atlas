@@ -26,12 +26,12 @@
     height: 20px;
     border-radius: 2px; }
   .input-color .chrome-picker {
-    position: absolute;
+    position: fixed;
     opacity: 0;
     pointer-events: none;
     z-index: 2;
-    right: 1.75rem;
-    top: 0rem; }
+    margin-left: -230px;
+    margin-top: -21px; }
     .input-color .chrome-picker.visible {
       opacity: 1;
       pointer-events: all; }

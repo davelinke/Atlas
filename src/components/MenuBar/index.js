@@ -37,7 +37,9 @@ class MenuBar extends Component {
             let items = sub[1].items;
             for (const item in items) {
                 let Component = require('./SingleComponents/'+items[item].tag+'/').MenuHelper;
-                output.push(<Component key={items[item].tag} />);
+                if (Component!==undefined){
+                    output.push(<Component key={items[item].tag} />);
+                }
             }
             return output;
         });

@@ -156,7 +156,7 @@ class Workarea extends Component {
 				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
 			xy = this.filterFunction(xy);
-			xyo = this.filterFunction(xyo);
+			//xyo = this.filterFunction(xyo);
 			store.dispatch({
 				type:'MOUSE_POSITION',
 				val:{

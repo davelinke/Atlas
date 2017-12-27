@@ -32,12 +32,12 @@
     }
 
     .chrome-picker {
-        position: absolute;
+        position: fixed;
         opacity: 0;
         pointer-events: none;
-        z-index:2;
-        right: 1.75rem;
-        top: 0rem;
+        z-index: 2;
+        margin-left: -230px;
+        margin-top: -21px;
 
         &.visible{
             opacity: 1;

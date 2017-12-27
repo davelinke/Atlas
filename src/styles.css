@@ -70,6 +70,9 @@ button {
 .js-start {
   justify-self: start; }
 
+.invisible {
+  opacity: 0; }
+
 input {
   text-rendering: auto;
   color: initial;
