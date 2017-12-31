@@ -62,6 +62,7 @@ export default {
             if (!pickEmpty) {
                 // calculate the delta
                 let mouse = state.mouse;
+                //console.log(mouse.down);
                 let delta = {
                     x:(mouse.down.x - mouse.x)/screen.zoom,
                     y:(mouse.down.y - mouse.y)/screen.zoom

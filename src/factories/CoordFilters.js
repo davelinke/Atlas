@@ -1,7 +1,6 @@
 import FilterTools from './FilterTools';
-export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
+export default (coords, wc=true, workarea, mouse, keyboard, screen, event=false) => {
     let finalCoords = coords;
-
     //filter all you want
     if (workarea.snapToGrid){
 		finalCoords = {
@@ -9,19 +8,18 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
 			y:FilterTools.roundToMultiple(coords.y, (workarea.gridSize*screen.zoom))
 		};
     }
-    let fc = Object.assign({},finalCoords);
-    if(keyboard.shift && wc){
+
+    if(keyboard.shift && wc && event.type==='mousemove'){
         let dd = {
-			x:finalCoords.x - mouse.down.x,
-			y:finalCoords.y - mouse.down.y
-		};
+            x:finalCoords.x - mouse.down.x,
+            y:finalCoords.y - mouse.down.y
+        };
 		let angle = -1 * Math.atan2(dd.y, dd.x) * 180 / Math.PI;
 		angle = Math.floor(angle < 0 ? 360 + angle : angle);
 		let quadrant = Math.floor((angle-15)/45);
 		let lower;
-        console.log(quadrant);
 		switch(quadrant){
-            /*
+
 			case 0: //(45deg) NE
 				lower = dd.x<Math.abs(dd.y)?dd.x:Math.abs(dd.y);
 				finalCoords = {
@@ -50,14 +48,16 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen) => {
 					y:mouse.down.y + lower
 				};
 				break;
-            */
-			case (1||5): //270px
+			case 1: //270px
+            case 5:
 				finalCoords = {
 					x: mouse.down.x,
 					y:finalCoords.y
 				};
 				break;
-			case(-1||7||3): //(-1 and 7 and 3)
+			case -1:
+            case 7:
+            case 3: //(-1 and 7 and 3)
 				finalCoords = {
 					x: finalCoords.x,
 					y: mouse.down.y

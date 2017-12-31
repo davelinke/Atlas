@@ -61,8 +61,8 @@ class Workarea extends Component {
 				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
 				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
-			xy = this.filterFunction(xy);
-			xyo = this.filterFunction(xyo);
+			xy = this.filterFunction(xy,e);
+			xyo = this.filterFunction(xyo,e);
 			//disable undus till we mouseup
 			store.dispatch({
 				type: 'UNDO_DEACTIVATE'
@@ -111,8 +111,8 @@ class Workarea extends Component {
 				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
 				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
-			xy = this.filterFunction(xy);
-			xyo = this.filterFunction(xyo);
+			xy = this.filterFunction(xy,e);
+			xyo = this.filterFunction(xyo, e);
 			store.dispatch({
 				type: 'WORKAREA_CLASS',
 				val:[]
@@ -155,8 +155,8 @@ class Workarea extends Component {
 				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
 				y:(xy.y - (so.top*screen.zoom))/screen.zoom
 			}
-			xy = this.filterFunction(xy);
-			//xyo = this.filterFunction(xyo);
+			xy = this.filterFunction(xy,{type:'mousemove'});
+			xyo = this.filterFunction(xyo,{type:'mousemove'});
 			store.dispatch({
 				type:'MOUSE_POSITION',
 				val:{
@@ -173,8 +173,8 @@ class Workarea extends Component {
 				val:['mouse-down','mouse-move']
 			});
 		}.bind(this);
-		this.filterFunction = function(coords){
-			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard,this.props.screen);
+		this.filterFunction = function(coords,e){
+			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard,this.props.screen,e);
 		}.bind(this);
 		// listen to keyboard
 		this.listenToKeydown = function(event){
