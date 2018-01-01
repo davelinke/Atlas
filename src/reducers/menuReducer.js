@@ -13,7 +13,12 @@ const defaultState = {
             'visible':false
         },
         'object':{
-            'visible':false
+            'visible':false,
+            'items':{
+                'group':{
+                    tag:'ObjectGroup'
+                }
+            }
         },
         'insert':{
             'visible':false

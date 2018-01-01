@@ -1,4 +1,4 @@
-import Tools from '../factories/Tools';
+import Tools from '../toolset/';
 import {merge} from 'lodash';
 const defaultState = {
     current:'selection',
