@@ -178,23 +178,31 @@ class Workarea extends Component {
 		}.bind(this);
 		// listen to keyboard
 		this.listenToKeydown = function(event){
-			// console.log('keydown',event);
-			if (event.keyCode === 16){
+			let keyCode = event.keyCode;
+			let keys = this.props.keyboard;
+			if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keydown!==undefined)){
+				keys.set[keyCode].keydown(event);
+			}
+			if (keyCode === 16){
 				store.dispatch({
 					type:'KEYBOARD_SHIFT',
 					val:true
 				});
 			}
-		};
+		}.bind(this);
 		this.listenToKeyup = function(event){
-			// console.log('keyup',event);
+			let keyCode = event.keyCode;
+			let keys = this.props.keyboard;
+			if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keyup!==undefined)){
+				keys.set[keyCode].keyup(event);
+			}
 			if (event.keyCode === 16){
 				store.dispatch({
 					type:'KEYBOARD_SHIFT',
 					val:false
 				});
 			}
-		};
+		}.bind(this);
 	}
 	shouldComponentUpdate(nextProps, nextState) {
 		return false; //gold

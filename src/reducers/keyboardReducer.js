@@ -1,6 +1,8 @@
 import {merge} from 'lodash';
+import Keys from '../factories/Keyboard';
 const defaultState = {
-    shift:false
+    shift:false,
+    set:Keys
 };
 const keyboardReducer = (state = defaultState, action) => {
   switch (action.type) {
