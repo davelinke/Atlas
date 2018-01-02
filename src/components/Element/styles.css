@@ -5,6 +5,10 @@
   pointer-events: none;
   opacity: 0; }
 
+.element--root > .element__contents > .element > .element__contents > .element > .element__tools {
+  opacity: 0 !important;
+  pointer-events: none !important; }
+
 .element__contents {
   position: absolute;
   left: 0;

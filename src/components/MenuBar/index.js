@@ -44,6 +44,44 @@ class MenuBar extends Component {
             return output;
         });
     }
+    // listen to keyboard
+    listenToKeydown(event){
+        event.preventDefault();
+        console.log(event)
+        let keyCode = event.keyCode;
+        let keys = this.props.keyboard;
+        if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keydown!==undefined)){
+            keys.set[keyCode].keydown(event);
+        }
+        if (keyCode === 16){
+            store.dispatch({
+                type:'KEYBOARD_SHIFT',
+                val:true
+            });
+        }
+    };
+    listenToKeyup(event){
+        event.preventDefault();
+        let keyCode = event.keyCode;
+        let keys = this.props.keyboard;
+        if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keyup!==undefined)){
+            keys.set[keyCode].keyup(event);
+        }
+        if (event.keyCode === 16){
+            store.dispatch({
+                type:'KEYBOARD_SHIFT',
+                val:false
+            });
+        }
+    };
+	componentWillMount(){
+		window.addEventListener("keydown", this.listenToKeydown.bind(this), false);
+		window.addEventListener("keyup", this.listenToKeyup.bind(this), false);
+	}
+	componentWillUnmount() {
+		window.removeEventListener("keydown", this.listenToKeydown.bind(this), false);
+		window.removeEventListener("keyup", this.listenToKeyup.bind(this), false);
+	}
     render(){
         return (
             <div className="top-header">
@@ -60,7 +98,8 @@ class MenuBar extends Component {
 
 const mapStateToProps = function(store) {
     return {
-        menu:store.menu
+        menu:store.menu,
+        keyboard:store.keyboard
     };
 };
 const SmartMenuBar = connect(mapStateToProps)(MenuBar);

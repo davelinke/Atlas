@@ -176,44 +176,6 @@ class Workarea extends Component {
 		this.filterFunction = function(coords,e){
 			return CoordFilters(coords,true,this.props.workarea,this.props.mouse,this.props.keyboard,this.props.screen,e);
 		}.bind(this);
-		// listen to keyboard
-		this.listenToKeydown = function(event){
-			let keyCode = event.keyCode;
-			let keys = this.props.keyboard;
-			if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keydown!==undefined)){
-				keys.set[keyCode].keydown(event);
-			}
-			if (keyCode === 16){
-				store.dispatch({
-					type:'KEYBOARD_SHIFT',
-					val:true
-				});
-			}
-		}.bind(this);
-		this.listenToKeyup = function(event){
-			let keyCode = event.keyCode;
-			let keys = this.props.keyboard;
-			if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keyup!==undefined)){
-				keys.set[keyCode].keyup(event);
-			}
-			if (event.keyCode === 16){
-				store.dispatch({
-					type:'KEYBOARD_SHIFT',
-					val:false
-				});
-			}
-		}.bind(this);
-	}
-	shouldComponentUpdate(nextProps, nextState) {
-		return false; //gold
-	}
-	componentWillMount(){
-		window.addEventListener("keydown", this.listenToKeydown, false);
-		window.addEventListener("keyup", this.listenToKeyup, false);
-	}
-	componentWillUnmount() {
-		window.removeEventListener("keydown", this.listenToKeydown, false);
-		window.removeEventListener("keyup", this.listenToKeyup, false);
 	}
 	render() {
 		return (

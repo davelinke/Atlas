@@ -71,10 +71,25 @@ export class DumbMenuItem extends Component {
             },groupDims)
         })
     }
+    componentDidMount(){
+        store.dispatch({
+            type:"KEY_COMBO",
+            val:{
+                '71':{
+                    keydown:(e)=>{
+                        if(e.ctrlKey||e.metaKey){
+                            this.group();
+                        }
+                    },
+                    keyup:(e)=>{}
+                }
+            }
+        })
+    }
     render(){
         return (
             <div>
-                <button className="menu__dropdown-item" onClick={this.group.bind(this)} disabled={(this.props.pick.elements.length<2)?'disabled':''}><span className="flex-loose">Group</span></button>
+                <button ref="groupButton" className="menu__dropdown-item" onClick={this.group.bind(this)} disabled={(this.props.pick.elements.length<2)?'disabled':''}><span className="flex-loose">Group</span></button>
             </div>
         )
     }

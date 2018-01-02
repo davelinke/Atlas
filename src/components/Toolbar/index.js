@@ -40,7 +40,8 @@ class Toolbar extends Component {
 
 const mapStateToProps = function(store) {
   return {
-    tools:store.tools
+    tools:store.tools,
+    keyboard:store.keyboard
   };
 };
 const SmartToolbar = connect(mapStateToProps)(Toolbar);

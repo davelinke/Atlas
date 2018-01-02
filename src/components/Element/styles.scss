@@ -22,7 +22,12 @@
     // &:hover{
     //     filter:none !important;
     // }
-    &--root{}
+    &--root{
+        & > .element__contents > .element > .element__contents > .element > .element__tools{
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    }
     &__contents{
         @include absFull;
         pointer-events: none;

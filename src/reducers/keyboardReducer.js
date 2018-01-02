@@ -11,6 +11,9 @@ const keyboardReducer = (state = defaultState, action) => {
         return merge({}, state, {
           shift: action.val
         });
+    case 'KEY_COMBO':
+        let kcState = merge({},state,{set:action.val});
+        return kcState;
     default:
         return state;
   }
