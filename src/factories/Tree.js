@@ -16,6 +16,23 @@ const TreeFactory = {
         };
         return searchTree(where);
     },
+    removeElementById:function(where,id){
+        let nuWhere = merge({},where);
+        let filterChildren = function(so){
+            for (var j=0;j<so.length; j++) {
+                var io = so[j];
+                if (io.id===id){
+                    so.splice(j,1);
+                    break;
+                } else {
+                    so[j].children = filterChildren(so[j].children);
+                }
+            }
+            return so;
+        };
+        nuWhere.children = filterChildren(nuWhere.children);
+        return nuWhere;
+    },
     makeId:function(){
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
