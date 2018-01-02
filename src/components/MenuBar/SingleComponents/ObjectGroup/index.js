@@ -27,17 +27,19 @@ export class DumbMenuItem extends Component {
             left:x0,
             top:y0,
             width:x1-x0,
-            height:y1-y0,
+            height:y1-y0
+        }
+        let groupStyle = merge({},groupDims,{
             backgroundColor:'rgba(0,0,0,0)',
             borderStyle:'none'
-        }
+        })
 
 
         let state = store.getState();
         // where are we storing the new elemwnt?
         let where = state.tree.children;
         // lets generate the element structure with the help of the tree functions
-        let newElement = treeHelpers.generateElement(where,'Group',groupDims);
+        let newElement = treeHelpers.generateElement(where,'Group',groupStyle);
         // we dupe the state not to interefere with the current one
         let newTree = merge({},state.tree);
         // lets nest the children within the group and correct their positions.
@@ -53,12 +55,21 @@ export class DumbMenuItem extends Component {
         // we push the new element to the tree children.
         newTree.children.push(newElement);
         // lets set the grouped elements within the grouped layer
-
         // now we send the new tree to be re-rendered
         store.dispatch({
             type:'TREE_FULL',
             val:newTree
         });
+        // and we fix the pick not to have the elements but the group
+        store.dispatch({
+            type:'PICK_CLEAR'
+        });
+        store.dispatch({
+            type:'PICK_ADD',
+            val:merge({},{
+                id:newElement.id
+            },groupDims)
+        })
     }
     render(){
         return (
