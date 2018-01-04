@@ -49,7 +49,7 @@ const TreeFactory = {
         text+= '_'+new Date().getTime();
         return text;
     },
-    generateElement:function(where,label,style){
+    generateElement:function(where,label,type,style){
         let baseStyle = merge({},Style,style);
         let baseState = merge({},State,{
             id:this.makeId(),
@@ -57,6 +57,7 @@ const TreeFactory = {
         });
         let baseElement = merge({},Element,{
             id:this.makeId(),
+            type:type,
             label:this.newLayerName(label,where),
             states:[baseState]
         });

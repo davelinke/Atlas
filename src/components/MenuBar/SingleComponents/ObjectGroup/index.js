@@ -39,7 +39,7 @@ export class DumbMenuItem extends Component {
         // where are we storing the new elemwnt?
         let where = state.tree.children;
         // lets generate the element structure with the help of the tree functions
-        let newElement = treeHelpers.generateElement(where,'Group',groupStyle);
+        let newElement = treeHelpers.generateElement(where,'Group','group',groupStyle);
         // we dupe the state not to interefere with the current one
         let newTree = merge({},state.tree);
         // lets nest the children within the group and correct their positions.

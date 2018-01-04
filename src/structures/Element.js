@@ -3,6 +3,7 @@ export const Artboard = {
     label:'Artboard 1',
     children:[],
     currentState:0,
+    type:'artboard',
     states:[
         {
             label:'base',
@@ -24,10 +25,10 @@ export const Artboard = {
 export const Element = {
     id:null,
     label:null,
-    type:0,
     currentState:0,
     states:[],
 	locked:false,
+    type:'box',
     children:[]
 };
 export const State = {

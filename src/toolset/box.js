@@ -27,7 +27,7 @@ export default {
                 left:mouse.offsetDown.x
             }
             // lets generate the element structure with the help of the tree functions
-            let newElement = treeHelpers.generateElement(where,'Box',offset);
+            let newElement = treeHelpers.generateElement(where,'Box','box',offset);
             // we dupe the state not to interefere with the current one
             let newTree = merge({},state.tree);
             // we push the new element to the tree children.
