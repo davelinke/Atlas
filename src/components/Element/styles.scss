@@ -23,7 +23,7 @@
     //     filter:none !important;
     // }
     &--root{
-        & > .element__contents > .element > .element__contents > .element > .element__tools{
+        & > .element__contents > .element > .element__contents > .element .element__tools{
             opacity: 0 !important;
             pointer-events: none !important;
         }

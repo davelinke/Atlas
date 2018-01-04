@@ -47,7 +47,6 @@ class MenuBar extends Component {
     // listen to keyboard
     listenToKeydown(event){
         event.preventDefault();
-        console.log(event)
         let keyCode = event.keyCode;
         let keys = this.props.keyboard;
         if ((keys.set[keyCode]!==undefined)&&(keys.set[keyCode].keydown!==undefined)){

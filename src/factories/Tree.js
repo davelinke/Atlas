@@ -1,6 +1,15 @@
 import { Style, State, Element } from '../structures/Element';
 import { merge } from 'lodash';
 const TreeFactory = {
+    getElementIndex:function(where,id){
+        for (var j=0;j<where.length; j++) {
+            var io = where[j];
+            if (io.id===id){
+                return j;
+            }
+        }
+        return false;
+    },
     getElementDataById:function(where,id){
         let searchTree = function(so){
             for (var j=0;j<so.length; j++) {

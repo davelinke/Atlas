@@ -17,6 +17,9 @@ const defaultState = {
             'items':{
                 'group':{
                     tag:'ObjectGroup'
+                },
+                'ungroup':{
+                    tag:'ObjectUnGroup'
                 }
             }
         },
