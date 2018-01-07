@@ -196,7 +196,6 @@ class ElementsSidebarProperties extends Component {
     render(){
         let elementValues = this.elementValues();
         let elementTypes = this.elementTypes();
-        console.log(elementTypes);
         let pickLength = this.props.pick.elements.length;
         return (
             <div className="sidebar__sub sidebar__properties">
@@ -257,14 +256,14 @@ class ElementsSidebarProperties extends Component {
                             </InputSelect>
                         </div>
                     </div>
-                    <div className={"sidebar__group" + ((elementTypes!='mixed')&&(elementTypes!='group')?'':' hidden')}>
+                    <div className={"sidebar__group" + ((elementTypes!=='mixed')&&(elementTypes!=='group')?'':' hidden')}>
                         <h3>Color</h3>
                         <div className="sidebar__grid">
                             <label title="Fill Style"><i className='material-icons'>format_color_fill</i></label>
                             <InputColor which="backgroundColor" value={this.getValue(elementValues,'backgroundColor')} change={this.updateValue.bind(this)} />
                         </div>
                     </div>
-                    <div className={"sidebar__group" + ((elementTypes!='mixed')&&(elementTypes!='group')?'':' hidden')}>
+                    <div className={"sidebar__group" + ((elementTypes!=='mixed')&&(elementTypes!=='group')?'':' hidden')}>
                         <h3>Border</h3>
                         <div className="sidebar__grid">
                             <label title="Border Style"><i className='material-icons'>border_style</i></label>
@@ -287,7 +286,7 @@ class ElementsSidebarProperties extends Component {
                             <InputNumeric disabled={pickLength<1?"disabled":""} min={0} which="borderWidth" value={this.getValue(elementValues,'borderWidth')} change={this.updateValue.bind(this)} />
                         </div>
                     </div>
-                    <div className={"sidebar__group"+(this.state.filtersCollapsed?" collapsed":"") + ((elementTypes!='artboard')?'':' hidden')}>
+                    <div className={"sidebar__group"+(this.state.filtersCollapsed?" collapsed":"") + ((elementTypes!=='artboard')?'':' hidden')}>
                         <h3>Filters <button className="collapse" onClick={()=>{this.setState({filtersCollapsed:!this.state.filtersCollapsed})}}><i className="material-icons dd">arrow_drop_down</i><i className="material-icons du">arrow_drop_up</i></button></h3>
                         <FilterComposer disabled={pickLength<1?"disabled":""} elements={this.props.pick.elements} which="filter" value={this.getValue(elementValues,'filter')} change={this.updateValue.bind(this)}  />
                     </div>

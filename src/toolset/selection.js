@@ -7,6 +7,7 @@ export default {
     iconClass:'custom_icons selection',
     iconString:'',
     willMove:false,
+    dragSelect:false,
     active:false,
     resizeDirection:false,
     mousedown:(args)=>{
@@ -22,6 +23,8 @@ export default {
 
             this.a.willMove = target.dataset.move;
             this.a.resizeDirection = target.dataset.resize;
+
+            console.log(elementId);
 
             // if what's clicked is not the artboard
             if (elementId && elementId!=='root'){
@@ -56,102 +59,109 @@ export default {
                 if (!shiftKey){ //if shift is not pressed
                     args.pick.clear(); // it is the root element, so let's clear
                 }
+                this.a.dragSelect = true;
             }
         }
     },
     mousemove:(args)=>{
         if (this.a.active){
-            let state = store.getState();
-            let screen = state.screen;
-            let pick = args.pick.elements;
-            let pickLength = pick.length;
-            let pickEmpty = (pickLength===0);
-            if (!pickEmpty) {
-                // calculate the delta
-                let mouse = state.mouse;
-                let delta = {
-                    x:(mouse.down.x - mouse.x)/screen.zoom,
-                    y:(mouse.down.y - mouse.y)/screen.zoom
-                };
-                let nuTree = merge({},state.tree);
-                for (let pickElement of pick){
-                    let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
-                    let currentState = currentElement.currentState;
-                    let ess = currentElement.states[currentState].style;
-                    if (this.a.willMove==='1'){
-                        // calculate new coords
-                        ess.left = pickElement.left - delta.x;
-                        ess.top = pickElement.top - delta.y;
-                    } else {
-                        let resizeDir = this.a.resizeDirection;
-                        let nextWidth,nextHeight;
-                        switch (resizeDir) {
-                            case('nw'):
-                                nextWidth = pickElement.width + delta.x;
-                                if (nextWidth>0){
-                                    ess.left = pickElement.left - delta.x;
-                                    ess.width = nextWidth;
-                                }
-                                nextHeight = pickElement.height + delta.y;
-                                if (nextHeight>0){
-                                    ess.top = pickElement.top - delta.y;
-                                    ess.height = nextHeight;
-                                }
-                                break;
-                            case('n'):
-                                nextHeight = pickElement.height + delta.y;
-                                if (nextHeight>0){
-                                    ess.top = pickElement.top - delta.y;
-                                    ess.height = nextHeight;
-                                }
-                                break;
-                            case('ne'):
-                                nextHeight = pickElement.height + delta.y;
-                                if (nextHeight>0){
-                                    ess.top = pickElement.top - delta.y;
-                                    ess.height = nextHeight;
-                                }
-                                ess.width = pickElement.width - delta.x;
-                                break;
-                            case('w'):
-                                nextWidth = pickElement.width + delta.x;
-                                if (nextWidth>0){
-                                    ess.left = pickElement.left - delta.x;
-                                    ess.width = nextWidth;
-                                }
-                                break;
-                            case('e'): //resize eastbound
-                                ess.width = pickElement.width - delta.x;
-                                break;
-                            case('sw'):
-                                ess.height = pickElement.height - delta.y;
-                                nextWidth = pickElement.width + delta.x;
-                                if (nextWidth>0){
-                                    ess.left = pickElement.left - delta.x;
-                                    ess.width = nextWidth;
-                                }
-                                break;
-                            case('s'): //resize southbound
-                                ess.height = pickElement.height - delta.y;
-                                break;
-                            case('se'): //resize southeast
-                                ess.height = pickElement.height - delta.y;
-                                ess.width = pickElement.width - delta.x;
-                                break;
-                            default:;
+            if (!this.a.dragSelect) {
+                let state = store.getState();
+                let screen = state.screen;
+                let pick = args.pick.elements;
+                let pickLength = pick.length;
+                let pickEmpty = (pickLength===0);
+                if (!pickEmpty) {
+                    // calculate the delta
+                    let mouse = state.mouse;
+                    let delta = {
+                        x:(mouse.down.x - mouse.x)/screen.zoom,
+                        y:(mouse.down.y - mouse.y)/screen.zoom
+                    };
+                    let nuTree = merge({},state.tree);
+                    for (let pickElement of pick){
+                        let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
+                        let currentState = currentElement.currentState;
+                        let ess = currentElement.states[currentState].style;
+                        if (this.a.willMove==='1'){
+                            // calculate new coords
+                            ess.left = pickElement.left - delta.x;
+                            ess.top = pickElement.top - delta.y;
+                        } else {
+                            let resizeDir = this.a.resizeDirection;
+                            let nextWidth,nextHeight;
+                            switch (resizeDir) {
+                                case('nw'):
+                                    nextWidth = pickElement.width + delta.x;
+                                    if (nextWidth>0){
+                                        ess.left = pickElement.left - delta.x;
+                                        ess.width = nextWidth;
+                                    }
+                                    nextHeight = pickElement.height + delta.y;
+                                    if (nextHeight>0){
+                                        ess.top = pickElement.top - delta.y;
+                                        ess.height = nextHeight;
+                                    }
+                                    break;
+                                case('n'):
+                                    nextHeight = pickElement.height + delta.y;
+                                    if (nextHeight>0){
+                                        ess.top = pickElement.top - delta.y;
+                                        ess.height = nextHeight;
+                                    }
+                                    break;
+                                case('ne'):
+                                    nextHeight = pickElement.height + delta.y;
+                                    if (nextHeight>0){
+                                        ess.top = pickElement.top - delta.y;
+                                        ess.height = nextHeight;
+                                    }
+                                    ess.width = pickElement.width - delta.x;
+                                    break;
+                                case('w'):
+                                    nextWidth = pickElement.width + delta.x;
+                                    if (nextWidth>0){
+                                        ess.left = pickElement.left - delta.x;
+                                        ess.width = nextWidth;
+                                    }
+                                    break;
+                                case('e'): //resize eastbound
+                                    ess.width = pickElement.width - delta.x;
+                                    break;
+                                case('sw'):
+                                    ess.height = pickElement.height - delta.y;
+                                    nextWidth = pickElement.width + delta.x;
+                                    if (nextWidth>0){
+                                        ess.left = pickElement.left - delta.x;
+                                        ess.width = nextWidth;
+                                    }
+                                    break;
+                                case('s'): //resize southbound
+                                    ess.height = pickElement.height - delta.y;
+                                    break;
+                                case('se'): //resize southeast
+                                    ess.height = pickElement.height - delta.y;
+                                    ess.width = pickElement.width - delta.x;
+                                    break;
+                                default:;
+                            }
                         }
                     }
+                    store.dispatch({
+                        type:'TREE_FULL',
+                        val:nuTree
+                    })
                 }
-                store.dispatch({
-                    type:'TREE_FULL',
-                    val:nuTree
-                })
+            } else {
+                // lets select by area
+                //console.log(args.event.target);
             }
         }
 
     },
     mouseup:(args)=>{
         // refresh pick
+        this.a.dragSelect = false;
 
         if(this.a.active){
             let state = store.getState();
