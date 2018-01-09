@@ -63,7 +63,8 @@ export default {
                     args.pick.clear(); // it is the root element, so let's clear
                     this.a.initialPick = [];
                 }
-                
+
+                // we should be dragselecting then
                 this.a.dragSelect = true;
 
                 let areaWindow
@@ -258,9 +259,22 @@ export default {
                     //console.log(isInArea);
                     if (isInArea) {
                         // find out how to deselect or re-selected
-                        let wasPicked = ObjectTools.objectAvailableByKey('id',elementId,this.a.initialPick)
+                        let wasPicked = ObjectTools.objectAvailableByKey('id',elementId,this.a.initialPick);
                         //console.log(wasPicked);
                         if (!wasPicked) {
+                            let pickObject = {
+                                id: elementId,
+                                top:eS.top,
+                                left:eS.left,
+                                width:eS.width,
+                                height:eS.height,
+                            }
+                            nextPick.push(pickObject);
+                        }
+                    } else {
+                        // lets check if it was already at pick and add if so.
+                        let startedPicked = ObjectTools.objectAvailableByKey('id',elementId,this.a.initialPick);
+                        if (startedPicked) {
                             let pickObject = {
                                 id: elementId,
                                 top:eS.top,
