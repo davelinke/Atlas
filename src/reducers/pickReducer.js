@@ -8,7 +8,7 @@ const pickReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
     case 'PICK_FULL':
-        let nspf = merge({}, state, {elements:action.val});
+        let nspf = merge({}, defaultState, {elements:action.val});
         return nspf;
     case 'PICK_ADD':
         let nspa = merge({}, state);

@@ -56,10 +56,14 @@ export default {
                     }
                 }
             } else {
+
+                this.a.initialPick = [].concat(args.pick.elements);
+
                 if (!shiftKey){ //if shift is not pressed
                     args.pick.clear(); // it is the root element, so let's clear
+                    this.a.initialPick = [];
                 }
-                this.a.initialPick = args.pick.elements;
+                
                 this.a.dragSelect = true;
 
                 let areaWindow
@@ -182,9 +186,9 @@ export default {
             } else {
                 // lets select by area
                 // lets start by doing the selection rectangle
+
                 let areaWindow = this.a.areaWindow;
                 let ess = areaWindow.style;
-                let shiftKey = args.event.shiftKey;
                 let artboardDimensions = {
                     width:nuTree.states[nuTree.currentState].style.width,
                     height:nuTree.states[nuTree.currentState].style.height
@@ -220,15 +224,29 @@ export default {
                     aVal.width = delta.x;
                 }
 
-                ess.top = aVal.top? aVal.top + 'px':'auto';
-                ess.left = aVal.left? aVal.left + 'px':'auto';
-                ess.width = aVal.width? aVal.width + 'px':'auto';
-                ess.height = aVal.height? aVal.height + 'px':'auto';
+                //console.log(aVal);
 
+                ess.top = aVal.top ? aVal.top + 'px':'auto';
+                ess.left = aVal.left ? aVal.left + 'px':'auto';
+                ess.width = aVal.width ? aVal.width + 'px':'auto';
+                ess.height = aVal.height ? aVal.height + 'px':'auto';
+                ess.bottom = aVal.bottom ? aVal.bottom + 'px':'auto';
+                ess.right = aVal.right ? aVal.right + 'px':'auto';
 
+                let nextPick = [];
                 for (let element of nuTree.children) {
                     let eS = element.states[element.currentState].style;
-                    let elementId = element.id
+                    let elementId = element.id;
+
+                    // lets create topleft definition for when whe have bottomright
+
+                    if (!aVal.left) {
+                        aVal.left = artboardDimensions.width - aVal.right - aVal.width;
+                    }
+                    if (!aVal.top) {
+                        aVal.top = artboardDimensions.height - aVal.bottom - aVal.height;
+                    }
+
 
                     let check = {
                         x1: aVal.left                   <=   (eS.left + eS.width),
@@ -237,19 +255,29 @@ export default {
                         y2: (aVal.height + aVal.top)    >=   eS.top
                     }
                     let isInArea = (check.x1&&check.x2&&check.y1&&check.y2);
-
+                    //console.log(isInArea);
                     if (isInArea) {
-                        let pickObject = {
-                            id: elementId,
-                            top:eS.top,
-                            left:eS.left,
-                            width:eS.width,
-                            height:eS.height,
-                        }
                         // find out how to deselect or re-selected
-                        // just trigger the selection when the args.target element changes
+                        let wasPicked = ObjectTools.objectAvailableByKey('id',elementId,this.a.initialPick)
+                        //console.log(wasPicked);
+                        if (!wasPicked) {
+                            let pickObject = {
+                                id: elementId,
+                                top:eS.top,
+                                left:eS.left,
+                                width:eS.width,
+                                height:eS.height,
+                            }
+                            nextPick.push(pickObject);
+                        }
                     }
                 }
+
+                // the new pick
+                store.dispatch({
+                    type:'PICK_FULL',
+                    val:nextPick
+                });
             }
 
         }
@@ -283,6 +311,8 @@ export default {
         }
         this.a.active = false;
         let areaWindow = this.a.areaWindow;
-        areaWindow.style.opacity=0;
+        if (areaWindow){
+            areaWindow.style.opacity=0;
+        }
     }
 }
