@@ -10,6 +10,8 @@ export default {
     dragSelect:false,
     active:false,
     resizeDirection:false,
+    areaWindow:false,
+    initialPick:[],
     mousedown:(args)=>{
         let mouseButton = args.event.button;
 
@@ -23,8 +25,6 @@ export default {
 
             this.a.willMove = target.dataset.move;
             this.a.resizeDirection = target.dataset.resize;
-
-            console.log(elementId);
 
             // if what's clicked is not the artboard
             if (elementId && elementId!=='root'){
@@ -59,26 +59,53 @@ export default {
                 if (!shiftKey){ //if shift is not pressed
                     args.pick.clear(); // it is the root element, so let's clear
                 }
+                this.a.initialPick = args.pick.elements;
                 this.a.dragSelect = true;
+
+                let areaWindow
+                if (!this.a.areaWindow) {
+                    areaWindow = document.createElement('div');
+                    areaWindow.setAttribute('class','area-window');
+                    areaWindow.style.position='absolute';
+                    areaWindow.style.border="1px dashed #ccc";
+                    areaWindow.style.pointerEvents = 'none';
+
+                    document.getElementById('els_root').appendChild(areaWindow);
+
+                    this.a.areaWindow = areaWindow;
+                } else {
+                    areaWindow = this.a.areaWindow;
+                }
+
+                // lets get the coordinates
+                let mouse = state.mouse;
+
+                areaWindow.style.top = mouse.offsetDown.y + 'px';
+                areaWindow.style.left = mouse.offsetDown.x + 'px';
+                areaWindow.style.opacity = 1;
+                areaWindow.style.width=0;
+                areaWindow.style.height=0;
             }
         }
     },
     mousemove:(args)=>{
         if (this.a.active){
+            let state = store.getState();
+            let mouse = state.mouse;
+            let screen = state.screen;
+
+            let delta = {
+                x:(mouse.down.x - mouse.x)/screen.zoom,
+                y:(mouse.down.y - mouse.y)/screen.zoom
+            };
+            let nuTree = merge({},state.tree);
+            let pick = args.pick.elements;
+
             if (!this.a.dragSelect) {
-                let state = store.getState();
-                let screen = state.screen;
-                let pick = args.pick.elements;
                 let pickLength = pick.length;
                 let pickEmpty = (pickLength===0);
                 if (!pickEmpty) {
                     // calculate the delta
-                    let mouse = state.mouse;
-                    let delta = {
-                        x:(mouse.down.x - mouse.x)/screen.zoom,
-                        y:(mouse.down.y - mouse.y)/screen.zoom
-                    };
-                    let nuTree = merge({},state.tree);
                     for (let pickElement of pick){
                         let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
                         let currentState = currentElement.currentState;
@@ -154,10 +181,78 @@ export default {
                 }
             } else {
                 // lets select by area
-                //console.log(args.event.target);
-            }
-        }
+                // lets start by doing the selection rectangle
+                let areaWindow = this.a.areaWindow;
+                let ess = areaWindow.style;
+                let shiftKey = args.event.shiftKey;
+                let artboardDimensions = {
+                    width:nuTree.states[nuTree.currentState].style.width,
+                    height:nuTree.states[nuTree.currentState].style.height
+                }
+                let aVal = {};
 
+                // and we calculate the coordinates of the element
+                if(delta.y<=0){ // this means the delta is positive (somehow)
+                    // we fix the top side and make it grow with the delta value
+                    aVal.height = (delta.y*-1);
+                    aVal.top = mouse.offsetDown.y;
+                    aVal.bottom = false;
+                } else {
+                    // we fix the bottom side and make it grow with the delta value
+                    // you might ask yourself why, well, if we modified top pos and height it got all wobbly on screen
+                    // so it is better modify only one value and have one fixed.
+                    aVal.top = false;
+                    aVal.bottom = (artboardDimensions.height - mouse.offsetDown.y);
+                    aVal.height = delta.y;
+                }
+
+                if(delta.x<=0){ // this means the delta is positive (somehow)
+                    // we fix the left side and make it grow with the delta value
+                    aVal.width = (delta.x*-1);
+                    aVal.left = mouse.offsetDown.x;
+                    aVal.right = false;
+                } else {
+                    // we fix the right side and make it grow with the delta value
+                    // you might ask yourself why, well, if we modified left pos and width it got all wobbly on screen
+                    // so it is better modify only one value and have one fixed.
+                    aVal.right = (artboardDimensions.width - mouse.offsetDown.x);
+                    aVal.left = false;
+                    aVal.width = delta.x;
+                }
+
+                ess.top = aVal.top? aVal.top + 'px':'auto';
+                ess.left = aVal.left? aVal.left + 'px':'auto';
+                ess.width = aVal.width? aVal.width + 'px':'auto';
+                ess.height = aVal.height? aVal.height + 'px':'auto';
+
+
+                for (let element of nuTree.children) {
+                    let eS = element.states[element.currentState].style;
+                    let elementId = element.id
+
+                    let check = {
+                        x1: aVal.left                   <=   (eS.left + eS.width),
+                        x2: (aVal.left + aVal.width)    >=   eS.left,
+                        y1: aVal.top                    <=   (eS.top + eS.height),
+                        y2: (aVal.height + aVal.top)    >=   eS.top
+                    }
+                    let isInArea = (check.x1&&check.x2&&check.y1&&check.y2);
+
+                    if (isInArea) {
+                        let pickObject = {
+                            id: elementId,
+                            top:eS.top,
+                            left:eS.left,
+                            width:eS.width,
+                            height:eS.height,
+                        }
+                        // find out how to deselect or re-selected
+                        // just trigger the selection when the args.target element changes
+                    }
+                }
+            }
+
+        }
     },
     mouseup:(args)=>{
         // refresh pick
@@ -187,5 +282,7 @@ export default {
             }
         }
         this.a.active = false;
+        let areaWindow = this.a.areaWindow;
+        areaWindow.style.opacity=0;
     }
 }

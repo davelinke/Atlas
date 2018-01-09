@@ -78,7 +78,7 @@ class Element extends Component {
         if (this.props.specs.states){
             let specs =  this.props.specs.states[this.props.specs.currentState];
             return (
-                <div className={this.getClassString()} style={{...specs.style}} ref={this.props.specs.id}>
+                <div id={'els_'+this.props.specs.id} className={this.getClassString()} style={{...specs.style}} ref={this.props.specs.id}>
                     {this.renderTools()}
                     <div className="element__contents">
                         {specs.text}
