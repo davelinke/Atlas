@@ -2,12 +2,15 @@ import {merge} from 'lodash';
 const defaultState = {
     snapToGrid:false,
     gridSize:10,
+    cursor:'default',
     elementClass:[],
     rootElement:null
 };
 const workareaReducer = (state = defaultState, action) => {
   switch (action.type) {
     // remember not to mutate the state
+    case 'WORKAREA_CURSOR':
+        return merge({}, state, {cursor:action.val});
     case 'WORKAREA_SNAP_TO_GRID':
         return merge({}, state, {
           snapToGrid: !state.snapToGrid

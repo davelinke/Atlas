@@ -84,7 +84,7 @@ class InputLogger extends Component {
     }
 	render() {
 		return (
-			<div ref="inputLogger" style={{zoom:this.props.zoom}}
+			<div ref="inputLogger" style={{zoom:this.props.zoom,cursor:this.props.cursor}}
     			className="input-logger"
     			onMouseDown={this.logEvent}
     			onMouseUp={this.logEvent}

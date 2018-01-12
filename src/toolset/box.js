@@ -5,6 +5,7 @@ import store from '../store'
 export default {
     iconClass:'material-icons',
     iconString:'crop_square',
+    cursor:'crosshair',
     initialized:false,
     activeElement:null,
     needsCleanup:{
@@ -154,9 +155,9 @@ export default {
                     }
                     // calculate the border sigma
                     let bordersigma = 0;
-                    if (ess.borderWidth!==undefined){
-                        bordersigma = ess.borderWidth * 2;
-                    }
+                    // if (ess.borderWidth!==undefined){
+                    //     bordersigma = ess.borderWidth * 2;
+                    // }
                     // we clean up
                     if (this.a.needsCleanup.right){
                         ess.left = artboardDimensions.width - ess.width - ess.right - bordersigma;

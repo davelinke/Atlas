@@ -6,6 +6,7 @@ import store from '../store'
 export default {
     iconClass:'custom_icons selection',
     iconString:'',
+    cursor:'default',
     willMove:false,
     dragSelect:false,
     active:false,

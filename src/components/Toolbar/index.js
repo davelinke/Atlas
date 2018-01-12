@@ -17,6 +17,10 @@ class Toolbar extends Component {
     				val:theTool
     			});
                 store.dispatch({
+    				type:'WORKAREA_CURSOR',
+    				val:this.props.tools.set[theTool].cursor
+    			});
+                store.dispatch({
                     type:'PICK_CLEAR'
                 });
             }

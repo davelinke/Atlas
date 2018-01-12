@@ -5,6 +5,3 @@
   .input-logger > * {
     flex: 0 0 auto;
     margin: auto; }
-
-.box .input-logger {
-  cursor: crosshair; }

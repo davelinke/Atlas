@@ -182,6 +182,7 @@ class Workarea extends Component {
 		return (
 			<InputLogger
 				zoom={this.props.screen.zoom}
+				cursor={this.props.workarea.cursor}
 				eventReceptorFunction={this.eventReceptorFunction}
 				filterFunction={this.filterFunction}
 				mouseDownFunction={this.mouseDownFunction}

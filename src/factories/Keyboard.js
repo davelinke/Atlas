@@ -10,6 +10,10 @@ export default {
                     type:'TOOLS_CURRENT',
                     val:'selection'
                 })
+                store.dispatch({
+    				type:'WORKAREA_CURSOR',
+    				val:'default'
+    			});
             }
         },
         keyup:(event)=>{}
@@ -22,7 +26,11 @@ export default {
                 store.dispatch({
                     type:'TOOLS_CURRENT',
                     val:'box'
-                })
+                });
+                store.dispatch({
+    				type:'WORKAREA_CURSOR',
+    				val:'crosshair'
+    			});
             }
         },
         keyup:(event)=>{}
@@ -35,9 +43,33 @@ export default {
                 store.dispatch({
                     type:'TOOLS_CURRENT',
                     val:'zoom'
-                })
+                });
+                store.dispatch({
+    				type:'WORKAREA_CURSOR',
+    				val:'zoom-in'
+    			});
             }
         },
         keyup:(event)=>{}
+    },
+    '18':{
+        keydown:(e)=>{
+            let state = store.getState();
+            if (state.tools.current==='zoom'){
+                store.dispatch({
+                    type:'WORKAREA_CURSOR',
+                    val:'zoom-out'
+                });
+            }
+        },
+        keyup:(e)=>{
+            let state = store.getState();
+            if (state.tools.current==='zoom'){
+                store.dispatch({
+                    type:'WORKAREA_CURSOR',
+                    val:'zoom-in'
+                });
+            }
+        }
     }
 };
