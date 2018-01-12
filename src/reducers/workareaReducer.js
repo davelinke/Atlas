@@ -1,6 +1,6 @@
 import {merge} from 'lodash';
 const defaultState = {
-    snapToGrid:false,
+    snapToGrid:true,
     gridSize:10,
     cursor:'default',
     elementClass:[],

@@ -4,8 +4,8 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen, event=false)
     //filter all you want
     if (workarea.snapToGrid){
 		finalCoords = {
-			x:FilterTools.roundToMultiple(coords.x, (workarea.gridSize*screen.zoom)),
-			y:FilterTools.roundToMultiple(coords.y, (workarea.gridSize*screen.zoom))
+			x:FilterTools.roundToMultiple(coords.x, (workarea.gridSize)),
+			y:FilterTools.roundToMultiple(coords.y, (workarea.gridSize))
 		};
     }
 

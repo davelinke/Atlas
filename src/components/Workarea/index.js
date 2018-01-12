@@ -49,7 +49,6 @@ class Workarea extends Component {
 							}
 						),
 						event:args.e
-						//keys:this.props.keyboard
 					});
 				}
 			}
@@ -108,9 +107,11 @@ class Workarea extends Component {
 		this.mouseUpFunction = function(e,xy){
 			let screen = store.getState().screen;
 			let so = screen.offset;
+			let ss = screen.scroll;
+
 			let xyo = {
-				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
-				y:(xy.y - (so.top*screen.zoom))/screen.zoom
+				x: Math.round((xy.x/screen.zoom) - (so.left) - (ss.left/screen.zoom),0) ,
+				y: Math.round((xy.y/screen.zoom) - (so.top) - (ss.top/screen.zoom),0)
 			}
 			xy = this.filterFunction(xy,e);
 			xyo = this.filterFunction(xyo, e);
@@ -121,10 +122,6 @@ class Workarea extends Component {
 
 			// enable undos
 			store.dispatch({type: 'UNDO_ACTIVATE'});
-
-			// if (History.checkTreeChange(state())!==undefined){
-			//     History.undoLog(state());
-			// }
 
 
 			// register the coordinates
@@ -152,9 +149,10 @@ class Workarea extends Component {
 		this.mouseMoveFunction = function(xy){
 			let screen = this.props.screen;
 			let so = screen.offset;
+			let ss = screen.scroll;
 			let xyo = {
-				x:(xy.x - (so.left*screen.zoom))/screen.zoom,
-				y:(xy.y - (so.top*screen.zoom))/screen.zoom
+				x: Math.round((xy.x/screen.zoom) - (so.left) - (ss.left/screen.zoom),0) ,
+				y: Math.round((xy.y/screen.zoom) - (so.top) - (ss.top/screen.zoom),0)
 			}
 			xy = this.filterFunction(xy,{type:'mousemove'});
 			xyo = this.filterFunction(xyo,{type:'mousemove'});

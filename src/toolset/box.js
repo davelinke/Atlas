@@ -56,8 +56,8 @@ export default {
             let screen = state.screen;
             // calculate the delta
             let delta = {
-                x:(mouse.down.x - mouse.x)/screen.zoom,
-                y:(mouse.down.y - mouse.y)/screen.zoom
+                x:(mouse.offsetDown.x - mouse.offset.x),
+                y:(mouse.offsetDown.y - mouse.offset.y)
             };
             // we create a new tree to prevent mutating the current one
             let nuTree = merge({},state.tree);

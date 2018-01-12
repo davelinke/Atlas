@@ -75,6 +75,7 @@ export default {
                     areaWindow.style.position='absolute';
                     areaWindow.style.border="1px dashed #ccc";
                     areaWindow.style.pointerEvents = 'none';
+                    areaWindow.style.boxSizing = 'border-box';
 
                     document.getElementById('els_root').appendChild(areaWindow);
 
@@ -101,8 +102,8 @@ export default {
             let screen = state.screen;
 
             let delta = {
-                x:(mouse.down.x - mouse.x)/screen.zoom,
-                y:(mouse.down.y - mouse.y)/screen.zoom
+                x:(mouse.offsetDown.x - mouse.offset.x),
+                y:(mouse.offsetDown.y - mouse.offset.y)
             };
             let nuTree = merge({},state.tree);
             let pick = args.pick.elements;
