@@ -1,6 +1,7 @@
 .input-logger {
   flex-grow: 1;
-  overflow: auto; }
+  overflow: auto;
+  padding: 20px; }
   .input-logger > * {
     flex: 0 0 auto;
     margin: auto; }
