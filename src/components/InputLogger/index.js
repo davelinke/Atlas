@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import store from '../../store';
 
 class InputLogger extends Component {
 	constructor(props){
@@ -50,6 +51,37 @@ class InputLogger extends Component {
 			}
 		}.bind(this);
 	}
+	componentDidUpdate(prevProps){
+		if (this.props.zoom!==prevProps.zoom){
+			window.dispatchEvent(new Event('resize'));
+		}
+    }
+	storeScroll(){
+        if (this.refs.inputLogger!==undefined){
+            let il = this.refs.inputLogger;
+            store.dispatch({
+                type:'SCREEN_SCROLL',
+                val:{
+					top:il.scrollTop,
+					left:il.scrollLeft
+				}
+            });
+
+			window.dispatchEvent(new Event('resize'));
+        }
+    }
+	componentDidMount(){
+        if (this.refs.inputLogger!==undefined){
+            this.storeScroll();
+            this.refs.inputLogger.addEventListener("scroll",this.storeScroll.bind(this));
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.refs.inputLogger!==undefined){
+            this.refs.inputLogger.removeEventListener("scroll", this.storeScroll.bind(this));
+        }
+    }
 	render() {
 		return (
 			<div ref="inputLogger" style={{zoom:this.props.zoom}}

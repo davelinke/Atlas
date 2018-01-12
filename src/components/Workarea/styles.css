@@ -2,7 +2,8 @@
   flex-grow: 1;
   overflow: auto; }
   .input-logger > * {
-    flex: 0 0 auto; }
+    flex: 0 0 auto;
+    margin: auto; }
 
 .box .input-logger {
   cursor: crosshair; }

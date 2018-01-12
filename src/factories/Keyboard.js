@@ -26,5 +26,18 @@ export default {
             }
         },
         keyup:(event)=>{}
+    },
+    '90':{ // Z
+        keydown:(e)=>{
+            if (e.ctrlKey){
+
+            } else { //zoom tool
+                store.dispatch({
+                    type:'TOOLS_CURRENT',
+                    val:'zoom'
+                })
+            }
+        },
+        keyup:(event)=>{}
     }
 };
