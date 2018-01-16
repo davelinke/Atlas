@@ -4,7 +4,9 @@ export default {
     iconClass:'material-icons',
     iconString:'search',
     cursor:'zoom-in',
+    inputLogger:false,
     mousedown:(args)=>{
+        if (!this.a.inputLogger) this.a.inputLogger = document.querySelector('.input-logger');
     },
     mousemove:(args)=>{
 
@@ -15,16 +17,19 @@ export default {
         let state = store.getState();
         let zoom = state.screen.zoom;
 
-        if (e.altKey) { // zoom out
-            store.dispatch({
-                type:'SCREEN_ZOOM',
-                val:zoom * 0.75
-            });
-        } else { // zoom in
-            store.dispatch({
-                type:'SCREEN_ZOOM',
-                val:zoom / 0.75
-            });
-        }
+        //console.log(state.mouse);
+
+        let zoomValue = (e.altKey?0.75:(1/0.75));
+        let nextZoom = zoom * zoomValue
+        let scaleChange = nextZoom - zoom;
+
+        //console.log(scaleChange);
+
+
+
+        store.dispatch({
+            type:'SCREEN_ZOOM',
+            val:nextZoom
+        });
     }
 }

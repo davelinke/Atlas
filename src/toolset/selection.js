@@ -99,7 +99,6 @@ export default {
         if (this.a.active){
             let state = store.getState();
             let mouse = state.mouse;
-            let screen = state.screen;
 
             let delta = {
                 x:(mouse.offsetDown.x - mouse.offset.x),

@@ -53,7 +53,6 @@ export default {
             let state = store.getState();
             // we get the crrent state of the cursor
             let mouse = state.mouse;
-            let screen = state.screen;
             // calculate the delta
             let delta = {
                 x:(mouse.offsetDown.x - mouse.offset.x),

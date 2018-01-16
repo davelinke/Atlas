@@ -71,5 +71,26 @@ export default {
                 });
             }
         }
+    },
+    '32':{
+        prevTool:false,
+        keydown:(e)=>{
+            let state = store.getState();
+            if(state.tools.current!=='pan'){
+                this.a['32'].prevTool = state.tools.current;
+
+                store.dispatch({
+                    type:'TOOLS_CURRENT',
+                    val:'pan'
+                });
+            }
+        },
+        keyup:(e)=>{
+
+            store.dispatch({
+                type:'TOOLS_CURRENT',
+                val:this.a['32'].prevTool
+            });
+        }
     }
 };

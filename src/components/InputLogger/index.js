@@ -51,6 +51,10 @@ class InputLogger extends Component {
 			}
 		}.bind(this);
 	}
+	shouldComponentUpdate(nextProps){
+		let itShould = ((this.props.zoom!==nextProps.zoom)||(this.props.cursor!==nextProps.cursor));
+		return itShould;
+	}
 	componentDidUpdate(prevProps){
 		if (this.props.zoom!==prevProps.zoom){
 			window.dispatchEvent(new Event('resize'));
