@@ -178,6 +178,7 @@ class Workarea extends Component {
 	}
 	render() {
 		return (
+			<div className="work-area">
 			<InputLogger
 				zoom={this.props.screen.zoom}
 				cursor={this.props.workarea.cursor}
@@ -188,6 +189,7 @@ class Workarea extends Component {
 				mouseMoveFunction={this.mouseMoveFunction}
 				registerMouseEventType={this.registerMouseEventType}
 			>{this.props.children}</InputLogger>
+			</div>
 		);
 	}
 };

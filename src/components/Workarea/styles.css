@@ -1,6 +1,7 @@
-.input-logger {
+.work-area {
   flex-grow: 1;
   overflow: hidden; }
-  .input-logger > * {
-    flex: 0 0 auto;
-    margin: auto; }
+  .work-area .input-logger {
+    height: 100%; }
+    .work-area .input-logger > * {
+      margin: 0 auto; }

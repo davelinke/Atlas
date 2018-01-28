@@ -1,9 +1,12 @@
-.input-logger{
+.work-area{
     flex-grow:1;
     overflow: hidden;
-    //padding:20px;
-    & > *{
-        flex:0 0 auto;
-        margin: auto;
+
+    .input-logger{
+        //padding:20px;
+        height: 100%;
+        & > *{
+            margin: 0 auto;
+        }
     }
 }
