@@ -9,17 +9,31 @@ export default {
     zoomInstance:false,
     initialize:function(){
         if (!this.inputLogger) this.inputLogger = document.querySelector('.input-logger');
+        let prn = function(s){
+            return parseFloat(s.replace('px',''));
+        };
+
+        let state = store.getState();
+
+        console.log(state.screen)
+
+        let ilstyle = window.getComputedStyle(this.inputLogger);
+        console.log(prn(ilstyle.width)/2,prn(ilstyle.height)/2);
+        this.inputLogger.addEventListener('zoom',function(e){
+            console.log(e.detail);
+            console.log('zoom has occurred');
+        })
 
         let zoomInstance = zoom(this.inputLogger,{
-            smoothScroll: false
+            smoothScroll: false,
+            boundsPadding:30
         });
-        console.log(zoomInstance);
-
         store.dispatch({
             type:'PUBLIC_ADD',
             key:'zoomInstance',
             val:zoomInstance
         });
+        //zoomInstance.zoomAbs(prn(ilstyle.width)/2,prn(ilstyle.height)/2,1)
     },
     destroy:function(){
         let state = store.getState();

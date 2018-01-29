@@ -10,7 +10,6 @@
     "lodash": "^4.17.4",
     "node-sass-chokidar": "0.0.3",
     "npm-run-all": "^4.1.2",
-    "panzoom": "git+https://github.com/davelinke/panzoom.git",
     "react": "^15.4.2",
     "react-color": "^2.13.8",
     "react-dom": "^15.4.2",

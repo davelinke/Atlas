@@ -56,13 +56,13 @@ class Workarea extends Component {
 		this.mouseDownFunction = function(e,xy){
 			let screen = store.getState().screen;
 			let so = screen.offset;
-			let ss = screen.scroll;
+			console.log(so)
 			let xyo = {
-				x: Math.round((xy.x/screen.zoom) - (so.left) - (ss.left/screen.zoom),0) ,
-				y: Math.round((xy.y/screen.zoom) - (so.top) - (ss.top/screen.zoom),0)
+				x: Math.round((xy.x - so.left)/screen.zoom,0),
+				y: Math.round((xy.y - so.top)/screen.zoom,0)
 			}
-			xy = this.filterFunction(xy,e);
-			xyo = this.filterFunction(xyo,e);
+			//xy = this.filterFunction(xy,e);
+			//xyo = this.filterFunction(xyo,e);
 			//disable undus till we mouseup
 			store.dispatch({
 				type: 'UNDO_DEACTIVATE'
@@ -107,11 +107,10 @@ class Workarea extends Component {
 		this.mouseUpFunction = function(e,xy){
 			let screen = store.getState().screen;
 			let so = screen.offset;
-			let ss = screen.scroll;
-
+			//let ss = screen.scroll;
 			let xyo = {
-				x: Math.round((xy.x/screen.zoom) - (so.left) - (ss.left/screen.zoom),0) ,
-				y: Math.round((xy.y/screen.zoom) - (so.top) - (ss.top/screen.zoom),0)
+				x: Math.round((xy.x - so.left)/screen.zoom,0),
+				y: Math.round((xy.y - so.top)/screen.zoom,0)
 			}
 			xy = this.filterFunction(xy,e);
 			xyo = this.filterFunction(xyo, e);
@@ -149,10 +148,10 @@ class Workarea extends Component {
 		this.mouseMoveFunction = function(xy){
 			let screen = this.props.screen;
 			let so = screen.offset;
-			let ss = screen.scroll;
+			//let ss = screen.scroll;
 			let xyo = {
-				x: Math.round((xy.x/screen.zoom) - (so.left) - (ss.left/screen.zoom),0) ,
-				y: Math.round((xy.y/screen.zoom) - (so.top) - (ss.top/screen.zoom),0)
+				x: Math.round((xy.x - so.left)/screen.zoom,0),
+				y: Math.round((xy.y - so.top)/screen.zoom,0)
 			}
 			xy = this.filterFunction(xy,{type:'mousemove'});
 			xyo = this.filterFunction(xyo,{type:'mousemove'});

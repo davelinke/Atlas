@@ -6,6 +6,6 @@ import Pan from './pan';
 export default {
     selection:Selection,
     box:Box,
-    zoom:Zoom,
-    pan:Pan
+    // zoom:Zoom,
+    // pan:Pan
 };
