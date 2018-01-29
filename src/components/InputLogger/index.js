@@ -92,15 +92,24 @@ class InputLogger extends Component {
     }
 	componentDidMount(){
         if (this.refs.inputLogger!==undefined){
+			let il = this.refs.inputLogger;
+
+			//lets talk about origin
+			let origin = {
+				x:'calc(50% - 50vw)',
+				y:'calc(50% - 50vh)',
+				z:0
+			};
 
 			// initialize zoompan
-			let zoomInstance = zoom(this.refs.inputLogger,{
+			let zoomInstance = zoom(il,{
 	            smoothScroll: false,
 				panButton:1,
-				zoomDoubleClickSpeed: 1
+				zoomDoubleClickSpeed: 1,
+				transformOrigin:origin
 	        });
-			this.refs.inputLogger.addEventListener('zoom',this.zoomFn);
-			this.refs.inputLogger.addEventListener('panend',this.panFn);
+			il.addEventListener('zoom',this.zoomFn);
+			il.addEventListener('panend',this.panFn);
 	        store.dispatch({
 	            type:'PUBLIC_ADD',
 	            key:'zoomInstance',

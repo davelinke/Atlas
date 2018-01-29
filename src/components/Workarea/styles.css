@@ -1,7 +1,16 @@
 .work-area {
   flex-grow: 1;
-  overflow: hidden; }
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
   .work-area .input-logger {
-    height: 100%; }
-    .work-area .input-logger > * {
-      margin: 0 auto; }
+    width: 10000px;
+    height: 10000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid #000;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    background-color: rgba(255, 255, 255, 0.02); }

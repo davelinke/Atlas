@@ -1,4 +1,3 @@
-import Tools from '../toolset/';
 import {merge} from 'lodash';
 const defaultState = {}
 const toolsReducer = (state = defaultState, action) => {

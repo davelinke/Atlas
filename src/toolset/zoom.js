@@ -1,6 +1,3 @@
-import store from '../store';
-import zoom from 'panzoom';
-
 export default {
     iconClass:'material-icons',
     iconString:'search',
@@ -8,40 +5,8 @@ export default {
     inputLogger:false,
     zoomInstance:false,
     initialize:function(){
-        if (!this.inputLogger) this.inputLogger = document.querySelector('.input-logger');
-        let prn = function(s){
-            return parseFloat(s.replace('px',''));
-        };
-
-        let state = store.getState();
-
-        console.log(state.screen)
-
-        let ilstyle = window.getComputedStyle(this.inputLogger);
-        console.log(prn(ilstyle.width)/2,prn(ilstyle.height)/2);
-        this.inputLogger.addEventListener('zoom',function(e){
-            console.log(e.detail);
-            console.log('zoom has occurred');
-        })
-
-        let zoomInstance = zoom(this.inputLogger,{
-            smoothScroll: false,
-            boundsPadding:30
-        });
-        store.dispatch({
-            type:'PUBLIC_ADD',
-            key:'zoomInstance',
-            val:zoomInstance
-        });
-        //zoomInstance.zoomAbs(prn(ilstyle.width)/2,prn(ilstyle.height)/2,1)
     },
     destroy:function(){
-        let state = store.getState();
-        state.public.zoomInstance.dispose();
-        store.dispatch({
-            type:'PUBLIC_REMOVE',
-            key:'zoomInstance'
-        });
     },
     mousedown:(args)=>{
 
@@ -50,58 +15,5 @@ export default {
 
     },
     mouseup:(args)=>{
-
-
-        // function dispatchZoom(nextZoom){
-        //     return new Promise((resolve,reject)=>{
-        //         resolve(store.dispatch({
-        //             type:'SCREEN_ZOOM',
-        //             val:nextZoom
-        //         }));
-        //     });
-        // };
-        //
-        // const zoom = async (e) => {
-        //
-        //     // state screen scroll values are not zoomed
-        //     // state screen offset values are not zoomed
-        //     // state mouse offset values are not zoomed
-        //
-        //     let state = store.getState();
-        //     let zoom = state.screen.zoom;
-        //     let artboardStyle = state.tree.states[state.tree.currentState].style;
-        //     let ilStyle = window.getComputedStyle(this.a.inputLogger);
-        //     let prn = function(s){
-        //         return parseFloat(s.replace('px',''));
-        //     };
-        //     let ilDims = {
-        //         height:prn(ilStyle.height)*zoom,
-        //         width:prn(ilStyle.width)*zoom
-        //     };
-        //
-        //
-        //     let zoomValue = (e.altKey?0.75:(1/0.75));
-        //     let nextZoom = zoom * zoomValue;
-        //     let scaleChange = nextZoom - zoom;
-        //
-        //     let rabDims = {
-        //         height:artboardStyle.height * nextZoom,
-        //         width:artboardStyle.width * nextZoom
-        //     };
-        //
-        //     // boom
-        //     let zo = await dispatchZoom(nextZoom);
-        //
-        //     if (rabDims.height > ilDims.height) {
-        //         //lo que cliqueé por el proximo zoom - lo que cliqueé por el zom de ahora
-        //         this.a.inputLogger.scrollTop = -1* (this.a.inputLogger.scrollTop - ((state.mouse.offsetDown.y * nextZoom) - (state.mouse.offsetDown.y * zoom)));
-        //     }
-        //     if (rabDims.width > ilDims.width) {
-        //         this.a.inputLogger.scrollLeft = -1* (this.a.inputLogger.scrollLeft - ((state.mouse.offsetDown.x * nextZoom) - (state.mouse.offsetDown.x * zoom)));
-        //     }
-        // };
-        //
-        //
-        // zoom(args.event);
     }
 }
