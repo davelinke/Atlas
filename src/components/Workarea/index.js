@@ -54,14 +54,15 @@ class Workarea extends Component {
 			}
 		}.bind(this);
 		this.mouseDownFunction = function(e,xy){
-			let screen = store.getState().screen;
+			let state = store.getState();
+			let screen = state.screen;
 			let so = screen.offset;
 			let xyo = {
 				x: Math.round((xy.x - so.left)/screen.zoom,0),
 				y: Math.round((xy.y - so.top)/screen.zoom,0)
 			}
-//xy = this.filterFunction(xy,e);
-//xyo = this.filterFunction(xyo,e);
+			xy = this.filterFunction(xy,e);
+			xyo = this.filterFunction(xyo,e);
 			//disable undus till we mouseup
 			store.dispatch({
 				type: 'UNDO_DEACTIVATE'
@@ -106,7 +107,6 @@ class Workarea extends Component {
 		this.mouseUpFunction = function(e,xy){
 			let screen = store.getState().screen;
 			let so = screen.offset;
-			//let ss = screen.scroll;
 			let xyo = {
 				x: Math.round((xy.x - so.left)/screen.zoom,0),
 				y: Math.round((xy.y - so.top)/screen.zoom,0)

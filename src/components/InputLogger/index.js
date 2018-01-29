@@ -37,7 +37,6 @@ class InputLogger extends Component {
 
 		this.logMove = function(e){
 			if (this.mouseDown){
-				//console.log(e);
 				let il = this.refs.inputLogger;
 				let xy = {
 					x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX) + il.scrollLeft,
@@ -51,45 +50,41 @@ class InputLogger extends Component {
 			}
 		}.bind(this);
 
-		this.dispatchZoom = function(nextZoom){
-		    return new Promise((resolve,reject)=>{
-		        resolve(store.dispatch({
-		            type:'SCREEN_ZOOM',
-		            val:nextZoom
-		        }));
-		    });
-		};
-
 		this.zoomFn = async (e) => {
-			return await this.dispatchZoom(e.detail.scale);
+			store.dispatch({
+				type:'SCREEN_ZOOM',
+				val:e.detail.scale
+			});
 		}
 		this.panFn = function(e){
-			return window.dispatchEvent(new Event('resize'));
 		}
+		this.transformFn = (e) => {
+			return window.dispatchEvent(new Event('resize'));
+		};
 	}
 	shouldComponentUpdate(nextProps){
-		let itShould = (this.props.cursor!==nextProps.cursor)||(this.props.zoom!==nextProps.zoom);
+		let itShould = (this.props.cursor!==nextProps.cursor);
 		return itShould;
 	}
 	componentDidUpdate(prevProps){
-		if (this.props.zoom!==prevProps.zoom){
-			window.dispatchEvent(new Event('resize'));
-		}
+		// if (this.props.zoom!==prevProps.zoom){
+		// 	window.dispatchEvent(new Event('resize'));
+		// }
     }
-	storeScroll(){
-        if (this.refs.inputLogger!==undefined){
-            let il = this.refs.inputLogger;
-            store.dispatch({
-                type:'SCREEN_SCROLL',
-                val:{
-					top:il.scrollTop,
-					left:il.scrollLeft
-				}
-            });
-
-			window.dispatchEvent(new Event('resize'));
-        }
-    }
+	// storeScroll(){
+    //     if (this.refs.inputLogger!==undefined){
+    //         let il = this.refs.inputLogger;
+    //         store.dispatch({
+    //             type:'SCREEN_SCROLL',
+    //             val:{
+	// 				top:il.scrollTop,
+	// 				left:il.scrollLeft
+	// 			}
+    //         });
+    //
+	// 		window.dispatchEvent(new Event('resize'));
+    //     }
+    // }
 	componentDidMount(){
         if (this.refs.inputLogger!==undefined){
 			let il = this.refs.inputLogger;
@@ -110,12 +105,12 @@ class InputLogger extends Component {
 	        });
 			il.addEventListener('zoom',this.zoomFn);
 			il.addEventListener('panend',this.panFn);
+			il.addEventListener('transform',this.transformFn);
 	        store.dispatch({
 	            type:'PUBLIC_ADD',
 	            key:'zoomInstance',
 	            val:zoomInstance
 	        });
-
         }
     }
 
@@ -123,6 +118,7 @@ class InputLogger extends Component {
         if (this.refs.inputLogger!==undefined){
 			this.refs.inputLogger.removeEventListener('zoom',this.zoomFn);
 			this.refs.inputLogger.removeEventListener('panend',this.panFn);
+			this.refs.inputLogger.removeEventListener('transform',this.transformFn);
         }
     }
 	render() {
