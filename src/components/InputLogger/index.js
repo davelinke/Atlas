@@ -66,25 +66,7 @@ class InputLogger extends Component {
 		let itShould = (this.props.cursor!==nextProps.cursor);
 		return itShould;
 	}
-	componentDidUpdate(prevProps){
-		// if (this.props.zoom!==prevProps.zoom){
-		// 	window.dispatchEvent(new Event('resize'));
-		// }
-    }
-	// storeScroll(){
-    //     if (this.refs.inputLogger!==undefined){
-    //         let il = this.refs.inputLogger;
-    //         store.dispatch({
-    //             type:'SCREEN_SCROLL',
-    //             val:{
-	// 				top:il.scrollTop,
-	// 				left:il.scrollLeft
-	// 			}
-    //         });
-    //
-	// 		window.dispatchEvent(new Event('resize'));
-    //     }
-    // }
+	componentDidUpdate(prevProps){}
 	componentDidMount(){
         if (this.refs.inputLogger!==undefined){
 			let il = this.refs.inputLogger;

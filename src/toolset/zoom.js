@@ -1,3 +1,5 @@
+import store from '../store'
+
 export default {
     iconClass:'material-icons',
     iconString:'search',
@@ -15,5 +17,11 @@ export default {
 
     },
     mouseup:(args)=>{
+        let state = store.getState();
+        let zoomInstance = state.public.zoomInstance;
+        if (args.event.button===0){
+            let nextZoom = (args.event.altKey?0.75:(1/0.75));
+            zoomInstance.zoomTo(args.event.clientX,args.event.clientY,nextZoom);
+        }
     }
 }
