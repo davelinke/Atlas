@@ -12,6 +12,9 @@ class Toolbar extends Component {
         super(props);
         this.activateTool = (theTool)=>{
             if (this.props.tools.current!==theTool){
+                if(typeof(this.props.tools.set[this.props.tools.current].destroy)==='function'){
+                    this.props.tools.set[this.props.tools.current].destroy();
+                }
                 store.dispatch({
     				type:'TOOLS_CURRENT',
     				val:theTool
@@ -23,6 +26,10 @@ class Toolbar extends Component {
                 store.dispatch({
                     type:'PICK_CLEAR'
                 });
+                console.log()
+                if(typeof(this.props.tools.set[theTool].initialize)==='function'){
+                    this.props.tools.set[theTool].initialize();
+                }
             }
         };
         this.renderTools = ()=>{

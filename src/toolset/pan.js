@@ -7,29 +7,22 @@ export default {
     downScroll: false,
     inputLogger:false,
     downCoords:false,
-    mousedown:(args)=>{
-        if (!this.a.inputLogger) this.a.inputLogger = document.querySelector('.input-logger');
+    initialize:function(){
         let state = store.getState();
-        this.a.downScroll = state.screen.scroll;
-        this.a.downCoords = {
-            x:args.event.pageX,
-            y:args.event.pageY
-        };
+        let zoomInstance = state.public.zoomInstance;
+
+        zoomInstance.setPanButton(0);
+    },
+    destroy:function(){
+        let state = store.getState();
+        let zoomInstance = state.public.zoomInstance;
+
+        zoomInstance.setPanButton(1);
+    },
+    mousedown:(args)=>{
     },
     mousemove:(args)=>{
-        let state = store.getState();
-        let mouse = state.mouse;
-
-        let delta = {
-            x:(this.a.downCoords.x - args.event.pageX)/state.screen.zoom,
-            y:(this.a.downCoords.y - args.event.pageY)/state.screen.zoom
-        };
-
-        // should i dispatch this here and pick up in the component and use a ref instead of this?
-        this.a.inputLogger.scrollTop = this.a.downScroll.top + delta.y;
-        this.a.inputLogger.scrollLeft = this.a.downScroll.left + delta.x;
     },
     mouseup:(args)=>{
-
     }
 }

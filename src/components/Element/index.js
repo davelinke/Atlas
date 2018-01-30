@@ -47,14 +47,13 @@ class Element extends Component {
     storeDimensions(){
         if (this.refs.root!==undefined){
             let offset = function(el) {
-                var rect = el.getBoundingClientRect(),
-                scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
-                scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+                let rect = el.getBoundingClientRect();
+                return { top: rect.top, left: rect.left }
             }
+            let zeOffset = offset(this.refs.root);
             store.dispatch({
                 type:'SCREEN_OFFSET',
-                val:offset(this.refs.root)
+                val:zeOffset
             });
         }
     }

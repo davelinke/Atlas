@@ -11,6 +11,7 @@ import workareaReducer from  './reducers/workareaReducer';
 import screenReducer from  './reducers/screenReducer';
 import pickReducer from  './reducers/pickReducer';
 import menuReducer from  './reducers/menuReducer';
+import publicReducer from  './reducers/publicReducer';
 
 
 // combine reducers - Although we have one only,
@@ -27,7 +28,8 @@ const combinedReducers = combineReducers({
     history:historyReducer,
     screen:screenReducer,
     pick:pickReducer,
-    menu:menuReducer
+    menu:menuReducer,
+    public:publicReducer
 });
 
 // create the holy grail of truth... The Store

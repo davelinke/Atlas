@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import store from '../../store';
+import zoom from 'panzoom';
 
 class InputLogger extends Component {
 	constructor(props){
@@ -10,10 +11,9 @@ class InputLogger extends Component {
 			e.preventDefault();
 			let xy;
             let eType = e.type;
-			let il = this.refs.inputLogger;
-            xy = {
-				x:e.pageX + il.scrollLeft,
-				y:e.pageY + il.scrollTop
+			xy = {
+				x:e.pageX,
+				y:e.pageY
 			};
 			switch (eType) {
 				case 'mousedown':
@@ -37,7 +37,6 @@ class InputLogger extends Component {
 
 		this.logMove = function(e){
 			if (this.mouseDown){
-				//console.log(e);
 				let il = this.refs.inputLogger;
 				let xy = {
 					x:(e.type==='touchmove'?e.originalEvent.touches[0].pageX:e.pageX) + il.scrollLeft,
@@ -50,45 +49,63 @@ class InputLogger extends Component {
 	            });
 			}
 		}.bind(this);
+
+		this.zoomFn = async (e) => {
+			store.dispatch({
+				type:'SCREEN_ZOOM',
+				val:e.detail.scale
+			});
+		}
+		this.panFn = function(e){
+		}
+		this.transformFn = (e) => {
+			return window.dispatchEvent(new Event('resize'));
+		};
 	}
 	shouldComponentUpdate(nextProps){
-		let itShould = ((this.props.zoom!==nextProps.zoom)||(this.props.cursor!==nextProps.cursor));
+		let itShould = (this.props.cursor!==nextProps.cursor);
 		return itShould;
 	}
-	componentDidUpdate(prevProps){
-		if (this.props.zoom!==prevProps.zoom){
-			window.dispatchEvent(new Event('resize'));
-		}
-    }
-	storeScroll(){
-        if (this.refs.inputLogger!==undefined){
-            let il = this.refs.inputLogger;
-            store.dispatch({
-                type:'SCREEN_SCROLL',
-                val:{
-					top:il.scrollTop,
-					left:il.scrollLeft
-				}
-            });
-
-			window.dispatchEvent(new Event('resize'));
-        }
-    }
+	componentDidUpdate(prevProps){}
 	componentDidMount(){
         if (this.refs.inputLogger!==undefined){
-            this.storeScroll();
-            this.refs.inputLogger.addEventListener("scroll",this.storeScroll.bind(this));
+			let il = this.refs.inputLogger;
+
+			//lets talk about origin
+			let origin = {
+				x:'calc(50% - 50vw)',
+				y:'calc(50% - 50vh)',
+				z:0
+			};
+
+			// initialize zoompan
+			let zoomInstance = zoom(il,{
+	            smoothScroll: false,
+				panButton:1,
+				zoomDoubleClickSpeed: 1,
+				transformOrigin:origin
+	        });
+			il.addEventListener('zoom',this.zoomFn);
+			il.addEventListener('panend',this.panFn);
+			il.addEventListener('transform',this.transformFn);
+	        store.dispatch({
+	            type:'PUBLIC_ADD',
+	            key:'zoomInstance',
+	            val:zoomInstance
+	        });
         }
     }
 
     componentWillUnmount() {
         if (this.refs.inputLogger!==undefined){
-            this.refs.inputLogger.removeEventListener("scroll", this.storeScroll.bind(this));
+			this.refs.inputLogger.removeEventListener('zoom',this.zoomFn);
+			this.refs.inputLogger.removeEventListener('panend',this.panFn);
+			this.refs.inputLogger.removeEventListener('transform',this.transformFn);
         }
     }
 	render() {
 		return (
-			<div ref="inputLogger" style={{zoom:this.props.zoom,cursor:this.props.cursor}}
+			<div ref="inputLogger" style={{cursor:this.props.cursor}}
     			className="input-logger"
     			onMouseDown={this.logEvent}
     			onMouseUp={this.logEvent}
