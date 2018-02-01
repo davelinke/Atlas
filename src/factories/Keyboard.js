@@ -1,4 +1,3 @@
-//import {merge} from 'lodash';
 import store from '../store';
 export default {
     '86':{ // C
@@ -52,7 +51,7 @@ export default {
         },
         keyup:(event)=>{}
     },
-    '18':{
+    '18':{ // altKey
         keydown:(e)=>{
             let state = store.getState();
             if (state.tools.current==='zoom'){
@@ -72,25 +71,46 @@ export default {
             }
         }
     },
-    '32':{
-        prevTool:false,
+    '32':{ // spacebar
         keydown:(e)=>{
             let state = store.getState();
             if(state.tools.current!=='pan'){
-                this.a['32'].prevTool = state.tools.current;
-
+                store.dispatch({
+                    type:'PUBLIC_ADD',
+                    key:'lastTool',
+                    val:state.tools.current
+                });
+                //this.a['32'].prevTool = state.tools.current;
                 store.dispatch({
                     type:'TOOLS_CURRENT',
                     val:'pan'
                 });
+                store.dispatch({
+                    type:'WORKAREA_CURSOR',
+                    val:state.tools.set.pan.cursor
+                });
+                state.tools.set.pan.initialize();
             }
         },
         keyup:(e)=>{
-
+            let state = store.getState();
+            let lastTool = state.public.lastTool;
+            state.tools.set.pan.destroy();
             store.dispatch({
                 type:'TOOLS_CURRENT',
-                val:this.a['32'].prevTool
+                val:lastTool
             });
+            store.dispatch({
+                type:'WORKAREA_CURSOR',
+                val:state.tools.set[lastTool].cursor
+            });
+            store.dispatch({
+                type:'PUBLIC_REMOVE',
+                key:'lastTool'
+            })
+            if (typeof(state.tools.set[lastTool].initialize)==='function'){
+                state.tools.set[lastTool].initialize();
+            }
         }
     }
 };

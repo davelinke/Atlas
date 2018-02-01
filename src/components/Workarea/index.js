@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {merge} from 'lodash';
 import CoordFilters from '../../factories/CoordFilters';
 import InputLogger from '../InputLogger/';
+import PickHelpers from '../../factories/Pick';
 import store from '../../store'
 
 import './styles.css';
@@ -10,25 +11,6 @@ import './styles.css';
 class Workarea extends Component {
 	constructor(props){
 		super(props);
-		this.pick = {
-			add:function(elementObject){
-				store.dispatch({
-					type:'PICK_ADD',
-					val:elementObject
-				});
-			},
-			remove:function(elementId){
-				store.dispatch({
-					type:'PICK_REMOVE',
-					val:elementId
-				});
-			},
-			clear:function(){
-				store.dispatch({
-					type:'PICK_CLEAR'
-				});
-			}
-		};
 		this.eventReceptorFunction = function(args){
 			store.dispatch({
 				type: 'MOUSE_EVENT',
@@ -42,7 +24,7 @@ class Workarea extends Component {
 					toolFn({
 						pick: merge(
 							{},
-							this.pick,
+							PickHelpers,
 							{
 								elements:currentPick.elements,
 								initialStates:currentPick.initialStates

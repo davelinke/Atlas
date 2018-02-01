@@ -1,7 +1,8 @@
-import treeHelpers from '../factories/Tree';
 import {merge} from 'lodash';
+import TreeHelpers from '../factories/Tree';
 import ObjectTools from '../factories/ObjectTools';
-import store from '../store'
+import PickHelpers from '../factories/Pick';
+import Store from '../store';
 
 export default {
     iconClass:'custom_icons selection',
@@ -12,7 +13,6 @@ export default {
     active:false,
     resizeDirection:false,
     areaWindow:false,
-    initialPick:[],
     mousedown:(args)=>{
         let mouseButton = args.event.button;
 
@@ -20,55 +20,21 @@ export default {
             this.a.active = true;
             let target = args.event.target;
             let elementId = target.dataset.id;
-            let shiftKey = args.event.shiftKey;
-            let state = store.getState();
-            let pick = args.pick.elements;
+            let addKey = args.event.shiftKey;
+            let state = Store.getState();
 
             this.a.willMove = target.dataset.move;
             this.a.resizeDirection = target.dataset.resize;
 
+            // BOOM
+            PickHelpers.addElementToPick(elementId, args.pick, addKey);
+            console.log(elementId);
             // if what's clicked is not the artboard
-            if (elementId && elementId!=='root'){
-
-                // element initial MOUSE_POSITION
-                let elementData = treeHelpers.getElementDataById(state.tree.children,elementId);
-                let elementState = elementData.currentState;
-                let stateStyle = elementData.states[elementState].style;
-
-                let pickObject = {
-                    id: elementId,
-                    top:stateStyle.top,
-                    left:stateStyle.left,
-                    width:stateStyle.width,
-                    height:stateStyle.height,
-                }
-                // let's see if it's already selected
-                let isInPick = ObjectTools.objectAvailableByKey('id',elementId,pick);
-                if (shiftKey){ // if shift is pressed
-                    if (isInPick){ // and the element is already selected
-                        args.pick.remove(elementId); // deselect it
-                    } else { // and the element is not selected
-                        args.pick.add(pickObject);// then select it too
-                    }
-                } else { // if shif is not pressed
-                    if (!isInPick){ // and the element is not selected/active
-                        args.pick.clear();
-                        args.pick.add(pickObject); //then select it
-                    }
-                }
-            } else {
-
-                this.a.initialPick = [].concat(args.pick.elements);
-
-                if (!shiftKey){ //if shift is not pressed
-                    args.pick.clear(); // it is the root element, so let's clear
-                    this.a.initialPick = [];
-                }
-
+            if (!elementId){
                 // we should be dragselecting then
                 this.a.dragSelect = true;
 
-                let areaWindow
+                let areaWindow;
                 if (!this.a.areaWindow) {
                     areaWindow = document.createElement('div');
                     areaWindow.setAttribute('class','area-window');
@@ -97,7 +63,7 @@ export default {
     },
     mousemove:(args)=>{
         if (this.a.active){
-            let state = store.getState();
+            let state = Store.getState();
             let mouse = state.mouse;
 
             let delta = {
@@ -113,7 +79,7 @@ export default {
                 if (!pickEmpty) {
                     // calculate the delta
                     for (let pickElement of pick){
-                        let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
+                        let currentElement = TreeHelpers.getElementDataById(nuTree.children,pickElement.id);
                         let currentState = currentElement.currentState;
                         let ess = currentElement.states[currentState].style;
                         if (this.a.willMove==='1'){
@@ -180,7 +146,7 @@ export default {
                             }
                         }
                     }
-                    store.dispatch({
+                    Store.dispatch({
                         type:'TREE_FULL',
                         val:nuTree
                     })
@@ -258,9 +224,10 @@ export default {
                     }
                     let isInArea = (check.x1&&check.x2&&check.y1&&check.y2);
                     //console.log(isInArea);
+                    let initialPick = state.public.initialPick;
                     if (isInArea) {
                         // find out how to deselect or re-selected
-                        let wasPicked = ObjectTools.objectAvailableByKey('id',elementId,this.a.initialPick);
+                        let wasPicked = ObjectTools.objectAvailableByKey('id',elementId,initialPick);
                         //console.log(wasPicked);
                         if (!wasPicked) {
                             let pickObject = {
@@ -274,7 +241,7 @@ export default {
                         }
                     } else {
                         // lets check if it was already at pick and add if so.
-                        let startedPicked = ObjectTools.objectAvailableByKey('id',elementId,this.a.initialPick);
+                        let startedPicked = ObjectTools.objectAvailableByKey('id',elementId,initialPick);
                         if (startedPicked) {
                             let pickObject = {
                                 id: elementId,
@@ -289,7 +256,7 @@ export default {
                 }
 
                 // the new pick
-                store.dispatch({
+                Store.dispatch({
                     type:'PICK_FULL',
                     val:nextPick
                 });
@@ -302,7 +269,7 @@ export default {
         this.a.dragSelect = false;
 
         if(this.a.active){
-            let state = store.getState();
+            let state = Store.getState();
 
             let pick = [].concat(args.pick.elements);
             let pickLength = pick.length;
@@ -311,16 +278,21 @@ export default {
                 let nuTree = state.tree;
                 for (let pickElement of pick){
                     // calculate new coords
-                    let currentElement = treeHelpers.getElementDataById(nuTree.children,pickElement.id);
+                    let currentElement = TreeHelpers.getElementDataById(nuTree.children,pickElement.id);
                     let currentState = currentElement.currentState;
                     pickElement.left = currentElement.states[currentState].style.left;
                     pickElement.top = currentElement.states[currentState].style.top;
                     pickElement.width = currentElement.states[currentState].style.width;
                     pickElement.height =currentElement.states[currentState].style.height;
                 }
-                store.dispatch({
+                Store.dispatch({
                     type:'PICK_FULL',
                     val:pick
+                })
+            } else {
+                Store.dispatch({
+                    type:'PUBLIC_REMOVE',
+                    key:'initialPick'
                 })
             }
         }
