@@ -5,18 +5,16 @@
   width: 150px;
   background-color: rgba(255, 255, 255, 0.1);
   border-left: 1px solid #000;
-  flex: 0 0 auto; }
-  .leftbar ul {
-    display: flex;
-    flex-direction: column-reverse;
-    list-style-type: none;
-    list-style-position: inside;
-    padding: 0 0 0 10px;
-    margin: 0; }
-    .leftbar ul li {
-      padding: 10;
-      margin: 0; }
-      .leftbar ul li button {
-        padding: 1px 0; }
-        .leftbar ul li button:hover {
-          color: #fff; }
+  flex: 0 0 auto;
+  padding: 0.25rem;
+  box-sizing: border-box; }
+
+.tree-element {
+  padding: 0 0 0 10px;
+  margin: 0; }
+
+.tree-button {
+  margin: 0.25rem 0; }
+
+.dropzone {
+  background-color: rgba(0, 0, 0, 0.5); }
