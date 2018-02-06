@@ -28,7 +28,6 @@ export default {
 
             // BOOM
             PickHelpers.addElementToPick(elementId, args.pick, addKey);
-            console.log(elementId);
             // if what's clicked is not the artboard
             if (!elementId){
                 // we should be dragselecting then
