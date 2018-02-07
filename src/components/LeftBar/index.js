@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PickHelpers from '../../factories/Pick';
+import TreeHelpers from '../../factories/Tree';
 import store from '../../store';
 import {merge} from 'lodash';
 
@@ -16,39 +17,6 @@ class Tree extends Component {
             }
         }
         return false;
-    }
-    sortTree(el,target,source,sibling){
-        let elId = el.dataset.elementId;
-        let prevId = (sibling?sibling.dataset.elementId:null);
-        let parentId = source.dataset.elementId;
-        let elIndex = 0;
-        let spliceIndex = 0;
-
-        let nuTree = merge({},this.props.tree);
-        let branch = this.findTree(parentId,nuTree);
-        let looseElement;
-
-        for (let child of branch.children){
-            if (child.id===elId) {
-                looseElement = branch.children.splice(elIndex,1);
-            }
-            elIndex++;
-        }
-
-        if (prevId) {
-            for (let child of branch.children) {
-                if (child.id === prevId) break;
-                spliceIndex++
-            }
-        }
-        branch.children.splice(spliceIndex,0,looseElement[0]);
-
-        console.log(nuTree);
-
-        // store.dispatch({
-        //     type:'TREE_FULL',
-        //     val:nuTree
-        // });
     }
     selectItem(e){
         let element = e.target;
@@ -69,12 +37,6 @@ class Tree extends Component {
         // BOOM
         PickHelpers.addElementToPick(elementId, pick, addKey);
     }
-    componentDidMount(){
-
-    }
-    componentWillUnmount(){
-
-    }
     renderChildren(){
         let children = this.props.tree.children;
         let returnArray =[];
@@ -90,36 +52,27 @@ class Tree extends Component {
     drop(e,tgt){
         e.preventDefault();
         let target = e.target;
-        let targetPathString = target.dataset.path;
-        let targetPathArray = targetPathString.split('_');
+        let targetId = target.dataset.elementId;
+
         let state = store.getState();
-
-        let source = state.public.layerDrag;
-
-        let sourcePathString = source.dataset.path;
-        let sourcePathArray = sourcePathString.split('_');
-
-        let path = merge({},state.tree);
-
-        let findWorkArray = function(pathArray){
-            for (let i=1; i<pathArray.length; i++){
-                if ((i+1)===pathArray.length){
-                    return path.children;
-                }
-                path = path.children[i];
-            }
+        let tree = merge({},state.tree);
+        let pick = state.pick.elements;
+        let transferArray = [];
+        for (let element of pick){
+            let transfer = TreeHelpers.spliceElementById(tree,element.id);
+            if (transfer) transferArray.push(transfer[0]);
         }
+        console.log(tree,transferArray);
+        tree = TreeHelpers.InsertElementsBefore(tree,targetId,transferArray);
 
-        //splice from source
-        let sa = findWorkArray(sourcePathArray);
-        let ta = findWorkArray(targetPathArray);
+        // concat the beginning for the insertion array, the transferarray and the end of the insertion array
 
-        let transfer = sa.splice(sourcePathArray[sourcePathArray.length-1],1);
-        ta.splice(targetPathArray[targetPathArray.length-1],0,transfer[0]);
+        console.log(tree);
+
 
         store.dispatch({
             type:'TREE_FULL',
-            val:path
+            val:tree
         });
 
         store.dispatch({
@@ -131,18 +84,18 @@ class Tree extends Component {
         e.preventDefault();
     }
     dragStart(e){
-        store.dispatch({
-            type:'PUBLIC_ADD',
-            key:'layerDrag',
-            val:e.target
-        })
+        // store.dispatch({
+        //     type:'PUBLIC_ADD',
+        //     key:'layerDrag',
+        //     val:e.target
+        // })
     }
     renderButton(){
         let tree = this.props.tree;
         if(tree.id !== 'root'){
-            return <button className="tree-button" data-element-id={this.props.tree.id} data-path={this.props.path+'_'+this.props.index} onDragStart={this.dragStart} onDragOver={this.dragOver} onDrop={this.drop} draggable="true" onClick={this.selectItem}>{tree.label}</button>
+            return <button className="tree-button" data-element-id={this.props.tree.id} data-path={this.props.path+'_'+this.props.index} onDragStart={this.dragStart} onDragOver={this.dragOver} onDrop={this.drop.bind(this)} draggable="true" onMouseDown={this.selectItem}>{tree.label}</button>
         } else {
-            return <button className="tree-button" data-element-id={this.props.tree.id} onClick={this.selectItem}>{tree.label}</button>
+            return <button className="tree-button" data-element-id={this.props.tree.id} onMouseDown={this.selectItem}>{tree.label}</button>
         }
     }
     render(){

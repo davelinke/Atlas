@@ -18,8 +18,11 @@
 
 .tree-button{
     margin: 0.25rem 0;
+    width: 100%;
+    text-align: left;
 }
-.dropzone{
-    //height: 1px;
-    background-color: rgba(0,0,0,0.5);
+.drop-zone{
+    height: 3px;
+    background-color: rgba(0,0,0,1);
+    display: block;
 }

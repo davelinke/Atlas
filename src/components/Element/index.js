@@ -6,11 +6,14 @@ import './styles.css';
 
 class Element extends Component {
     renderChildren(){
-        return this.props.specs.children.map(
-            (child, i) => {
-                return (<Element key={i} specs={child} pick={this.props.pick} />);
-            }
-        )
+        if(this.props.specs.children){
+            return this.props.specs.children.map(
+                (child, i) => {
+                    return (<Element key={i} specs={child} pick={this.props.pick} />);
+                }
+            )
+        }
+        return null;
     }
     getClassString(){
         let classes = this.props.specs.states[this.props.specs.currentState].classes;

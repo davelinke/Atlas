@@ -14,7 +14,11 @@
   margin: 0; }
 
 .tree-button {
-  margin: 0.25rem 0; }
+  margin: 0.25rem 0;
+  width: 100%;
+  text-align: left; }
 
-.dropzone {
-  background-color: rgba(0, 0, 0, 0.5); }
+.drop-zone {
+  height: 3px;
+  background-color: black;
+  display: block; }
