@@ -48,52 +48,87 @@ class Tree extends Component {
     }
     dragEnter(e){
         e.preventDefault();
+        e.target.classList.add('hover');
     }
-    drop(e,tgt){
+    dragLeave(e){
+        e.preventDefault();
+        e.target.classList.remove('hover');
+    }
+    drop(e, before=true){
         e.preventDefault();
         let target = e.target;
         let targetId = target.dataset.elementId;
 
-        let state = store.getState();
-        let tree = merge({},state.tree);
-        let pick = state.pick.elements;
-        let transferArray = [];
-        for (let element of pick){
-            let transfer = TreeHelpers.spliceElementById(tree,element.id);
-            if (transfer) transferArray.push(transfer[0]);
+        if (!PickHelpers.isInPick(targetId)){
+            let state = store.getState();
+            let tree = merge({},state.tree);
+            let pick = state.pick.elements;
+            let transferArray = [];
+            for (let element of pick){
+                let transfer = TreeHelpers.spliceElementById(tree,element.id);
+                if (transfer) transferArray.push(transfer[0]);
+            }
+            console.log(tree,transferArray);
+
+            tree = TreeHelpers[(before?'InsertElementsBefore':'InsertElementsAfter')](tree,targetId,transferArray);
+
+            // concat the beginning for the insertion array, the transferarray and the end of the insertion array
+
+            console.log(tree);
+
+
+            store.dispatch({
+                type:'TREE_FULL',
+                val:tree
+            });
+            store.dispatch({
+                type:'PUBLIC_ADD',
+                key:'layerDrag',
+                val:false
+            })
         }
-        console.log(tree,transferArray);
-        tree = TreeHelpers.InsertElementsBefore(tree,targetId,transferArray);
-
-        // concat the beginning for the insertion array, the transferarray and the end of the insertion array
-
-        console.log(tree);
-
-
-        store.dispatch({
-            type:'TREE_FULL',
-            val:tree
-        });
-
-        store.dispatch({
-            type:'PUBLIC_REMOVE',
-            key:'layerDrag'
-        })
+    }
+    dropBefore(e){
+        console.log('before');
+        this.drop(e,true);
+    }
+    dropAfter(e){
+        console.log('after');
+        this.drop(e,false);
     }
     dragOver(e){
         e.preventDefault();
     }
     dragStart(e){
-        // store.dispatch({
-        //     type:'PUBLIC_ADD',
-        //     key:'layerDrag',
-        //     val:e.target
-        // })
+        store.dispatch({
+            type:'PUBLIC_ADD',
+            key:'layerDrag',
+            val:true
+        })
+    }
+    componentWillMount(){
+        store.dispatch({
+            type:'PUBLIC_ADD',
+            key:'layerDrag',
+            val:false
+        })
+    }
+    componentWillUnmount(){
+        store.dispatch({
+            type:'PUBLIC_REMOVE',
+            key:'layerDrag'
+        })
     }
     renderButton(){
         let tree = this.props.tree;
         if(tree.id !== 'root'){
-            return <button className="tree-button" data-element-id={this.props.tree.id} data-path={this.props.path+'_'+this.props.index} onDragStart={this.dragStart} onDragOver={this.dragOver} onDrop={this.drop.bind(this)} draggable="true" onMouseDown={this.selectItem}>{tree.label}</button>
+            return (
+                <button className="tree-button" data-element-id={this.props.tree.id} onDragStart={this.dragStart} draggable="true" onMouseDown={this.selectItem}>
+                    <span className="drop-zone" data-element-id={this.props.tree.id} onDragOver={this.dragOver} onDragEnter={this.dragEnter} onDragLeave={this.dragLeave}  onDrop={this.dropBefore.bind(this)}></span>
+                    {tree.label}
+                    <span className="drop-zone" data-element-id={this.props.tree.id} onDragOver={this.dragOver} onDragEnter={this.dragEnter} onDragLeave={this.dragLeave} onDrop={this.dropAfter.bind(this)}></span>
+                </button>
+            );
         } else {
             return <button className="tree-button" data-element-id={this.props.tree.id} onMouseDown={this.selectItem}>{tree.label}</button>
         }
@@ -117,7 +152,7 @@ class Tree extends Component {
 class LeftBar extends Component {
     render(){
         return (
-            <div className={"leftbar "+this.props.pick.elements.map((element)  => {return element.id+" "}).join(" ")}>
+            <div className={"leftbar "+(this.props.public.layerDrag?'drag':'')+" "+this.props.pick.elements.map((element)  => {return element.id+" "}).join(" ")}>
                 <Tree tree={this.props.tree} path={''} index={'root'}></Tree>
             </div>
         );
@@ -127,7 +162,8 @@ class LeftBar extends Component {
 const mapStateToProps = function(store) {
     return {
         tree:store.tree,
-        pick:store.pick
+        pick:store.pick,
+        public:store.public
     };
 };
 

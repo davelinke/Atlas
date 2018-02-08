@@ -19,6 +19,10 @@ export default {
             type:'PICK_CLEAR'
         });
     },
+    isInPick:function(elementId){
+        let pick = Store.getState().pick.elements;
+        return ObjectTools.objectAvailableByKey('id',elementId,pick);
+    },
     addElementToPick:function(elementId, pick, addKey){
         // if what's clicked is not the artboard
         if (elementId && elementId!=='root'){

@@ -16,9 +16,24 @@
 .tree-button {
   margin: 0.25rem 0;
   width: 100%;
-  text-align: left; }
+  text-align: left;
+  position: relative;
+  padding: 0; }
 
 .drop-zone {
-  height: 3px;
+  height: 4px;
   background-color: black;
-  display: block; }
+  display: block;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  opacity: 0; }
+  .drop-zone:first-of-type {
+    top: -6px; }
+  .drop-zone:last-of-type {
+    bottom: -6px; }
+
+.drag .drop-zone {
+  pointer-events: all; }
+  .drag .drop-zone.hover {
+    opacity: 1; }
