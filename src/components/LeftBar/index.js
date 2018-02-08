@@ -55,6 +55,8 @@ class Tree extends Component {
         e.target.classList.remove('hover');
     }
     drop(e, before=true){
+        // VERIFY WHY WHEN DROPPING ON PARENT GROUPS LAYER GOES TO HELL
+
         e.preventDefault();
         let target = e.target;
         let targetId = target.dataset.elementId;
@@ -68,14 +70,8 @@ class Tree extends Component {
                 let transfer = TreeHelpers.spliceElementById(tree,element.id);
                 if (transfer) transferArray.push(transfer[0]);
             }
-            console.log(tree,transferArray);
 
             tree = TreeHelpers[(before?'InsertElementsBefore':'InsertElementsAfter')](tree,targetId,transferArray);
-
-            // concat the beginning for the insertion array, the transferarray and the end of the insertion array
-
-            console.log(tree);
-
 
             store.dispatch({
                 type:'TREE_FULL',
@@ -89,11 +85,9 @@ class Tree extends Component {
         }
     }
     dropBefore(e){
-        console.log('before');
         this.drop(e,true);
     }
     dropAfter(e){
-        console.log('after');
         this.drop(e,false);
     }
     dragOver(e){
@@ -140,7 +134,7 @@ class Tree extends Component {
 
                 {this.renderButton()}
 
-                <style type="text/css">{'.'+tree.id+' .ch_'+tree.id+'{background-color:#ccc}'}</style>
+                <style type="text/css">{'.'+tree.id+' .ch_'+tree.id+'{background-color:#ccc} .'+tree.id+' .ch_'+tree.id+' .drop-zone{opacity:0 !important;pointer-events:none !important;}'}</style>
 
                 {this.renderChildren()}
 
