@@ -64,12 +64,23 @@ class Tree extends Component {
         if (!PickHelpers.isInPick(targetId)){
             let state = store.getState();
             let tree = merge({},state.tree);
+            let targetElementParent = TreeHelpers.getParentElement(tree,targetId);
             let pick = state.pick.elements;
             let transferArray = [];
             for (let element of pick){
+                let elementSource = TreeHelpers.getParentElement(tree,element.id);
+                if(targetElementParent!==elementSource){
+                    console.log('isdifferent');
+                    // is different, thus recalculate the top-left
+                    // find the delta by comparing coords to root
+                    
+                }
                 let transfer = TreeHelpers.spliceElementById(tree,element.id);
                 if (transfer) transferArray.push(transfer[0]);
             }
+
+            // recalculate coords when transfering
+            // check the position of parents and opearte accordingly
 
             tree = TreeHelpers[(before?'InsertElementsBefore':'InsertElementsAfter')](tree,targetId,transferArray);
 

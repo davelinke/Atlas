@@ -1,13 +1,19 @@
 import { Style, State, Element } from '../structures/Element';
 import { merge } from 'lodash';
 const TreeFactory = {
-    InsertElementsAfter:function(where,id,elements){
+    getRootCoords:function(element){
+        let offset = {
+            x:0,
+            y:0
+        }
+    },
+    InsertElements:function(where,id,elements,position = 0){
         let searchTree = function(so){
             for (var j=0;j<so.length; j++) {
                 var io = so[j];
                 if (io.id===id){
                     for (let element of elements) {
-                        so.splice(j,0,element);
+                        so.splice((j+position),0,element);
                     }
                     break;
                 } else {
@@ -19,23 +25,11 @@ const TreeFactory = {
         };
         return searchTree(where.children);
     },
+    InsertElementsAfter:function(where,id,elements){
+        return this.InsertElements(where,id,elements,0);
+    },
     InsertElementsBefore:function(where,id,elements){
-        let searchTree = function(so){
-            for (var j=0;j<so.length; j++) {
-                var io = so[j];
-                if (io.id===id){
-                    for (let element of elements) {
-                        so.splice(j+1,0,element);
-                    }
-                    break;
-                } else {
-                    var c = searchTree(io.children);
-                    if ((io.children.length > 0) && (c)) return c;
-                }
-            }
-            return where;
-        };
-        return searchTree(where.children);
+        return this.InsertElements(where,id,elements,1);
     },
     getElementIndex:function(where,id){
         for (var j=0;j<where.length; j++) {
@@ -61,7 +55,28 @@ const TreeFactory = {
         };
         return searchTree(where);
     },
+    getParentElement:function(where,id){
+        let searchTree = function(so){
+            for (var j=0;j<so.children.length; j++) {
+                var io = so.children[j];
+                if (io.id===id){
+                    return so;
+                } else {
+                    var c = searchTree(io);
+                    if ((io.children.length > 0) && (c)) return c;
+                }
+            }
+            return null;
+        };
+        return searchTree(where);
+    },
     getElementDataById:function(where,id){
+        let target = where;
+        if (target.children!== undefined){
+            if (target.id===id) return target;
+            target = target.children;
+        }
+
         let searchTree = function(so){
             for (var j=0;j<so.length; j++) {
                 var io = so[j];
@@ -74,7 +89,7 @@ const TreeFactory = {
             }
             return false;
         };
-        return searchTree(where);
+        return searchTree(target);
     },
     removeElementById:function(where,id){
         let nuWhere = merge({},where);
@@ -100,7 +115,8 @@ const TreeFactory = {
                 if (io.id===id){
                     return so.splice(j,1);
                 } else {
-                    so[j].children = filterChildren(so[j].children);
+                    var c = filterChildren(io.children);
+                    if ((io.children.length > 0) && (c)) return c;
                 }
             }
             return false;
