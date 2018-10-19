@@ -25,6 +25,7 @@ export default {
     },
     addElementToPick:function(elementId, pick, addKey){
         // if what's clicked is not the artboard
+        
         if (elementId && elementId!=='root'){
 
             // element initial MOUSE_POSITION
