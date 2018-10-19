@@ -28,7 +28,7 @@ export default {
 
             // BOOM
             PickHelpers.addElementToPick(elementId, args.pick, addKey);
-            console.log(elementId);
+            
             // if what's clicked is not the artboard
             if (!elementId){
                 // we should be dragselecting then
@@ -79,14 +79,19 @@ export default {
                 if (!pickEmpty) {
                     // calculate the delta
                     for (let pickElement of pick){
+                        // get element id within pick
                         let currentElement = TreeHelpers.getElementDataById(nuTree.children,pickElement.id);
+                        // get the state of the element (diverse css style)
                         let currentState = currentElement.currentState;
+                        // get the element style in current state
                         let ess = currentElement.states[currentState].style;
+                        // will it move? (resize 0, move 1)
                         if (this.a.willMove==='1'){
                             // calculate new coords
                             ess.left = pickElement.left - delta.x;
                             ess.top = pickElement.top - delta.y;
                         } else {
+                            // let's check how it will resize (depending on the quadrant chosen)
                             let resizeDir = this.a.resizeDirection;
                             let nextWidth,nextHeight;
                             switch (resizeDir) {
@@ -192,8 +197,6 @@ export default {
                     aVal.width = delta.x;
                 }
 
-                //console.log(aVal);
-
                 ess.top = aVal.top ? aVal.top + 'px':'auto';
                 ess.left = aVal.left ? aVal.left + 'px':'auto';
                 ess.width = aVal.width ? aVal.width + 'px':'auto';
@@ -223,12 +226,12 @@ export default {
                         y2: (aVal.height + aVal.top)    >=   eS.top
                     }
                     let isInArea = (check.x1&&check.x2&&check.y1&&check.y2);
-                    //console.log(isInArea);
+                    
                     let initialPick = state.public.initialPick;
                     if (isInArea) {
                         // find out how to deselect or re-selected
                         let wasPicked = ObjectTools.objectAvailableByKey('id',elementId,initialPick);
-                        //console.log(wasPicked);
+                        
                         if (!wasPicked) {
                             let pickObject = {
                                 id: elementId,

@@ -11,8 +11,8 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen, event=false)
 
     if(keyboard.shift && wc && event.type==='mousemove'){
         let dd = {
-            x:finalCoords.x - mouse.down.x,
-            y:finalCoords.y - mouse.down.y
+            x:finalCoords.x - mouse.offsetDown.x,
+            y:finalCoords.y - mouse.offsetDown.y
         };
 		let angle = -1 * Math.atan2(dd.y, dd.x) * 180 / Math.PI;
 		angle = Math.floor(angle < 0 ? 360 + angle : angle);
@@ -23,35 +23,35 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen, event=false)
 			case 0: //(45deg) NE
 				lower = dd.x<Math.abs(dd.y)?dd.x:Math.abs(dd.y);
 				finalCoords = {
-					x:mouse.down.x + lower,
-					y:mouse.down.y - lower
+					x:mouse.offsetDown.x + lower,
+					y:mouse.offsetDown.y - lower
 				};
 				break;
 			case 2: //135
 				lower = dd.x>dd.y?dd.x:dd.y;
 				finalCoords = {
-					x:mouse.down.x + lower,
-					y:mouse.down.y + lower
+					x:mouse.offsetDown.x + lower,
+					y:mouse.offsetDown.y + lower
 				};
 				break;
 			case 4: //225
 				lower = Math.abs(dd.x)<dd.y?Math.abs(dd.x):dd.y;
 				finalCoords = {
-					x:mouse.down.x - lower,
-					y:mouse.down.y + lower
+					x:mouse.offsetDown.x - lower,
+					y:mouse.offsetDown.y + lower
 				};
 				break;
 			case 6: //305
 				lower = dd.x<dd.y?dd.x:dd.y;
 				finalCoords = {
-					x:mouse.down.x + lower,
-					y:mouse.down.y + lower
+					x:mouse.offsetDown.x + lower,
+					y:mouse.offsetDown.y + lower
 				};
 				break;
 			case 1: //270px
             case 5:
 				finalCoords = {
-					x: mouse.down.x,
+					x: mouse.offsetDown.x,
 					y:finalCoords.y
 				};
 				break;
@@ -60,7 +60,7 @@ export default (coords, wc=true, workarea, mouse, keyboard, screen, event=false)
             case 3: //(-1 and 7 and 3)
 				finalCoords = {
 					x: finalCoords.x,
-					y: mouse.down.y
+					y: mouse.offsetDown.y
 				};
                 break;
             default:;
