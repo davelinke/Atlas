@@ -1,12 +1,6 @@
 import { Style, State, Element } from '../structures/Element';
 import { merge } from 'lodash';
 const TreeFactory = {
-    getRootCoords:function(element){
-        let offset = {
-            x:0,
-            y:0
-        }
-    },
     InsertElements:function(where,id,elements,position = 0){
         let searchTree = function(so){
             for (var j=0;j<so.length; j++) {
@@ -51,22 +45,47 @@ const TreeFactory = {
                     if ((io.children.length > 0) && (c)) return c;
                 }
             }
-            return null;
+            return false;
         };
         return searchTree(where);
     },
-    getParentElement:function(where,id){
+    getParentElementById:function(where,id){
+        let output = false;
+        for (let io of where.children) {
+            console.log(io.id,id);
+            if (io.id===id){
+                output = where;
+                console.log('match',output.id);
+                break;
+            } else {
+                output = this.getParentElementById(io,id);
+            }
+        }
+        return output;
+    },
+    getElementGlobalPosition:function(where, id){
+        let coords = {
+            left:0,
+            top:0
+        }
+        if (id==='root'){
+            return coords;
+        }
         let searchTree = function(so){
             for (var j=0;j<so.children.length; j++) {
                 var io = so.children[j];
+                coords.left += io.states[io.currentState].style.left;
+                coords.top += io.states[io.currentState].style.top;
                 if (io.id===id){
-                    return so;
+                    return coords;
                 } else {
                     var c = searchTree(io);
                     if ((io.children.length > 0) && (c)) return c;
                 }
+                coords.left -= io.states[io.currentState].style.left;
+                coords.top -= io.states[io.currentState].style.top;
             }
-            return null;
+            return coords;
         };
         return searchTree(where);
     },

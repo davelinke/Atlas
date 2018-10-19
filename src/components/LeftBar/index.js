@@ -55,32 +55,42 @@ class Tree extends Component {
         e.target.classList.remove('hover');
     }
     drop(e, before=true){
-        // VERIFY WHY WHEN DROPPING ON PARENT GROUPS LAYER GOES TO HELL
+
+        // recursive funciton to calculate the new top-left
 
         e.preventDefault();
         let target = e.target;
         let targetId = target.dataset.elementId;
 
+        //console.log(e.target, targetId);
+
         if (!PickHelpers.isInPick(targetId)){
             let state = store.getState();
             let tree = merge({},state.tree);
-            let targetElementParent = TreeHelpers.getParentElement(tree,targetId);
+            let targetElementParent = TreeHelpers.getParentElementById(tree,targetId);
+
             let pick = state.pick.elements;
             let transferArray = [];
             for (let element of pick){
-                let elementSource = TreeHelpers.getParentElement(tree,element.id);
+                // get the element to splice parent
+                let elementSource = TreeHelpers.getParentElementById(tree,element.id);
+                // get the parent position respect to 0
+                let parentGlobalPosition = TreeHelpers.getElementGlobalPosition(tree,elementSource.id);
+                
+                // splice the element
+                let transfer = TreeHelpers.spliceElementById(tree,element.id)[0];
+                
+                console.log(transfer);
                 if(targetElementParent!==elementSource){
-                    console.log('isdifferent');
-                    // is different, thus recalculate the top-left
-                    // find the delta by comparing coords to root
-                    
+                    let targetParentGlobalPosition = TreeHelpers.getElementGlobalPosition(tree,targetElementParent.id);
+
+                    transfer.states[transfer.currentState].style.left += (parentGlobalPosition.left - targetParentGlobalPosition.left);
+                    transfer.states[transfer.currentState].style.top += (parentGlobalPosition.top - targetParentGlobalPosition.top);
                 }
-                let transfer = TreeHelpers.spliceElementById(tree,element.id);
-                if (transfer) transferArray.push(transfer[0]);
+                if (transfer) transferArray.push(transfer);
             }
 
-            // recalculate coords when transfering
-            // check the position of parents and opearte accordingly
+            // recalculate the width and height of the group now tha tit has a new element tha tcould have gone out of the boundaries
 
             tree = TreeHelpers[(before?'InsertElementsBefore':'InsertElementsAfter')](tree,targetId,transferArray);
 
