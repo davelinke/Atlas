@@ -12,7 +12,7 @@ There's a big reason for an open source project like Atlas, and it is that there
 
 If you share the passion for web technologies and find that prototyping software is missing an open alternative you are more than welcome to participate.
 
-##Demo
+## Demo
 
 [Atlas Demo (not that much yet)](http://atlas.davelinke.com)
 
