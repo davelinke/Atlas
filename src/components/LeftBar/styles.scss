@@ -18,8 +18,31 @@
 
 .tree-button{
     margin: 0.25rem 0;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    padding: 0;
 }
-.dropzone{
-    //height: 1px;
-    background-color: rgba(0,0,0,0.5);
+.drop-zone{
+    height: 4px;
+    background-color: rgba(0,0,0,1);
+    display: block;
+    pointer-events: none;
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+    &:first-of-type{
+        top:-6px;
+    }
+    &:last-of-type{
+        bottom:-6px
+    }
+}
+.drag{
+    .drop-zone{
+        pointer-events: all;
+        &.hover{
+            opacity: 1;
+        }
+    }
 }
