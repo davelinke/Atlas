@@ -16,10 +16,10 @@ export default {
             'items':{
                 'group':{
                     tag:'ObjectGroup'
-                },
-                'ungroup':{
-                    tag:'ObjectUnGroup'
-                }
+                }//,
+                // 'ungroup':{
+                //     tag:'ObjectUnGroup'
+                // }
             }
         },
         // 'insert':{
