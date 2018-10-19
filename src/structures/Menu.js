@@ -8,9 +8,9 @@ export default {
                 }
             }
         },
-        'edit':{
-            'visible':false
-        },
+        // 'edit':{
+        //     'visible':false
+        // },
         'object':{
             'visible':false,
             'items':{
@@ -22,12 +22,12 @@ export default {
                 }
             }
         },
-        'insert':{
-            'visible':false
-        },
-        'view':{
-            'visible':false
-        },
+        // 'insert':{
+        //     'visible':false
+        // },
+        // 'view':{
+        //     'visible':false
+        // },
         'workspace':{
             'visible':false,
             'items':{
@@ -35,13 +35,13 @@ export default {
                     tag:'WorkspaceSnapToGrid'
                 }
             }
-        },
-        'window':{
-            'visible':false
-        },
-        'help':{
-            'visible':false
-        }
+        }//,
+        // 'window':{
+        //     'visible':false
+        // },
+        // 'help':{
+        //     'visible':false
+        // }
     },
     helperData:{}
 }
