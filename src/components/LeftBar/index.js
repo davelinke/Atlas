@@ -67,6 +67,7 @@ class Tree extends Component {
         if (!PickHelpers.isInPick(targetId)){
             let state = store.getState();
             let tree = merge({},state.tree);
+
             let targetElementParent = TreeHelpers.getParentElementById(tree,targetId);
 
             let pick = state.pick.elements;
@@ -74,21 +75,24 @@ class Tree extends Component {
             for (let element of pick){
                 // get the element to splice parent
                 let elementSource = TreeHelpers.getParentElementById(tree,element.id);
+                console.log(elementSource);
                 // get the parent position respect to 0
                 let parentGlobalPosition = TreeHelpers.getElementGlobalPosition(tree,elementSource.id);
                 
+                console.log(parentGlobalPosition);
                 // splice the element
                 let transfer = TreeHelpers.spliceElementById(tree,element.id)[0];
                 
-                console.log(transfer);
                 if(targetElementParent!==elementSource){
                     let targetParentGlobalPosition = TreeHelpers.getElementGlobalPosition(tree,targetElementParent.id);
+                    console.log(targetParentGlobalPosition);
 
                     transfer.states[transfer.currentState].style.left += (parentGlobalPosition.left - targetParentGlobalPosition.left);
                     transfer.states[transfer.currentState].style.top += (parentGlobalPosition.top - targetParentGlobalPosition.top);
                     
                     // recalculate the width and height of the group now tha tit has a new element tha tcould have gone out of the boundaries
                 }
+                
                 if (transfer) transferArray.push(transfer);
             }
 

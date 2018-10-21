@@ -50,18 +50,15 @@ const TreeFactory = {
         return searchTree(where);
     },
     getParentElementById:function(where,id){
-        let output = false;
         for (let io of where.children) {
-            console.log(io.id,id);
             if (io.id===id){
-                output = where;
-                console.log('match',output.id);
-                break;
+                return where;
             } else {
-                output = this.getParentElementById(io,id);
+                let sub = this.getParentElementById(io,id);
+                if (sub) return sub;
             }
         }
-        return output;
+        return false;
     },
     getElementGlobalPosition:function(where, id){
         let coords = {
@@ -71,23 +68,22 @@ const TreeFactory = {
         if (id==='root'){
             return coords;
         }
-        let searchTree = function(so){
-            for (var j=0;j<so.children.length; j++) {
-                var io = so.children[j];
+        let searchTree = function(so,id){
+            for (let io of so.children) {
                 coords.left += io.states[io.currentState].style.left;
                 coords.top += io.states[io.currentState].style.top;
+
                 if (io.id===id){
                     return coords;
                 } else {
-                    var c = searchTree(io);
-                    if ((io.children.length > 0) && (c)) return c;
+                    searchTree(io,id);
                 }
                 coords.left -= io.states[io.currentState].style.left;
                 coords.top -= io.states[io.currentState].style.top;
             }
             return coords;
         };
-        return searchTree(where);
+        return searchTree(where,id);
     },
     getElementDataById:function(where,id){
         let target = where;
