@@ -2,29 +2,33 @@ import {merge} from 'lodash';
 import TreeHelpers from '../factories/Tree';
 import ObjectTools from '../factories/ObjectTools';
 import PickHelpers from '../factories/Pick';
+import ToolData from '../factories/ToolData';
 import Store from '../store';
 
 export default {
     iconClass:'custom_icons selection',
     iconString:'',
     cursor:'default',
-    willMove:false,
-    dragSelect:false,
-    active:false,
-    resizeDirection:false,
-    areaWindow:false,
+    initialize:()=>{
+        ToolData.set('select','willMove',false);
+        ToolData.set('select','dragSelect',false);
+        ToolData.set('select','active',false);
+        ToolData.set('select','resizeSirection',false);
+        ToolData.set('select','areaWindow',false);
+    },
     mousedown:(args)=>{
         let mouseButton = args.event.button;
+        let state = Store.getState();
 
         if ((mouseButton===0)){
-            this.a.active = true;
+            ToolData.set('select','active',true);
             let target = args.event.target;
             let elementId = target.dataset.id;
             let addKey = args.event.shiftKey;
-            let state = Store.getState();
 
-            this.a.willMove = target.dataset.move;
-            this.a.resizeDirection = target.dataset.resize;
+
+            ToolData.set('select','willMove',target.dataset.move);
+            ToolData.set('select','resizeDirection',target.dataset.resize);
 
             // BOOM
             PickHelpers.addElementToPick(elementId, args.pick, addKey);
@@ -32,10 +36,12 @@ export default {
             // if what's clicked is not the artboard
             if (!elementId){
                 // we should be dragselecting then
-                this.a.dragSelect = true;
-
+                ToolData.set('select','dragSelect',true);
+                
                 let areaWindow;
-                if (!this.a.areaWindow) {
+                let curAreaWindow = ToolData.get('select','areaWindow');
+
+                if (!curAreaWindow){
                     areaWindow = document.createElement('div');
                     areaWindow.setAttribute('class','area-window');
                     areaWindow.style.position='absolute';
@@ -45,9 +51,9 @@ export default {
 
                     document.getElementById('els_root').appendChild(areaWindow);
 
-                    this.a.areaWindow = areaWindow;
+                    ToolData.set('select','areaWindow',areaWindow);
                 } else {
-                    areaWindow = this.a.areaWindow;
+                    areaWindow = curAreaWindow;
                 }
 
                 // lets get the coordinates
@@ -62,7 +68,8 @@ export default {
         }
     },
     mousemove:(args)=>{
-        if (this.a.active){
+
+        if(ToolData.get('select','active')){
             let state = Store.getState();
             let mouse = state.mouse;
 
@@ -73,7 +80,7 @@ export default {
             let nuTree = merge({},state.tree);
             let pick = args.pick.elements;
 
-            if (!this.a.dragSelect) {
+            if (!ToolData.get('select','dragSelect')) {
                 let pickLength = pick.length;
                 let pickEmpty = (pickLength===0);
                 if (!pickEmpty) {
@@ -85,14 +92,15 @@ export default {
                         let currentState = currentElement.currentState;
                         // get the element style in current state
                         let ess = currentElement.states[currentState].style;
+                        
                         // will it move? (resize 0, move 1)
-                        if (this.a.willMove==='1'){
+                        if (ToolData.get('select','willMove')==='1'){
                             // calculate new coords
                             ess.left = pickElement.left - delta.x;
                             ess.top = pickElement.top - delta.y;
                         } else {
                             // let's check how it will resize (depending on the quadrant chosen)
-                            let resizeDir = this.a.resizeDirection;
+                            let resizeDir = ToolData.get('select','resizeDirection');
                             let nextWidth,nextHeight;
                             switch (resizeDir) {
                                 case('nw'):
@@ -160,7 +168,7 @@ export default {
                 // lets select by area
                 // lets start by doing the selection rectangle
 
-                let areaWindow = this.a.areaWindow;
+                let areaWindow = ToolData.get('select','areaWindow');
                 let ess = areaWindow.style;
                 let artboardDimensions = {
                     width:nuTree.states[nuTree.currentState].style.width,
@@ -269,9 +277,9 @@ export default {
     },
     mouseup:(args)=>{
         // refresh pick
-        this.a.dragSelect = false;
+        ToolData.set('select','dragSelect',false);
 
-        if(this.a.active){
+        if(ToolData.get('select','active')){
             let state = Store.getState();
 
             let pick = [].concat(args.pick.elements);
@@ -299,8 +307,10 @@ export default {
                 })
             }
         }
-        this.a.active = false;
-        let areaWindow = this.a.areaWindow;
+
+        ToolData.set('select','active', false);
+        
+        let areaWindow = ToolData.get('select','areaWindow');
         if (areaWindow){
             areaWindow.style.opacity=0;
         }

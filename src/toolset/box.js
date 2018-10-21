@@ -1,21 +1,23 @@
 import treeHelpers from '../factories/Tree';
+import ToolData from '../factories/ToolData';
 import {merge} from 'lodash';
-import store from '../store'
+import store from '../store';
 
 export default {
     iconClass:'material-icons',
     iconString:'crop_square',
     cursor:'crosshair',
-    initialized:false,
-    activeElement:null,
-    needsCleanup:{
-        right:false,
-        bottom:false,
+    initialize:()=>{
+        ToolData.set('box','initialized',false);
+        ToolData.set('box','activeElement',false);
+        ToolData.set('box','needsCleanupRight',false);
+        ToolData.set('box','needsCleanupBottom',false);
     },
     mousedown:(args)=>{
         let mouseButton = args.event.button;
         if ((mouseButton===0)){
-            this.a.initialized = true;
+            
+            ToolData.set('box','initialized',true);
             // lets have a look on how things are at this point
             let state = store.getState();
             // where are we storing the new elemwnt?
@@ -34,7 +36,7 @@ export default {
             // we push the new element to the tree children.
             newTree.children.push(newElement);
             // lets save the element id for resizing while creating
-            this.a.activeElement = newElement.id;
+            ToolData.set('box', 'activeElement', newElement.id); 
             // now we send the new tree to be re-rendered
             store.dispatch({
                 type:'TREE_FULL',
@@ -46,9 +48,9 @@ export default {
         }
     },
     mousemove:(args)=>{
-        if (this.a.initialized) {
+        if(ToolData.get('box','initialized')){
             // lets get the element id of what we created
-            let elementId = this.a.activeElement;
+            let elementId = ToolData.get('box','activeElement');
             // current state of things
             let state = store.getState();
             // we get the crrent state of the cursor
@@ -78,7 +80,7 @@ export default {
                 ess.height = delta.y*-1;
                 ess.top = mouse.offsetDown.y;
                 delete ess.bottom;
-                this.a.needsCleanup.bottom = false;
+                ToolData.set('box','needsCleanupBottom',false);
             } else {
                 // we fix the bottom side and make it grow with the delta value
                 // you might ask yourself why, well, if we modified top pos and height it got all wobbly on screen
@@ -86,7 +88,7 @@ export default {
                 delete ess.top;
                 ess.bottom = artboardDimensions.height - mouse.offsetDown.y;
                 ess.height = delta.y;
-                this.a.needsCleanup.bottom = true;
+                ToolData.set('box','needsCleanupBottom',true);
             }
 
             if(delta.x<=0){ // this means the delta is positive (somehow)
@@ -94,7 +96,7 @@ export default {
                 ess.width = delta.x*-1;
                 ess.left = mouse.offsetDown.x;
                 delete ess.right
-                this.a.needsCleanup.right = false;
+                ToolData.set('box','needsCleanupRight',false);
             } else {
                 // we fix the right side and make it grow with the delta value
                 // you might ask yourself why, well, if we modified left pos and width it got all wobbly on screen
@@ -102,7 +104,7 @@ export default {
                 ess.right = artboardDimensions.width - mouse.offsetDown.x;
                 delete ess.left;
                 ess.width = delta.x;
-                this.a.needsCleanup.right = true;
+                ToolData.set('box','needsCleanupRight',true);
             }
             // we send our new lovely tree to the dispatcher
             store.dispatch({
@@ -112,9 +114,9 @@ export default {
         }
     },
     mouseup:(args)=>{
-        if (this.a.initialized){
-            this.a.initialized = false;
-            let elementId = this.a.activeElement;
+        if(ToolData.get('box','initialized')){
+            ToolData.set('box','initialized',false);
+            let elementId = ToolData.get('box','activeElement');
             // current state of things
             let state = store.getState();
             // we create a new tree to prevent mutating the current one
@@ -145,7 +147,7 @@ export default {
                 // if so, lets fix that here (you know, for consistency)
                 // lets get the element id of what we created
 
-                if (this.a.needsCleanup.right || this.a.needsCleanup.bottom){
+                if(ToolData.get('box','needsCleanupRight') || ToolData.get('box','needsCleanupBottom')){
 
                     // lets get the arboard dimensions
                     let artboardDimensions = {
@@ -158,11 +160,11 @@ export default {
                     //     bordersigma = ess.borderWidth * 2;
                     // }
                     // we clean up
-                    if (this.a.needsCleanup.right){
+                    if(ToolData.get('box','needsCleanupRight')){
                         ess.left = artboardDimensions.width - ess.width - ess.right - bordersigma;
                         delete ess.right;
                     }
-                    if (this.a.needsCleanup.bottom){
+                    if(ToolData.get('box','needsCleanupBottom')){
                         ess.top = artboardDimensions.height - ess.height - ess.bottom - bordersigma;
                         delete ess.bottom;
                     }
