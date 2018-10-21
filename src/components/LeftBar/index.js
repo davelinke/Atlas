@@ -86,11 +86,11 @@ class Tree extends Component {
 
                     transfer.states[transfer.currentState].style.left += (parentGlobalPosition.left - targetParentGlobalPosition.left);
                     transfer.states[transfer.currentState].style.top += (parentGlobalPosition.top - targetParentGlobalPosition.top);
+                    
+                    // recalculate the width and height of the group now tha tit has a new element tha tcould have gone out of the boundaries
                 }
                 if (transfer) transferArray.push(transfer);
             }
-
-            // recalculate the width and height of the group now tha tit has a new element tha tcould have gone out of the boundaries
 
             tree = TreeHelpers[(before?'InsertElementsBefore':'InsertElementsAfter')](tree,targetId,transferArray);
 
