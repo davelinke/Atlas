@@ -4,9 +4,6 @@ export default {
     iconClass:'material-icons',
     iconString:'pan_tool',
     cursor:'move',
-    downScroll: false,
-    inputLogger:false,
-    downCoords:false,
     initialize:function(){
         let state = store.getState();
         let zoomInstance = state.public.zoomInstance;

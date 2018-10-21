@@ -1,6 +1,30 @@
 import { Style, State, Element } from '../structures/Element';
 import { merge } from 'lodash';
 const TreeFactory = {
+    InsertElements:function(where,id,elements,position = 0){
+        let searchTree = function(so){
+            for (let io of so){
+                if (io.id===id){
+                    for (let element of elements) {
+                        so.splice((so.indexOf(io)+position),0,element);
+                    }
+                    return where;
+                } else {
+                    
+                    let c = searchTree(io.children);
+                    if (c) return c;
+                }
+            }
+            return false;
+        };
+        return searchTree(where.children);
+    },
+    InsertElementsAfter:function(where,id,elements){
+        return this.InsertElements(where,id,elements,0);
+    },
+    InsertElementsBefore:function(where,id,elements){
+        return this.InsertElements(where,id,elements,1);
+    },
     getElementIndex:function(where,id){
         for (var j=0;j<where.length; j++) {
             var io = where[j];
@@ -10,7 +34,64 @@ const TreeFactory = {
         }
         return false;
     },
+    getParentArray:function(where,id){
+        let searchTree = function(so){
+            for (var j=0;j<so.length; j++) {
+                var io = so[j];
+                if (io.id===id){
+                    return so;
+                } else {
+                    var c = searchTree(io.children);
+                    if ((io.children.length > 0) && (c)) return c;
+                }
+            }
+            return false;
+        };
+        return searchTree(where);
+    },
+    getParentElementById:function(where,id){
+        for (let io of where.children) {
+            if (io.id===id){
+                return where;
+            } else {
+                let sub = this.getParentElementById(io,id);
+                if (sub) return sub;
+            }
+        }
+        return false;
+    },
+    getElementGlobalPosition:function(where, id){
+        let coords = {
+            left:0,
+            top:0
+        }
+        if (id==='root'){
+            return coords;
+        }
+        let searchTree = function(so,id){
+            for (let io of so.children) {
+                coords.left += io.states[io.currentState].style.left;
+                coords.top += io.states[io.currentState].style.top;
+
+                if (io.id===id){
+                    return coords;
+                } else {
+                    searchTree(io,id);
+                }
+                coords.left -= io.states[io.currentState].style.left;
+                coords.top -= io.states[io.currentState].style.top;
+            }
+            return coords;
+        };
+        return searchTree(where,id);
+    },
     getElementDataById:function(where,id){
+        let target = where;
+        if (target.children!== undefined){
+            if (target.id===id) return target;
+            target = target.children;
+        }
+
         let searchTree = function(so){
             for (var j=0;j<so.length; j++) {
                 var io = so[j];
@@ -23,7 +104,7 @@ const TreeFactory = {
             }
             return false;
         };
-        return searchTree(where);
+        return searchTree(target);
     },
     removeElementById:function(where,id){
         let nuWhere = merge({},where);
@@ -41,6 +122,21 @@ const TreeFactory = {
         };
         nuWhere.children = filterChildren(nuWhere.children);
         return nuWhere;
+    },
+    spliceElementById:function(where,id){
+        let filterChildren = function(so){
+            for (var j=0;j<so.length; j++) {
+                var io = so[j];
+                if (io.id===id){
+                    return so.splice(j,1);
+                } else {
+                    var c = filterChildren(io.children);
+                    if ((io.children.length > 0) && (c)) return c;
+                }
+            }
+            return false;
+        };
+        return filterChildren(where.children);
     },
     makeId:function(){
         var text = "";
