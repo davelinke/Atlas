@@ -3,19 +3,19 @@ import { merge } from 'lodash';
 const TreeFactory = {
     InsertElements:function(where,id,elements,position = 0){
         let searchTree = function(so){
-            for (var j=0;j<so.length; j++) {
-                var io = so[j];
+            for (let io of so){
                 if (io.id===id){
                     for (let element of elements) {
-                        so.splice((j+position),0,element);
+                        so.splice((so.indexOf(io)+position),0,element);
                     }
-                    break;
+                    return where;
                 } else {
-                    var c = searchTree(io.children);
-                    if ((io.children.length > 0) && (c)) return c;
+                    
+                    let c = searchTree(io.children);
+                    if (c) return c;
                 }
             }
-            return where;
+            return false;
         };
         return searchTree(where.children);
     },

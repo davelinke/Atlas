@@ -55,14 +55,11 @@ class Tree extends Component {
         e.target.classList.remove('hover');
     }
     drop(e, before=true){
-
         // recursive funciton to calculate the new top-left
 
         e.preventDefault();
         let target = e.target;
         let targetId = target.dataset.elementId;
-
-        //console.log(e.target, targetId);
 
         if (!PickHelpers.isInPick(targetId)){
             let state = store.getState();
@@ -75,17 +72,15 @@ class Tree extends Component {
             for (let element of pick){
                 // get the element to splice parent
                 let elementSource = TreeHelpers.getParentElementById(tree,element.id);
-                console.log(elementSource);
+
                 // get the parent position respect to 0
                 let parentGlobalPosition = TreeHelpers.getElementGlobalPosition(tree,elementSource.id);
                 
-                console.log(parentGlobalPosition);
                 // splice the element
                 let transfer = TreeHelpers.spliceElementById(tree,element.id)[0];
                 
                 if(targetElementParent!==elementSource){
                     let targetParentGlobalPosition = TreeHelpers.getElementGlobalPosition(tree,targetElementParent.id);
-                    console.log(targetParentGlobalPosition);
 
                     transfer.states[transfer.currentState].style.left += (parentGlobalPosition.left - targetParentGlobalPosition.left);
                     transfer.states[transfer.currentState].style.top += (parentGlobalPosition.top - targetParentGlobalPosition.top);
@@ -95,9 +90,7 @@ class Tree extends Component {
                 
                 if (transfer) transferArray.push(transfer);
             }
-
             tree = TreeHelpers[(before?'InsertElementsBefore':'InsertElementsAfter')](tree,targetId,transferArray);
-
             store.dispatch({
                 type:'TREE_FULL',
                 val:tree
