@@ -14,12 +14,15 @@ export default {
         'object':{
             'visible':false,
             'items':{
+                'delete':{
+                    tag:'ObjectDelete'
+                },
                 'group':{
                     tag:'ObjectGroup'
-                }//,
-                // 'ungroup':{
-                //     tag:'ObjectUnGroup'
-                // }
+                },
+                'ungroup':{
+                    tag:'ObjectUnGroup'
+                }
             }
         },
         // 'insert':{
