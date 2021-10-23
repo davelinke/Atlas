@@ -7,8 +7,7 @@ class EditorMenuItemFileNew extends EditorMenuItem {
      */
     constructor() {
         super();
-
-        this._button.innerHTML = "New";
+        this._button.innerHTML = this.echo("New");
     }
 
 }

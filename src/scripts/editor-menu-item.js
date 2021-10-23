@@ -1,3 +1,5 @@
+import CustomElement from "./element.js";
+
 const Css = `
 :host{
     display: block;
@@ -22,7 +24,7 @@ button{
   }
 `;
 
-class EditorMenuItem extends HTMLElement {
+class EditorMenuItem extends CustomElement {
 
     /**
      * the button constructor
@@ -39,6 +41,8 @@ class EditorMenuItem extends HTMLElement {
 
         // attach shadow dom
         this._shadow = this.attachShadow({ mode: 'open' });
+
+        this.setAttribute('role', 'menuitem');
 
         const styles = document.createElement('style');
         styles.innerHTML = Css;

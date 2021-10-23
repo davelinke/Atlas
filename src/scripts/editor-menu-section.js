@@ -1,3 +1,5 @@
+import CustomElement from "./element.js";
+
 const Css = `
 :host{
     display:inline-block;
@@ -28,7 +30,7 @@ button{
 }
 `;
 
-class EditorMenuSection extends HTMLElement {
+class EditorMenuSection extends CustomElement {
 
     
 
@@ -101,12 +103,14 @@ class EditorMenuSection extends HTMLElement {
 
         this._shadow = this.attachShadow({ mode: 'open' });
 
+        this.setAttribute('role', 'menu');
+
         const styles = document.createElement('style');
         styles.innerHTML = Css;
         this._shadow.appendChild(styles);
 
         const button = document.createElement('button');
-        button.innerText = this.getAttribute('label');
+        button.innerText = this.echo(this.getAttribute('label'));
         button.addEventListener('click', this._buttonClick);
 
         this._shadow.append(button);
