@@ -1,9 +1,0 @@
-.css-prop {
-  display: grid;
-  grid-template-columns: 100px auto 18px;
-  grid-column-gap: 5px;
-  margin-bottom: 5px;
-  justify-items: start;
-  align-items: center; }
-  .css-prop-val {
-    width: 106px !important; }

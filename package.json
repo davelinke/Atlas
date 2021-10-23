@@ -1,38 +1,14 @@
 {
-  "name": "atlas",
-  "version": "0.1.0",
-  "private": true,
-  "homepage": "http://atlas.davelinke.com",
+  "name": "editor",
+  "version": "0.0.1",
+  "description": "App development for designers",
+  "main": "index.js",
+  "author": "David Linke",
+  "license": "MIT",
   "devDependencies": {
-    "react-scripts": "2.0.5"
-  },
-  "dependencies": {
-    "codemirror": "^5.32.0",
-    "lodash": "^4.17.4",
-    "node-sass-chokidar": "0.0.3",
-    "npm-run-all": "^4.1.2",
-    "panzoom": "git+https://github.com/davelinke/panzoom.git",
-    "react": "^15.4.2",
-    "react-color": "^2.13.8",
-    "react-dom": "^15.4.2",
-    "react-redux": "^5.0.3",
-    "react-router": "^3.0.2",
-    "redux": "^3.6.0"
+    "browser-sync": "^2.26.14"
   },
   "scripts": {
-    "build-css": "node-sass-chokidar src/ -o src/",
-    "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
-    "start-js": "react-scripts start",
-    "start": "npm-run-all -p watch-css start-js",
-    "build-js": "react-scripts build",
-    "build": "npm-run-all build-css build-js",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "start": "node start.js"
+  }
 }

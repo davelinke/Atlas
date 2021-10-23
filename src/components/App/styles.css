@@ -1,9 +1,0 @@
-.wrap {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: #232323; }
-
-.main {
-  display: flex;
-  flex-grow: 1; }

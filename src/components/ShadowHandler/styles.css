@@ -1,6 +1,0 @@
-.shadow-handler {
-  display: grid;
-  grid-template-columns: calc(25% - 4.5px) calc(25% - 4.5px) calc(25% - 4.5px) calc(25% - 4.5px);
-  grid-template-rows: 20px;
-  grid-column-gap: 6px;
-  box-sizing: border-box; }
