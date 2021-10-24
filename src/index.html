@@ -20,23 +20,23 @@
     <script type="module" src="/scripts/scripts.js"></script>
 </head>
 
-<body class="layout">
-    <div class="layout__menu">
-        <editor-menu>
-            <editor-menu-section label="File">
-                <editor-menu-item-file-new></editor-menu-item-file-new>
-            </editor-menu-section>
-            <editor-menu-section label="Edit">
-                woot
-            </editor-menu-section>
-        </editor-menu>
-    </div>
-    <div class="layout__toolbar"></div>
-    <div class="layout__workspace">
-        <editor-workspace></editor-workspace>
-    </div>
-    <div class="layout__sidebar"></div>
-    <div class="layout__statusbar"></div>
+<body>
+    <editor-app class="layout">
+        <div class="layout__menu">
+            <editor-menu>
+                <editor-menu-section label="File">
+                    <editor-menu-item-file-new></editor-menu-item-file-new>
+                </editor-menu-section>
+            </editor-menu>
+        </div>
+        <div class="layout__toolbar"></div>
+        <div class="layout__workspace">
+            <editor-workspace></editor-workspace>
+        </div>
+        <div class="layout__sidebar">
+        </div>
+        <div class="layout__statusbar"></div>
+    </editor-app>
 </body>
 
 </html>
