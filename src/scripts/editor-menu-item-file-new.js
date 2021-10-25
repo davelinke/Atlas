@@ -1,5 +1,5 @@
 import EditorMenuItem from "./editor-menu-item.js";
-// import { LoadParticles } from "./tools-loader.js";
+// import { LoadParticles } from "./lib-loader.js";
 
 class EditorMenuItemFileNew extends EditorMenuItem {
 

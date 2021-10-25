@@ -1,4 +1,4 @@
-import { LoadParticles } from "./tools-loader.js";
+import { LoadParticles } from "./lib-loader.js";
 
 (function () {
     document.addEventListener("DOMContentLoaded", function () {

@@ -35,7 +35,8 @@ class EditorMenuItem extends CustomElement {
         // METHODS
         this._onClick = (e) => {
             this.dispatchEvent(new CustomEvent('editorMenuItemClick', {
-                bubbles: true
+                bubbles: true,
+                composed: true
             }));
         }
 

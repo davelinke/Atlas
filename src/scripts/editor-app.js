@@ -6,33 +6,85 @@ class EditorApp extends HTMLElement {
     constructor() {
         super();
 
-        this.model = {
-            doc: null,
-            tools: null,
-            activeTool: null,
-            baseElementStyle: null,
-            zoomScale: 1,
-            activeElement: null,
-            gridActive: true,
-            gridSize: 20
-        }
+        // PROPS
 
-        this.setModel = (key, value)=>{
-            const modelCopy = Object.assign({}, this.model);
-            modelCopy[key] = value;
-            this.model = modelCopy;
+        this.doc = null;
+
+        this.zoomScale = 1;
+
+        this.gridSize = 20;
+
+        this.gridActive = true;
+
+        this.workspace = null;
+
+        this.toolDefault = 'rectangle';
+
+        this.toolActive = null;
+
+        // METHODS
+
+        this.setModel = (key, value) => {
+            this[key] = value;
             // broadcast model change event
-            this.dispatchEvent(new CustomEvent('modelChange', {detail: this.model}));
+            this.dispatchEvent(
+                new CustomEvent(
+                    'modelChange',
+                    {
+                        detail: { key: key, value: value },
+                        bubbles: true,
+                        composed: true
+                    }
+                )
+            );
         }
 
-        this.addEventListener('setModel', (e)=>{
+        // EVENT LISTENERS
+
+        // setting the model through bubbled events
+        this.addEventListener('setModel', (e) => {
             this.setModel(e.detail.key, e.detail.value);
         });
 
+        // what to do when the editor becomes available
+        this.addEventListener('editorWorkspaceReady', (e) => {
+            this.workspace = e.detail;
+        });
+
+        // what to do when tools become available
+        this.addEventListener('toolReady', (e) => {
+            if ((this.toolActive === null) && (this.toolDefault === e.detail.name)) {
+                this.toolActive = e.detail;
+                e.detail.activateTool(this);
+            }
+        });
+
+        // what to do when workspace starts input
+        this.addEventListener('workspaceInputStart', (e) => {
+            if (this.toolActive !== null) {
+                this.toolActive.inputStart(e);
+            }
+        });
+
+        // what to do when workspace ends input
+        this.addEventListener('workspaceInputEnd', (e) => {
+            if (this.toolActive !== null) {
+                this.toolActive.inputEnd(e);
+            }
+        });
+
+        // what to do when workspace moves input
+        this.addEventListener('workspaceInputMove', (e) => {
+            if (this.toolActive !== null) {
+                this.toolActive.inputMove(e);
+            }
+        });
+
+
+        // THE DOM STRUCTURE
+
         // attach shadow dom
         this._shadow = this.attachShadow({ mode: 'open' });
-
-        this.setAttribute('role', 'menubar');
 
         // create the html
         const slot = document.createElement('slot');

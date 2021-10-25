@@ -12,8 +12,8 @@ body{
 
 .layout{
     display: grid;
-    grid-template-columns: 50px auto 200px;
-    grid-template-rows: 50px auto 30px
+    grid-template-columns: 50px auto 230px;
+    grid-template-rows: 40px auto 15px
 }
 
 .layout__menu{

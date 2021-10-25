@@ -23,6 +23,7 @@ button{
     pointer-events:none;
     position:absolute;
     box-shadow: 0px 3px 4px rgba(0,0,0,0.25);
+    z-index:2;
 }
 :host([open="true"]) .layer{
     opacity:1;
@@ -52,7 +53,8 @@ class EditorMenuSection extends CustomElement {
             this.setAttribute('aria-expanded', 'true');
 
             const event = new CustomEvent('editorMenuOpen', {
-                bubbles: true
+                bubbles: true,
+                composed: true
             });
             this.dispatchEvent(event);
         }
@@ -62,7 +64,8 @@ class EditorMenuSection extends CustomElement {
             this.setAttribute('aria-expanded', 'false');
 
             const event = new CustomEvent('editorMenuClose', {
-                bubbles: true
+                bubbles: true,
+                composed: true
             });
             this.dispatchEvent(event);
         }
