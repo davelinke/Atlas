@@ -55,3 +55,7 @@ body{
     grid-column-end: 3;
     position: relative;
 }
+
+.layout__sidebar{
+    border-inline-start: 1px solid var(--layout-border-color);
+}
