@@ -55,13 +55,20 @@ class EditorApp extends HTMLElement {
         this.addEventListener('toolReady', (e) => {
             if ((this.toolActive === null) && (this.toolDefault === e.detail.name)) {
                 this.toolActive = e.detail;
-                e.detail.activateTool(this);
+                this.toolActive.activateTool(this);
             }
         });
+
+        this.addEventListener('toolChange', (e) => {
+            this.toolActive = e.detail;
+            console.log(e.detail)
+            this.toolActive.activateTool(this, false);
+        })
 
         // what to do when workspace starts input
         this.addEventListener('workspaceInputStart', (e) => {
             if (this.toolActive !== null) {
+                console.log(this.toolActive)
                 this.toolActive.inputStart(e);
             }
         });
@@ -78,6 +85,21 @@ class EditorApp extends HTMLElement {
             if (this.toolActive !== null) {
                 this.toolActive.inputMove(e);
             }
+        });
+
+        // what to do when workspace moves input
+        this.addEventListener('setZoom', (e) => {
+            this.zoomScale = e.detail;
+            this.dispatchEvent(
+                new CustomEvent(
+                    'zoomChange',
+                    {
+                        detail: this.zoomScale,
+                        bubbles: true,
+                        composed: true
+                    }
+                )
+            );
         });
 
 

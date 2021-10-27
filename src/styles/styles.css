@@ -1,5 +1,10 @@
 @import './reset.css';
 
+:root {
+  --layout-border-color: #ccc;
+  --input-border-color: #ccc;
+}
+
 html, body, .layout{
     width: 100vw;
     height: 100vh;
@@ -12,20 +17,41 @@ body{
 
 .layout{
     display: grid;
-    grid-template-columns: 50px auto 230px;
-    grid-template-rows: 40px auto 15px
+    grid-template-columns: 200px auto 230px;
+    grid-template-rows: 28px 50px auto;
 }
 
 .layout__menu{
     grid-column-start: 1;
     grid-column-end: 4;
+    border-bottom: 1px solid var(--layout-border-color);
 }
 
-.layout__statusbar{
+.layout__toolbar{
     grid-column-start: 1;
     grid-column-end: 4;
+    grid-row-start: 2;
+    grid-row-end: 3;
+    border-bottom: 1px solid var(--layout-border-color);
+    display: flex;
+}
+.layout__toolbar-tools{
+    flex:1 1 auto;
+}
+.layout__toolbar-settings{
+    flex:0 0 auto;
+}
+
+.layout__docbar{
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 4;
+    border-inline-end: 1px solid var(--layout-border-color);
 }
 
 .layout__workspace{
+    grid-column-start: 2;
+    grid-column-end: 3;
     position: relative;
 }

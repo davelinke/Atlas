@@ -1,13 +1,13 @@
 const Css = `
 button {
-    display: block;
+    display: inline-block;
     position: relative;
     width:42px;
     height:42px;
     background-color: var(--tool-button-color-idle, var(--cta-color-idle, transparent));
     border: none;
     border-radius: var(--tool-button-border-radius, var(--cta-border-radius, 3px));
-    margin: 0 4px 4px;
+    margin: 4px 0 4px 4px;
     cursor: pointer;
 }
 :host([active]) button {
@@ -26,6 +26,9 @@ button:focus,
 ::slotted(i){
     color: var(--tool-button-icon-color, var(--cta-icon-color, #444));
 }
+::slotted(.reflect){
+    transform: scaleX(-1);
+}
 `;
 
 class Tool extends HTMLElement {
@@ -40,13 +43,16 @@ class Tool extends HTMLElement {
 
         //METHODS
 
-        this.activateTool = (app) => {
+        this.activateTool = (app, dispatchEvent = true) => {
             // deactivate active sibling
             let activeSibling = this.parentNode.querySelector('[active]');
             if (activeSibling) {
                 activeSibling.deactivateTool(app);
             }
             this.setAttribute('active', 'true');
+            if (dispatchEvent) {
+                this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }));
+            }
 
             if (this.toolInit){
                 this.toolInit(app);
@@ -85,7 +91,7 @@ class Tool extends HTMLElement {
         // fire up an event to make myself available to the app
         this.dispatchEvent(new CustomEvent('toolReady', { detail: this, bubbles: true, composed: true }));
 
-        this.innerHTML = `<i class="material-icons">${this.icon}</i>`;
+        this.innerHTML = `<i class="material-icons ${this.iconClass?this.iconClass:''}">${this.icon}</i>`;
     }
 
 
@@ -101,7 +107,6 @@ class Tool extends HTMLElement {
             }
         }
     }
-
 }
 
 export default Tool;
