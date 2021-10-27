@@ -23,6 +23,8 @@ class ToolRectangle extends Tool {
 
         this.toolInit = (app) => {
             // do stuff on initialization
+            const ws = app.workspace;
+            ws && ws.deactivateSelection();
         };
         this.toolDestroy = (app) => {
             // do stuff on destruction

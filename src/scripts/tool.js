@@ -43,16 +43,13 @@ class Tool extends HTMLElement {
 
         //METHODS
 
-        this.activateTool = (app, dispatchEvent = true) => {
+        this.activateTool = (app) => {
             // deactivate active sibling
             let activeSibling = this.parentNode.querySelector('[active]');
-            if (activeSibling) {
+            if (activeSibling && activeSibling !== this) {
                 activeSibling.deactivateTool(app);
             }
             this.setAttribute('active', 'true');
-            if (dispatchEvent) {
-                this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }));
-            }
 
             if (this.toolInit){
                 this.toolInit(app);
@@ -75,7 +72,10 @@ class Tool extends HTMLElement {
         this._shadow.appendChild(styles);
 
         this._toolButton = document.createElement('button');
-        this._toolButton.addEventListener('click', this.activateTool);
+        this._toolButton.addEventListener('click', (e) => {
+            // fire envent
+            this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }));
+        });
 
         const slot = document.createElement('slot');
         this._toolButton.append(slot);

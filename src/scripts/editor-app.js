@@ -39,6 +39,10 @@ class EditorApp extends HTMLElement {
             );
         }
 
+        this.getWorkspace = () => {
+            return this.workspace;
+        }
+
         // EVENT LISTENERS
 
         // setting the model through bubbled events
@@ -61,8 +65,7 @@ class EditorApp extends HTMLElement {
 
         this.addEventListener('toolChange', (e) => {
             this.toolActive = e.detail;
-            console.log(e.detail)
-            this.toolActive.activateTool(this, false);
+            this.toolActive.activateTool(this);
         })
 
         // what to do when workspace starts input

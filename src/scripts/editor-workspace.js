@@ -92,6 +92,11 @@ const Css = `
     position:absolute;
     top:0;
     left:0;
+    pointer-events:none;
+}
+
+.canvas.selection-active{
+    pointer-events:auto;
 }
 
 .input-area{
@@ -368,6 +373,13 @@ class EditorWorkspace extends HTMLElement {
 
             c.style.left = `${newLeft}px`;
             c.style.top = `${newTop}px`;
+        }
+
+        this.activateSelection = ()=>{
+            this._canvas.classList.add('selection-active');
+        }
+        this.deactivateSelection = ()=>{
+            this._canvas.classList.remove('selection-active');
         }
 
         // STRUCTURE
