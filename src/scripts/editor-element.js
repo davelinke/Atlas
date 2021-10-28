@@ -2,7 +2,6 @@ const Css = `
 :host {
 	user-select: none;
 	box-sizing: border-box;
-	overflow: hidden;
 }
 
 :host(.active) .mod__resize--n, :host(.active) .mod__resize--w, :host(.active) .mod__resize--e, :host(.active) .mod__resize--s {
@@ -32,12 +31,26 @@ const Css = `
 .mod {
 	display: grid;
 	position: absolute;
-	grid-template-columns: 5px auto 5px;
-	grid-template-rows: 5px auto 5px;
+	grid-template-columns: 0 auto 0;
+	grid-template-rows: 0 auto 0;
 	top: 0;
 	left: 0;
 	bottom: 0;
 	right: 0;
+    margin: -1px;
+}
+
+.mod:hover {
+    border: 1px solid var(--editor-element-border-hover-color, blue);
+}
+
+:host([active]) .mod{
+	grid-template-columns: 5px auto 5px;
+	grid-template-rows: 5px auto 5px;
+    margin: -5px
+}
+:host(.picked) .mod{
+    border: 1px solid var(--editor-element-border-picked-color, blue);
 }
 
 .mod__move {
@@ -85,6 +98,22 @@ class EditorElement extends HTMLElement {
      */
     constructor() {
         super();
+
+        // STATE
+
+        this._picked = false;
+
+        //PROPS
+        Object.defineProperty(this, 'picked', {
+            get: () => {
+                return this._picked;
+            },
+            set: (val) => {
+                this._picked = val ? true : false;
+                const classListFn = this._picked ? 'add' : 'remove';
+                this.classList[classListFn]('picked');
+            }
+        });
 
         // attach shadow dom
         this._shadow = this.attachShadow({ mode: 'open' });

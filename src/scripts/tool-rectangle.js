@@ -47,8 +47,8 @@ class ToolRectangle extends Tool {
             const ws = e.target;
 
             // get the deltas from the input
-            const deltaX = e.detail.deltaX;
-            const deltaY = e.detail.deltaY;
+            const deltaX = e.detail.delta.x;
+            const deltaY = e.detail.delta.y;
 
             // get the initial point of input (mousedown, touchstart)
             const downTop = this._inputDown.top;

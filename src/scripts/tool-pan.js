@@ -42,8 +42,8 @@ class ToolPan extends Tool {
             const ws = e.target;
 
             // get the deltas from the input
-            const deltaX = e.detail.deltaX;
-            const deltaY = e.detail.deltaY;
+            const deltaX = e.detail.delta.x;
+            const deltaY = e.detail.delta.y;
 
             const newLeft = this._inputDown.left + deltaX;
             const newTop = this._inputDown.top + deltaY;

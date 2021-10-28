@@ -287,8 +287,11 @@ class EditorWorkspace extends HTMLElement {
                     const deltaY = filteredDelta.y / scale;
 
                     const eventDetail = {
-                        deltaX,
-                        deltaY
+                        mouseEvent: e,
+                        delta: {
+                            x: deltaX,
+                            y: deltaY
+                        }
                     }
                     // fire move event listener
 
@@ -357,9 +360,10 @@ class EditorWorkspace extends HTMLElement {
 
             element.setAttribute('id', elementId);
 
-            const elementStyle = document.createElement('style');
-            elementStyle.innerHTML = GenerateSytle(args, elementId);
-            element.appendChild(elementStyle);
+            for (const prop in args) {
+                const unit = propUnitsJs[prop] ? propUnitsJs[prop] : '';
+                element.style[prop] = args[prop]+unit;
+            }
             this._canvas.appendChild(element);
 
             return element;
