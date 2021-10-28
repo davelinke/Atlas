@@ -10,7 +10,7 @@ class EditorApp extends HTMLElement {
 
         this.doc = null;
 
-        this.zoomScale = 1;
+        this._zoomScale = 1;
 
         this.gridSize = 20;
 
@@ -21,6 +21,18 @@ class EditorApp extends HTMLElement {
         this.toolDefault = 'rectangle';
 
         this.toolActive = null;
+
+
+        Object.defineProperty(this, 'zoomScale', {
+            get: () => {
+                return this._zoomScale;
+            },
+            set: (val) => {
+                if (val !== this._zoomScale) {
+                    this._zoomScale = val;
+                }
+            }
+        });
 
         // METHODS
 
