@@ -7,6 +7,9 @@ const CssPa = `
     z-index: 50000;
     pointer-events: none;
     box-sizing: border-box;
+    
+    outline: 1px solid transparent;
+    -webkit-backface-visibility: hidden;
 }
 .editor-workspace-pa-handle {
     position: absolute;
@@ -16,38 +19,47 @@ const CssPa = `
     border: 1px solid blue;
     box-sizing: border-box;
     box-shadow: 0px 1px 2px rgb(0 0 0 / 25%);
+    pointer-events: all;
 }
 .editor-workspace-pa-handle.nw {
     top: -5px;
     left: -5px;
+    cursor: nwse-resize;
 }
 .editor-workspace-pa-handle.n {
     top: -5px;
     left: calc(50% - 5px);
+    cursor: ns-resize;
 }
 .editor-workspace-pa-handle.ne {
     top: -5px;
     right: -5px;
+    cursor: nesw-resize;
 }
 .editor-workspace-pa-handle.e {
     top: calc(50% - 5px);
     right: -5px;
+    cursor: ew-resize;
 }
 .editor-workspace-pa-handle.se {
     bottom: -5px;
     right: -5px;
+    cursor: nwse-resize;
 }
 .editor-workspace-pa-handle.s {
     bottom: -5px;
     left: calc(50% - 5px);
+    cursor: ns-resize;
 }
 .editor-workspace-pa-handle.sw {
     bottom: -5px;
     left: -5px;
+    cursor: nesw-resize;
 }
 .editor-workspace-pa-handle.w {
     top: calc(50% - 5px);
     left: -5px;
+    cursor: ew-resize;
 }
 `;
 
@@ -71,12 +83,13 @@ class ToolSelect extends Tool {
 
         this.appReference = null;
 
+        this.resizeDir = null;
+
         // METHODS
 
         // lets return the specific element that was clicked
         this.getCompElement = (path) => {
             for (let element of path) {
-                console.log(element.tagName, element.tagName === 'EDITOR-ELEMENT');
                 if (element.tagName && (element.tagName === 'EDITOR-ELEMENT')) {
                     return element;
                 }
@@ -152,7 +165,6 @@ class ToolSelect extends Tool {
             }
         }
         this.deselectAll = () => {
-            console.log('deselecting all');
             for (let element of this.pick) {
                 element.picked = false;
             }
@@ -174,6 +186,124 @@ class ToolSelect extends Tool {
             element.style.top = newY + 'px';
         }
 
+        this.startResize = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const dir = e.target.classList[1];
+            this.resizing = true;
+            this.resizeDir = dir;
+            this.resizeDownCoords = {
+                x: e.clientX,
+                y: e.clientY
+            };
+            
+            const areaStart = {
+                left: parseInt(this.pickAreaElement.style.left.replace('px', ''), 10),
+                top: parseInt(this.pickAreaElement.style.top.replace('px', ''), 10),
+                width: this.pickAreaElement.offsetWidth,
+                height: this.pickAreaElement.offsetHeight
+            }
+
+            console.log(areaStart)
+
+            const pickStart = this.pick.map((element)=>{
+                return {
+                    left: parseInt(element.style.left.replace('px', ''), 10),
+                    top: parseInt(element.style.top.replace('px', ''), 10),
+                    width: element.offsetWidth,
+                    height: element.offsetHeight
+                }
+            });
+
+            const resizeFunctions = {
+                nw: (e, proportions) => {
+                    this.resize(e, 'nw');
+                }
+                , n: (e, proportions) => {
+                    this.resize(e, 'n');
+                }
+                , ne: (e, proportions) => {
+                    resizeFunctions.e(e, proportions);
+                }
+                , e: (e, proportions) => {
+
+                    // i obtain the new area width calculatinng the initial width
+                    // multiplied by the new proportion of the x axis
+                    const newAreaWidth = Math.ceil(areaStart.width * proportions.x);
+
+                    // with this information i can calculate teh new left and widths of all the elements
+                    this.pick.forEach((element, i) => {
+                        // width of the pick equals the 100% of the transformation
+                        // i got to calculate my initial position translated to a percentage (multiple) of the 100%
+                        const pctLeft = ((pickStart[i].left - areaStart.left) * 1) / areaStart.width;
+                        // then i get the new area width
+                        // and since i know the multiple of my starting position before the resize
+                        // i can calculate the new position of the element
+                        const newLeft = areaStart.left + (newAreaWidth * pctLeft);
+
+                        // then i set the new styles of the elements
+                        element.style.left = newLeft + 'px';
+                        element.style.width = pickStart[i].width * proportions.x + 'px';
+                    });
+
+                    // and of course we need to update the width of the pick area
+                    this.pickAreaElement.style.width = newAreaWidth + 'px';
+                }
+                , se: (e, proportions) => {
+                    resizeFunctions.e(e, proportions);
+                }
+                , s: (e, proportions) => {
+                    this.resize(e, 's');
+                }
+                , sw: (e, proportions) => {
+                    this.resize(e, 'sw');
+                }
+                , w: (e, proportions) => {
+                    this.resize(e, 'w');
+                }
+            }
+
+            const resize = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const getProportions = () => {
+                    const output = {
+                        x:null,
+                        y:null
+                    }
+                    if (this.resizeDir === 'n' || this.resizeDir === 's' || this.resizeDir === 'nw' || this.resizeDir === 'se' || this.resizeDir === 'sw' || this.resizeDir === 'ne') {
+                        output.y = (areaStart.height + (e.clientY - this.resizeDownCoords.y)) / areaStart.height;
+                    }
+                    if (this.resizeDir === 'e' || this.resizeDir === 'w' || this.resizeDir === 'ne' || this.resizeDir === 'nw' || this.resizeDir === 'se' || this.resizeDir === 'sw') {
+                        output.x = (areaStart.width + (e.clientX - this.resizeDownCoords.x)) / areaStart.width;
+                    }
+                    return output;
+                }
+                resizeFunctions[dir](e, getProportions());
+            }
+
+            const stopResize = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                this.resizing = false;
+                this.resizeDir = null;
+                this.resizeDownCoords = null;
+                document.removeEventListener('mousemove', resize);
+                document.removeEventListener('touchmove', resize);
+                document.removeEventListener('mouseup', stopResize);
+                document.removeEventListener('touchend', stopResize);
+            }
+
+            document.addEventListener('mouseup', stopResize);
+            document.addEventListener('touchend', stopResize);
+            document.addEventListener('mousemove', resize);
+            document.addEventListener('touchmove', resize);
+        }
+
+        this.resize = (e, dir) => {}
+
         this.toolInit = (app) => {
             // do stuff on initialization
             const ws = app.workspace;
@@ -189,34 +319,42 @@ class ToolSelect extends Tool {
 
             this.paNW = document.createElement('div');
             this.paNW.setAttribute('class', 'editor-workspace-pa-handle nw');
+            this.paNW.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paNW);
 
             this.paN = document.createElement('div');
             this.paN.setAttribute('class', 'editor-workspace-pa-handle n');
+            this.paN.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paN);
 
             this.paNE = document.createElement('div');
             this.paNE.setAttribute('class', 'editor-workspace-pa-handle ne');
+            this.paNE.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paNE);
 
             this.paW = document.createElement('div');
             this.paW.setAttribute('class', 'editor-workspace-pa-handle w');
+            this.paW.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paW);
 
             this.paE = document.createElement('div');
             this.paE.setAttribute('class', 'editor-workspace-pa-handle e');
+            this.paE.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paE);
 
             this.paSW = document.createElement('div');
             this.paSW.setAttribute('class', 'editor-workspace-pa-handle sw');
+            this.paSW.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paSW);
 
             this.paS = document.createElement('div');
             this.paS.setAttribute('class', 'editor-workspace-pa-handle s');
+            this.paS.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paS);
 
             this.paSE = document.createElement('div');
             this.paSE.setAttribute('class', 'editor-workspace-pa-handle se');
+            this.paSE.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paSE);
 
 

@@ -1,21 +1,19 @@
 class EditorMenu extends HTMLElement {
-
-    /**
+  /**
      * the button constructor
      */
-    constructor() {
-        super();
+  constructor () {
+    super()
 
-        // attach shadow dom
-        this._shadow = this.attachShadow({ mode: 'open' });
+    // attach shadow dom
+    this._shadow = this.attachShadow({ mode: 'open' })
 
-        this.setAttribute('role', 'menubar');
+    this.setAttribute('role', 'menubar')
 
-        // create the html
-        const slot = document.createElement('slot');
-        this._shadow.append(slot);
-    }
-
+    // create the html
+    const slot = document.createElement('slot')
+    this._shadow.append(slot)
+  }
 }
 
-export default EditorMenu;
+export default EditorMenu

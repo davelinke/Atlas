@@ -1,27 +1,25 @@
 class CustomElement extends HTMLElement {
-
-    /**
+  /**
      * the button constructor
      */
-    constructor() {
-        super();
+  constructor () {
+    super()
 
-        this._lang = {};
+    this._lang = {}
 
-        this.echo = (key) => {
-            const term = this._lang[key];
-            return term ? term : key;
-        }
+    this.echo = (key) => {
+      const term = this._lang[key]
+      return term || key
     }
+  }
 
-    async connectedCallback() {
-        const lang = document.documentElement.lang;
-        const langPath = `./languages/${lang}.js`;
-        const langModule = await import(langPath)
+  async connectedCallback () {
+    const lang = document.documentElement.lang
+    const langPath = `./languages/${lang}.js`
+    const langModule = await import(langPath)
 
-        this._lang = langModule.default;
-    }
-
+    this._lang = langModule.default
+  }
 }
 
-export default CustomElement;
+export default CustomElement

@@ -29,84 +29,80 @@ button:focus,
 ::slotted(.reflect){
     transform: scaleX(-1);
 }
-`;
+`
 
 class Tool extends HTMLElement {
-
-    /**
+  /**
      * the button constructor
      */
-    constructor() {
-        super();
+  constructor () {
+    super()
 
-        // PROPERTIES
+    // PROPERTIES
 
-        //METHODS
+    // METHODS
 
-        this.activateTool = (app) => {
-            // deactivate active sibling
-            let activeSibling = this.parentNode.querySelector('[active]');
-            if (activeSibling && activeSibling !== this) {
-                activeSibling.deactivateTool(app);
-            }
-            this.setAttribute('active', 'true');
+    this.activateTool = (app) => {
+      // deactivate active sibling
+      const activeSibling = this.parentNode.querySelector('[active]')
+      if (activeSibling && activeSibling !== this) {
+        activeSibling.deactivateTool(app)
+      }
+      this.setAttribute('active', 'true')
 
-            if (this.toolInit){
-                this.toolInit(app);
-            }
-        }
-
-        this.deactivateTool = (app) => {
-            this.removeAttribute('active');
-
-            if (this.toolDestroy){
-                this.toolDestroy(app);
-            }
-        }
-
-        // attach shadow dom
-        this._shadow = this.attachShadow({ mode: 'open' });
-
-        const styles = document.createElement('style');
-        styles.innerHTML = Css;
-        this._shadow.appendChild(styles);
-
-        this._toolButton = document.createElement('button');
-        this._toolButton.addEventListener('click', (e) => {
-            // fire envent
-            this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }));
-        });
-
-        const slot = document.createElement('slot');
-        this._toolButton.append(slot);
-
-        this._shadow.appendChild(this._toolButton);
+      if (this.toolInit) {
+        this.toolInit(app)
+      }
     }
 
+    this.deactivateTool = (app) => {
+      this.removeAttribute('active')
 
-    // LIFECYCLE
-
-
-    connectedCallback() {
-        // fire up an event to make myself available to the app
-        this.dispatchEvent(new CustomEvent('toolReady', { detail: this, bubbles: true, composed: true }));
-
-        this.innerHTML = `<i class="material-icons ${this.iconClass?this.iconClass:''}">${this.icon}</i>`;
+      if (this.toolDestroy) {
+        this.toolDestroy(app)
+      }
     }
 
+    // attach shadow dom
+    this._shadow = this.attachShadow({ mode: 'open' })
 
-    // ATTRIBUTE CHANGES
-    static get observedAttributes() { return ['active'] }
+    const styles = document.createElement('style')
+    styles.innerHTML = Css
+    this._shadow.appendChild(styles)
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'active') {
-            if (newValue) {
-                // activate tool
-            } else {
-                // deactivate tool
-            }
-        }
+    this._toolButton = document.createElement('button')
+    this._toolButton.addEventListener('click', (e) => {
+      // fire envent
+      this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
+    })
+
+    const slot = document.createElement('slot')
+    this._toolButton.append(slot)
+
+    this._shadow.appendChild(this._toolButton)
+  }
+
+  // LIFECYCLE
+
+  connectedCallback () {
+    // fire up an event to make myself available to the app
+    this.dispatchEvent(new CustomEvent('toolReady', { detail: this, bubbles: true, composed: true }))
+
+    this.innerHTML = `<i class="material-icons ${this.iconClass ? this.iconClass : ''}">${this.icon}</i>`
+  }
+
+  // ATTRIBUTE CHANGES
+  static get observedAttributes () { return ['active'] }
+
+  attributeChangedCallback (name, oldValue, newValue) {
+    if (name === 'active') {
+      if (newValue) {
+        // activate tool
+      } else {
+        // deactivate tool
+      }
     }
+  }
 }
 
-export default Tool;
+export default Tool

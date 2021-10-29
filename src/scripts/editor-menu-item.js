@@ -1,4 +1,4 @@
-import CustomElement from "./element.js";
+import CustomElement from './element.js'
 
 const Css = `
 :host{
@@ -22,39 +22,37 @@ button{
         background-color:var(--menu-button-bg-color-hover, var(--element-highlight-color, #f5f5f5));
     }
   }
-`;
+`
 
 class EditorMenuItem extends CustomElement {
-
-    /**
+  /**
      * the button constructor
      */
-    constructor() {
-        super();
+  constructor () {
+    super()
 
-        // METHODS
-        this._onClick = (e) => {
-            this.dispatchEvent(new CustomEvent('editorMenuItemClick', {
-                bubbles: true,
-                composed: true
-            }));
-        }
-
-        // attach shadow dom
-        this._shadow = this.attachShadow({ mode: 'open' });
-
-        this.setAttribute('role', 'menuitem');
-
-        const styles = document.createElement('style');
-        styles.innerHTML = Css;
-        this._shadow.appendChild(styles);
-
-        this._button = document.createElement('button');
-        this._button.addEventListener('click', this._onClick);
-
-        this._shadow.appendChild(this._button);
+    // METHODS
+    this._onClick = (e) => {
+      this.dispatchEvent(new CustomEvent('editorMenuItemClick', {
+        bubbles: true,
+        composed: true
+      }))
     }
 
+    // attach shadow dom
+    this._shadow = this.attachShadow({ mode: 'open' })
+
+    this.setAttribute('role', 'menuitem')
+
+    const styles = document.createElement('style')
+    styles.innerHTML = Css
+    this._shadow.appendChild(styles)
+
+    this._button = document.createElement('button')
+    this._button.addEventListener('click', this._onClick)
+
+    this._shadow.appendChild(this._button)
+  }
 }
 
-export default EditorMenuItem;
+export default EditorMenuItem

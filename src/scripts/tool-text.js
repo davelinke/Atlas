@@ -1,15 +1,12 @@
-import Tool from "./tool.js";
+import Tool from './tool.js'
 
 class ToolText extends Tool {
+  constructor () {
+    super()
 
-    constructor() {
-        super();
-        
-        this.name = "text";
-        this.icon = "title";
-    }
-
-
+    this.name = 'text'
+    this.icon = 'title'
+  }
 }
 
-export default ToolText;
+export default ToolText
