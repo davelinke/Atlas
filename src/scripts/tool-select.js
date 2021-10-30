@@ -195,7 +195,7 @@ class ToolSelect extends Tool {
             // find out the orientations of the resize
             this.resizeV = e.target.dataset.resizeV ? e.target.dataset.resizeV : false;
             this.resizeH = e.target.dataset.resizeH ? e.target.dataset.resizeH : false;
-            
+
             // save the coords of the down event
             this.resizeDownCoords = {
                 x: e.clientX,
@@ -241,7 +241,7 @@ class ToolSelect extends Tool {
                 const newAreaMag = Math.round(
                     (
                         areaStart[mag] * proportions[o]
-                    
+
                     ) * 10) / 10;
 
                 // with this information i can calculate teh new left and widths of all the elements
@@ -264,10 +264,62 @@ class ToolSelect extends Tool {
 
             }
 
+            const resizeBw = (o, proportions) => {
+                const dims = {
+                    y: {
+                        start: 'top',
+                        mag: 'height'
+                    },
+                    x: {
+                        start: 'left',
+                        mag: 'width'
+                    }
+                }
+
+                const start = dims[o].start;
+                const mag = dims[o].mag;
+
+                // i obtain the new area width calculatinng the initial width
+                // multiplied by the new proportion of the x axis
+                const newAreaMag = Math.round(
+                    (
+                        areaStart[mag] * proportions[o]
+
+                    ) * 10) / 10;
+
+
+                const newAreaStart = areaStart[start] + (areaStart[mag] - newAreaMag);
+
+                // with this information i can calculate teh new left and widths of all the elements
+                this.pick.forEach((element, i) => {
+                    // width of the pick equals the 100% of the transformation
+                    // i got to calculate my initial position translated to a percentage (multiple) of the 100%
+                    const pctStart = (pickStart[i][start] - areaStart[start]) / areaStart[mag];
+                    // then i get the new area width
+                    // and since i know the multiple of my starting position before the resize
+                    // i can calculate the new position of the element
+                    const newStart = Math.floor(
+
+                        newAreaStart + (newAreaMag * pctStart)
+
+                    );
+
+                    // then i set the new styles of the elements
+                    element.style[start] = newStart + 'px';
+                    element.style[mag] = Math.ceil(pickStart[i][mag] * proportions[o]) + 'px';
+                });
+
+                // and of course we need to update the width of the pick area
+                this.pickAreaElement.style[mag] = Math.ceil(newAreaMag) + 'px';
+                this.pickAreaElement.style[start] = newAreaStart + 'px';
+
+            }
+
+
             // an object that determines which functions to use depending on the orientations of the resize
             const resizeFunctions = {
                 n: (e, proportions) => {
-                    //
+                    resizeBw('y', proportions);
                 }
                 , e: (e, proportions) => {
                     resizeFw('x', proportions);
@@ -276,7 +328,7 @@ class ToolSelect extends Tool {
                     resizeFw('y', proportions);
                 }
                 , w: (e, proportions) => {
-                    //
+                    resizeBw('x', proportions);
                 }
             }
 
@@ -286,22 +338,38 @@ class ToolSelect extends Tool {
                 e.stopPropagation();
 
                 const zoomScale = this.appReference.zoomScale;
+
                 const proportions = {
                     x: null,
                     y: null
                 }
-                if (this.resizeV) {
+
+                if (this.resizeV === 's') {
                     proportions.y = (
-                        areaStart.height + 
+                        areaStart.height +
                         ((e.clientY - this.resizeDownCoords.y) / zoomScale)
                     ) / areaStart.height;
                 }
-                if (this.resizeH) {
+                if (this.resizeV === 'n') {
+                    proportions.y = (
+                        areaStart.height -
+                        ((e.clientY - this.resizeDownCoords.y) / zoomScale)
+                    ) / areaStart.height;
+                }
+
+                if (this.resizeH === 'e') {
                     proportions.x = (
-                        areaStart.width + 
+                        areaStart.width +
                         ((e.clientX - this.resizeDownCoords.x) / zoomScale)
                     ) / areaStart.width;
                 }
+                if (this.resizeH === 'w') {
+                    proportions.x = (
+                        areaStart.width -
+                        ((e.clientX - this.resizeDownCoords.x) / zoomScale)
+                    ) / areaStart.width;
+                }
+
                 this.resizeV && resizeFunctions[this.resizeV](e, proportions);
                 this.resizeH && resizeFunctions[this.resizeH](e, proportions);
             }
