@@ -83,8 +83,6 @@ class ToolSelect extends Tool {
 
         this.appReference = null;
 
-        this.resizeDir = null;
-
         // METHODS
 
         // lets return the specific element that was clicked
@@ -187,16 +185,24 @@ class ToolSelect extends Tool {
         }
 
         this.startResize = (e) => {
+            // prevent the propagation of the event
             e.preventDefault();
             e.stopPropagation();
-            const dir = e.target.classList[1];
+
+            // flag that we are resizing
             this.resizing = true;
-            this.resizeDir = dir;
+
+            // find out the orientations of the resize
+            this.resizeV = e.target.dataset.resizeV ? e.target.dataset.resizeV : false;
+            this.resizeH = e.target.dataset.resizeH ? e.target.dataset.resizeH : false;
+            
+            // save the coords of the down event
             this.resizeDownCoords = {
                 x: e.clientX,
                 y: e.clientY
             };
-            
+
+            // calculate and store the dimensions of the resizing area at the beginning
             const areaStart = {
                 left: parseInt(this.pickAreaElement.style.left.replace('px', ''), 10),
                 top: parseInt(this.pickAreaElement.style.top.replace('px', ''), 10),
@@ -204,9 +210,8 @@ class ToolSelect extends Tool {
                 height: this.pickAreaElement.offsetHeight
             }
 
-            console.log(areaStart)
-
-            const pickStart = this.pick.map((element)=>{
+            // save the dimensions of the elements to be resized in the beginning
+            const pickStart = this.pick.map((element) => {
                 return {
                     left: parseInt(element.style.left.replace('px', ''), 10),
                     top: parseInt(element.style.top.replace('px', ''), 10),
@@ -215,80 +220,100 @@ class ToolSelect extends Tool {
                 }
             });
 
+            // a function for resizing forwards (when locked side is either left or top)
+            const resizeFw = (o, proportions) => {
+                const dims = {
+                    y: {
+                        start: 'top',
+                        mag: 'height'
+                    },
+                    x: {
+                        start: 'left',
+                        mag: 'width'
+                    }
+                }
+
+                const start = dims[o].start;
+                const mag = dims[o].mag;
+
+                // i obtain the new area width calculatinng the initial width
+                // multiplied by the new proportion of the x axis
+                const newAreaMag = Math.round(
+                    (
+                        areaStart[mag] * proportions[o]
+                    
+                    ) * 10) / 10;
+
+                // with this information i can calculate teh new left and widths of all the elements
+                this.pick.forEach((element, i) => {
+                    // width of the pick equals the 100% of the transformation
+                    // i got to calculate my initial position translated to a percentage (multiple) of the 100%
+                    const pctStart = ((pickStart[i][start] - areaStart[start]) * 1) / areaStart[mag];
+                    // then i get the new area width
+                    // and since i know the multiple of my starting position before the resize
+                    // i can calculate the new position of the element
+                    const newStart = Math.floor(areaStart[start] + (newAreaMag * pctStart));
+
+                    // then i set the new styles of the elements
+                    element.style[start] = newStart + 'px';
+                    element.style[mag] = Math.ceil(pickStart[i][mag] * proportions[o]) + 'px';
+                });
+
+                // and of course we need to update the width of the pick area
+                this.pickAreaElement.style[mag] = Math.ceil(newAreaMag) + 'px';
+
+            }
+
+            // an object that determines which functions to use depending on the orientations of the resize
             const resizeFunctions = {
-                nw: (e, proportions) => {
-                    this.resize(e, 'nw');
-                }
-                , n: (e, proportions) => {
-                    this.resize(e, 'n');
-                }
-                , ne: (e, proportions) => {
-                    resizeFunctions.e(e, proportions);
+                n: (e, proportions) => {
+                    //
                 }
                 , e: (e, proportions) => {
-
-                    // i obtain the new area width calculatinng the initial width
-                    // multiplied by the new proportion of the x axis
-                    const newAreaWidth = Math.ceil(areaStart.width * proportions.x);
-
-                    // with this information i can calculate teh new left and widths of all the elements
-                    this.pick.forEach((element, i) => {
-                        // width of the pick equals the 100% of the transformation
-                        // i got to calculate my initial position translated to a percentage (multiple) of the 100%
-                        const pctLeft = ((pickStart[i].left - areaStart.left) * 1) / areaStart.width;
-                        // then i get the new area width
-                        // and since i know the multiple of my starting position before the resize
-                        // i can calculate the new position of the element
-                        const newLeft = areaStart.left + (newAreaWidth * pctLeft);
-
-                        // then i set the new styles of the elements
-                        element.style.left = newLeft + 'px';
-                        element.style.width = pickStart[i].width * proportions.x + 'px';
-                    });
-
-                    // and of course we need to update the width of the pick area
-                    this.pickAreaElement.style.width = newAreaWidth + 'px';
-                }
-                , se: (e, proportions) => {
-                    resizeFunctions.e(e, proportions);
+                    resizeFw('x', proportions);
                 }
                 , s: (e, proportions) => {
-                    this.resize(e, 's');
-                }
-                , sw: (e, proportions) => {
-                    this.resize(e, 'sw');
+                    resizeFw('y', proportions);
                 }
                 , w: (e, proportions) => {
-                    this.resize(e, 'w');
+                    //
                 }
             }
 
+            // the resizing function when the mouse is moving
             const resize = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const getProportions = () => {
-                    const output = {
-                        x:null,
-                        y:null
-                    }
-                    if (this.resizeDir === 'n' || this.resizeDir === 's' || this.resizeDir === 'nw' || this.resizeDir === 'se' || this.resizeDir === 'sw' || this.resizeDir === 'ne') {
-                        output.y = (areaStart.height + (e.clientY - this.resizeDownCoords.y)) / areaStart.height;
-                    }
-                    if (this.resizeDir === 'e' || this.resizeDir === 'w' || this.resizeDir === 'ne' || this.resizeDir === 'nw' || this.resizeDir === 'se' || this.resizeDir === 'sw') {
-                        output.x = (areaStart.width + (e.clientX - this.resizeDownCoords.x)) / areaStart.width;
-                    }
-                    return output;
+                const zoomScale = this.appReference.zoomScale;
+                const proportions = {
+                    x: null,
+                    y: null
                 }
-                resizeFunctions[dir](e, getProportions());
+                if (this.resizeV) {
+                    proportions.y = (
+                        areaStart.height + 
+                        ((e.clientY - this.resizeDownCoords.y) / zoomScale)
+                    ) / areaStart.height;
+                }
+                if (this.resizeH) {
+                    proportions.x = (
+                        areaStart.width + 
+                        ((e.clientX - this.resizeDownCoords.x) / zoomScale)
+                    ) / areaStart.width;
+                }
+                this.resizeV && resizeFunctions[this.resizeV](e, proportions);
+                this.resizeH && resizeFunctions[this.resizeH](e, proportions);
             }
 
+            // the stop resize function that clears event listeners and resets the flags
             const stopResize = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
 
                 this.resizing = false;
-                this.resizeDir = null;
+                this.resizeV = null;
+                this.resizeH = null;
                 this.resizeDownCoords = null;
                 document.removeEventListener('mousemove', resize);
                 document.removeEventListener('touchmove', resize);
@@ -296,13 +321,14 @@ class ToolSelect extends Tool {
                 document.removeEventListener('touchend', stopResize);
             }
 
+            // the event listerners for the subsequent move and mouseup events
             document.addEventListener('mouseup', stopResize);
             document.addEventListener('touchend', stopResize);
             document.addEventListener('mousemove', resize);
             document.addEventListener('touchmove', resize);
         }
 
-        this.resize = (e, dir) => {}
+        this.resize = (e, dir) => { }
 
         this.toolInit = (app) => {
             // do stuff on initialization
@@ -319,41 +345,53 @@ class ToolSelect extends Tool {
 
             this.paNW = document.createElement('div');
             this.paNW.setAttribute('class', 'editor-workspace-pa-handle nw');
+            this.paNW.dataset.resizeV = 'n';
+            this.paNW.dataset.resizeH = 'w';
             this.paNW.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paNW);
 
             this.paN = document.createElement('div');
             this.paN.setAttribute('class', 'editor-workspace-pa-handle n');
+            this.paN.dataset.resizeV = 'n';
             this.paN.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paN);
 
             this.paNE = document.createElement('div');
             this.paNE.setAttribute('class', 'editor-workspace-pa-handle ne');
+            this.paNE.dataset.resizeV = 'n';
+            this.paNE.dataset.resizeH = 'e';
             this.paNE.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paNE);
 
             this.paW = document.createElement('div');
             this.paW.setAttribute('class', 'editor-workspace-pa-handle w');
+            this.paW.dataset.resizeH = 'w';
             this.paW.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paW);
 
             this.paE = document.createElement('div');
             this.paE.setAttribute('class', 'editor-workspace-pa-handle e');
+            this.paE.dataset.resizeH = 'e';
             this.paE.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paE);
 
             this.paSW = document.createElement('div');
             this.paSW.setAttribute('class', 'editor-workspace-pa-handle sw');
+            this.paSW.dataset.resizeV = 's';
+            this.paSW.dataset.resizeH = 'w';
             this.paSW.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paSW);
 
             this.paS = document.createElement('div');
             this.paS.setAttribute('class', 'editor-workspace-pa-handle s');
+            this.paS.dataset.resizeV = 's';
             this.paS.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paS);
 
             this.paSE = document.createElement('div');
             this.paSE.setAttribute('class', 'editor-workspace-pa-handle se');
+            this.paSE.dataset.resizeV = 's';
+            this.paSE.dataset.resizeH = 'e';
             this.paSE.addEventListener('mousedown', this.startResize);
             this.pickAreaElement.appendChild(this.paSE);
 
