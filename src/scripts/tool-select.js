@@ -1,4 +1,5 @@
 import Tool from "./tool.js";
+import { coordsFilterFn } from './lib-filters.js'
 
 const CssPa = `
 .editor-workspace-pa {
@@ -82,6 +83,7 @@ class ToolSelect extends Tool {
         this.pickAreaHidden = false;
 
         this.appReference = null;
+        this.pickStart = null;
 
         // METHODS
 
@@ -161,6 +163,14 @@ class ToolSelect extends Tool {
                 // and add the element to the pick
                 this.addToPick(element);
             }
+            this.pickStart = this.pick.map((element) => {
+                return {
+                    left: parseInt(element.style.left.replace('px', ''), 10),
+                    top: parseInt(element.style.top.replace('px', ''), 10),
+                    width: element.offsetWidth,
+                    height: element.offsetHeight
+                }
+            });
         }
         this.deselectAll = () => {
             for (let element of this.pick) {
@@ -175,11 +185,15 @@ class ToolSelect extends Tool {
         this.modTasks = {};
 
         // the mod task for moving objects
-        this.modTasks['mod'] = (element, e) => {
-            const currentX = parseInt(element.style.left.replace('px', ''), 10);
-            const currentY = parseInt(element.style.top.replace('px', ''), 10);
-            const newX = currentX + (e.detail.mouseEvent.movementX / this.appReference.zoomScale);
-            const newY = currentY + (e.detail.mouseEvent.movementY / this.appReference.zoomScale);
+        this.modTasks['mod'] = (element, i, e) => {
+            const zoomedDelta = {
+                x: e.detail.delta.x,
+                y: e.detail.delta.y
+            }
+
+            const newX = this.pickStart[i].left + zoomedDelta.x;
+            const newY = this.pickStart[i].top + zoomedDelta.y;
+
             element.style.left = newX + 'px';
             element.style.top = newY + 'px';
         }
@@ -344,29 +358,31 @@ class ToolSelect extends Tool {
                     y: null
                 }
 
+                const filteredCoords = coordsFilterFn({left:e.clientX, top:e.clientY}, this.appReference.gridActive, this.appReference.gridSize, this.appReference.zoomScale, false);
+
                 if (this.resizeV === 's') {
                     proportions.y = (
                         areaStart.height +
-                        ((e.clientY - this.resizeDownCoords.y) / zoomScale)
+                        ((filteredCoords.top - this.resizeDownCoords.y) / zoomScale)
                     ) / areaStart.height;
                 }
                 if (this.resizeV === 'n') {
                     proportions.y = (
                         areaStart.height -
-                        ((e.clientY - this.resizeDownCoords.y) / zoomScale)
+                        ((filteredCoords.left - this.resizeDownCoords.y) / zoomScale)
                     ) / areaStart.height;
                 }
 
                 if (this.resizeH === 'e') {
                     proportions.x = (
                         areaStart.width +
-                        ((e.clientX - this.resizeDownCoords.x) / zoomScale)
+                        ((filteredCoords.left - this.resizeDownCoords.x) / zoomScale)
                     ) / areaStart.width;
                 }
                 if (this.resizeH === 'w') {
                     proportions.x = (
                         areaStart.width -
-                        ((e.clientX - this.resizeDownCoords.x) / zoomScale)
+                        ((filteredCoords.left - this.resizeDownCoords.x) / zoomScale)
                     ) / areaStart.width;
                 }
 
@@ -510,12 +526,15 @@ class ToolSelect extends Tool {
                 this.constrainAngle = false;
             }
 
-            this.pick.forEach((element) => {
-                this.modTasks[this.modTask](element, e);
+            this.pick.forEach((element, i) => {
+                this.modTasks[this.modTask](element, i, e);
             })
-            this.modTasks[this.modTask](this.pickAreaElement, e);
+            this.resizePickArea();
         }
         this.inputEnd = (e) => {
+            this.moveIncrementX = null;
+            this.moveIncrementY = null;
+
             if (this.pick.length > 0) {
                 this.pickAreaElement.style.opacity = 1;
                 this.pickAreaHidden = false;

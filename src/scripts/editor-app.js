@@ -9,15 +9,15 @@ class EditorApp extends HTMLElement {
 
     this.doc = null
 
-    this._zoomScale = 1
+    this._zoomScale = 0.5
 
-    this.gridSize = 20
+    this.gridSize = 10
 
-    this.gridActive = true
+    this.gridActive = true;
 
     this.workspace = null
 
-    this.toolDefault = 'select'
+    this.toolDefault = 'rectangle'
 
     this.toolActive = null
 
