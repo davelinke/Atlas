@@ -186,20 +186,21 @@ class ToolSelect extends Tool {
 
         // the mod task for moving objects
         this.modTasks['mod'] = (element, i, e) => {
-            const zoomedDelta = {
-                x: e.detail.delta.x,
-                y: e.detail.delta.y
-            }
+            // const zoomedDelta = {
+            //     x: e.detail.delta.x,
+            //     y: e.detail.delta.y
+            // }
 
-            const newX = this.pickStart[i].left + zoomedDelta.x;
-            const newY = this.pickStart[i].top + zoomedDelta.y;
+            // const newX = this.pickStart[i].left + zoomedDelta.x;
+            // const newY = this.pickStart[i].top + zoomedDelta.y;
 
-            element.style.left = newX + 'px';
-            element.style.top = newY + 'px';
+            // element.style.left = newX + 'px';
+            // element.style.top = newY + 'px';
         }
 
         this.startResize = (e) => {
             // prevent the propagation of the event
+            console.log('hello')
             e.preventDefault();
             e.stopPropagation();
 
@@ -220,8 +221,8 @@ class ToolSelect extends Tool {
             const areaStart = {
                 left: parseInt(this.pickAreaElement.style.left.replace('px', ''), 10),
                 top: parseInt(this.pickAreaElement.style.top.replace('px', ''), 10),
-                width: this.pickAreaElement.offsetWidth,
-                height: this.pickAreaElement.offsetHeight
+                right: parseInt(this.pickAreaElement.style.right.replace('px', ''), 10),
+                bottom: parseInt(this.pickAreaElement.style.bottom.replace('px', ''), 10)
             }
 
             // save the dimensions of the elements to be resized in the beginning
@@ -229,8 +230,8 @@ class ToolSelect extends Tool {
                 return {
                     left: parseInt(element.style.left.replace('px', ''), 10),
                     top: parseInt(element.style.top.replace('px', ''), 10),
-                    width: element.offsetWidth,
-                    height: element.offsetHeight
+                    right: parseInt(element.style.right.replace('px', ''), 10),
+                    bottom: parseInt(element.style.bottom.replace('px', ''), 10)
                 }
             });
 
@@ -239,11 +240,11 @@ class ToolSelect extends Tool {
                 const dims = {
                     y: {
                         start: 'top',
-                        mag: 'height'
+                        end: 'bottom'
                     },
                     x: {
                         start: 'left',
-                        mag: 'width'
+                        end: 'right'
                     }
                 }
 
@@ -361,16 +362,20 @@ class ToolSelect extends Tool {
                 const filteredCoords = coordsFilterFn({left:e.clientX, top:e.clientY}, this.appReference.gridActive, this.appReference.gridSize, this.appReference.zoomScale, false);
 
                 if (this.resizeV === 's') {
+                    const asEnd = this.appReference.workspace.viewportDim - areaStart.bottom;
+                    const asHeight = asEnd - areaStart.top;
                     proportions.y = (
-                        areaStart.height +
+                        asHeight +
                         ((filteredCoords.top - this.resizeDownCoords.y) / zoomScale)
-                    ) / areaStart.height;
+                    ) / asHeight;
                 }
                 if (this.resizeV === 'n') {
+                    const asEnd = this.appReference.workspace.viewportDim - areaStart.bottom;
+                    const asHeight = asEnd - areaStart.top;
                     proportions.y = (
-                        areaStart.height -
+                        asHeight -
                         ((filteredCoords.left - this.resizeDownCoords.y) / zoomScale)
-                    ) / areaStart.height;
+                    ) / asHeight;
                 }
 
                 if (this.resizeH === 'e') {

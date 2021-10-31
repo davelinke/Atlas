@@ -17,7 +17,7 @@ class EditorApp extends HTMLElement {
 
     this.workspace = null
 
-    this.toolDefault = 'rectangle'
+    this.toolDefault = 'select'
 
     this.toolActive = null
 
