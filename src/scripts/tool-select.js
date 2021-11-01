@@ -207,7 +207,7 @@ class ToolSelect extends Tool {
         this.modTasks['mod'] = (element, i, e) => {
             const delta = {
                 x: (e.detail.mouseEvent.clientX - this.inputStartPos.x) / this.appReference.zoomScale,
-                y: (e.detail.mouseEvent.clientY - this.inputStartPos.y)  / this.appReference.zoomScale,
+                y: (e.detail.mouseEvent.clientY - this.inputStartPos.y) / this.appReference.zoomScale,
             }
 
             const newLeft = this.pickStart[i].left + delta.x;
@@ -221,6 +221,11 @@ class ToolSelect extends Tool {
 
             element.style.right = this.applyFilters(newRight) + 'px';
             element.style.bottom = this.applyFilters(newBottom) + 'px';
+
+
+
+            // store the doc
+            this.appReference.storeDocument();
         }
 
         this.applyFilters = (value) => {
@@ -299,28 +304,35 @@ class ToolSelect extends Tool {
                         areaStartMag * proportions[o]
 
                     ) * 10) / 10;
-                const newAreaDelta = newAreaMag - areaStartMag;
 
-                // and of course we need to update the width of the pick area
-                const pickAreaEnd = this.applyFilters(areaStart[end] - newAreaDelta);
+                if (newAreaMag > 0) {
+                    const newAreaDelta = newAreaMag - areaStartMag;
 
-                // with this information i can calculate teh new left and widths of all the elements
-                this.pick.forEach((element, i) => {
-                    // calculate new start position
-                    const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
-                    const newStart = areaStart[start] + (newAreaMag * pctStart)
+                    // and of course we need to update the width of the pick area
+                    const pickAreaEnd = this.applyFilters(areaStart[end] - newAreaDelta);
 
-                    element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
+                    // with this information i can calculate teh new left and widths of all the elements
+                    this.pick.forEach((element, i) => {
+                        // calculate new start position
+                        const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
+                        const newStart = areaStart[start] + (newAreaMag * pctStart)
 
-                    // calculate new end position
-                    const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
-                    const newEnd = pickAreaEnd + (newAreaMag * pctEnd)
+                        element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
 
-                    element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
-                });
-                this.pickAreaElement.style[end] = Math.floor(
-                    pickAreaEnd
-                ) + 'px';
+                        // calculate new end position
+                        const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
+                        const newEnd = pickAreaEnd + (newAreaMag * pctEnd)
+
+                        element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
+                    });
+                    this.pickAreaElement.style[end] = Math.floor(
+                        pickAreaEnd
+                    ) + 'px';
+
+                    // store the doc
+                    this.appReference.storeDocument();
+                }
+
 
             }
 
@@ -352,30 +364,35 @@ class ToolSelect extends Tool {
                         areaStartMag * proportions[o]
 
                     ) * 10) / 10;
-                const newAreaDelta = newAreaMag - areaStartMag;
 
-                // and of course we need to update the width of the pick area
-                const pickAreaStart = this.applyFilters(areaStart[start] - newAreaDelta);
+                if (newAreaMag > 0) {
+                    const newAreaDelta = newAreaMag - areaStartMag;
 
-                // with this information i can calculate teh new left and widths of all the elements
-                
-                this.pick.forEach((element, i) => {
-                    // calculate new start position
-                    const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
-                    const newStart = pickAreaStart + (newAreaMag * pctStart);
+                    // and of course we need to update the width of the pick area
+                    const pickAreaStart = this.applyFilters(areaStart[start] - newAreaDelta);
 
-                    element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
+                    this.pick.forEach((element, i) => {
+                        // calculate new start position
+                        const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
+                        const newStart = pickAreaStart + (newAreaMag * pctStart);
 
-                    // calculate new end position
-                    const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
-                    const newEnd = areaStart[end] + (newAreaMag * pctEnd)
+                        element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
 
-                    element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
-                });
-                /**/
-                this.pickAreaElement.style[start] = Math.floor(
-                    pickAreaStart
-                ) + 'px';
+                        // calculate new end position
+                        const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
+                        const newEnd = areaStart[end] + (newAreaMag * pctEnd)
+
+                        element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
+                    });
+
+                    this.pickAreaElement.style[start] = Math.floor(
+                        pickAreaStart
+                    ) + 'px';
+
+                    // store the doc
+                    this.appReference.storeDocument();
+
+                }
 
             }
 

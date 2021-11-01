@@ -161,7 +161,7 @@ class EditorWorkspace extends HTMLElement {
                 bottom
             }
 
-            const filteredCoords = coordsFilterFn(coords, this.app.gridActive,  this.app.gridSize, this.app.zoomScale, false);
+            const filteredCoords = coordsFilterFn(coords, this.app.gridActive, this.app.gridSize, this.app.zoomScale, false);
 
             const returnValue = {
                 left: (filteredCoords.left / scale),
@@ -222,7 +222,7 @@ class EditorWorkspace extends HTMLElement {
 
                     const moveEventDetail = {
                         mouseEvent: e,
-                        coords:coords
+                        coords: coords
                     }
                     // fire move event listener
 
@@ -314,6 +314,16 @@ class EditorWorkspace extends HTMLElement {
             this._canvas.classList.remove('selection-active')
         }
 
+        this.getDocumentHTML = () => {
+            const doc = this._canvas.cloneNode(true);
+            doc.removeChild(doc.querySelector('.input-area'));
+            doc.removeChild(doc.querySelector('.editor-workspace-pa'));
+            doc.querySelectorAll('.picked').forEach(e => {
+                e.classList.remove('picked');
+            })
+            return doc.innerHTML;
+        }
+
         // STRUCTURE
 
         this._shadow = this.attachShadow({ mode: 'open' })
@@ -335,6 +345,10 @@ class EditorWorkspace extends HTMLElement {
 
         this._canvas = document.createElement('div')
         this._canvas.classList.add('canvas')
+
+        // get the store document
+        const storedDocument = window.localStorage.getItem('currentDocument');
+        storedDocument && (this._canvas.innerHTML = storedDocument);
         this._workspace.appendChild(this._canvas)
 
         this._inputArea = document.createElement('div')
@@ -354,9 +368,6 @@ class EditorWorkspace extends HTMLElement {
 
         // fire up an event to make myself available to the app
         this.dispatchEvent(new CustomEvent('editorWorkspaceReady', { detail: this, bubbles: true, composed: true }))
-
-        this.addElement({ top: 15000, left: 15000 })
-        this.addElement({ top: 15200, left: 15200, right: 14700, bottom: 14700 })
     }
 }
 

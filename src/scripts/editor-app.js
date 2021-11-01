@@ -2,14 +2,14 @@ class EditorApp extends HTMLElement {
   /**
      * the button constructor
      */
-  constructor () {
+  constructor() {
     super()
 
     // PROPS
 
     this.doc = null
 
-    this._zoomScale = 0.5
+    this._zoomScale = 1
 
     this.gridSize = 10
 
@@ -51,6 +51,11 @@ class EditorApp extends HTMLElement {
 
     this.getWorkspace = () => {
       return this.workspace
+    }
+
+    this.storeDocument = () => {
+      const docHTML = this.workspace.getDocumentHTML();
+      window.localStorage.setItem('currentDocument', docHTML);
     }
 
     // EVENT LISTENERS
