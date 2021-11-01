@@ -42,6 +42,11 @@ class Tool extends HTMLElement {
 
     // METHODS
 
+    this.registerApp = (app) => {
+      this.app = app;
+      this.onToolReady && this.onToolReady();
+    }
+
     this.activateTool = (app) => {
       // deactivate active sibling
       const activeSibling = this.parentNode.querySelector('[active]')

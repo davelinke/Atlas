@@ -292,9 +292,15 @@ class EditorWorkspace extends HTMLElement {
                 const unit = propUnitsJs[prop] ? propUnitsJs[prop] : ''
                 element.style[prop] = args[prop] + unit
             }
-            this._canvas.appendChild(element)
+            this._canvas.appendChild(element);
+
+            this.dispatchEvent(new CustomEvent('editorElementAdded', { detail: element, bubbles: true, composed: true }))
 
             return element
+        }
+
+        this.removeElement = (element) => {
+            this._canvas.removeChild(element);
         }
 
         this.canvasOffset = (newLeft, newTop) => {
@@ -305,6 +311,9 @@ class EditorWorkspace extends HTMLElement {
 
             c.style.left = `${newLeft}px`
             c.style.top = `${newTop}px`
+
+            this.dispatchEvent(new CustomEvent('editorCanvasOffset', { detail: { left: newLeft, top: newTop }, bubbles: true, composed: true }))
+            
         }
 
         this.activateSelection = () => {
@@ -315,11 +324,11 @@ class EditorWorkspace extends HTMLElement {
         }
 
         this.getDocumentHTML = () => {
+            // tools to register 
             const doc = this._canvas.cloneNode(true);
-            doc.removeChild(doc.querySelector('.input-area'));
-            doc.removeChild(doc.querySelector('.editor-workspace-pa'));
-            doc.querySelectorAll('.picked').forEach(e => {
-                e.classList.remove('picked');
+            doc.querySelectorAll(':not(editor-element').forEach(el => el.remove());
+            doc.querySelectorAll('editor-element[class]').forEach(e => {
+                e.removeAttribute('class');
             })
             return doc.innerHTML;
         }
@@ -365,6 +374,11 @@ class EditorWorkspace extends HTMLElement {
         // scroll to middle if it's not defined
         this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
         this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
+
+        // set the initial offset
+        const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'));
+
+        storedCanvasOffset && this.canvasOffset(storedCanvasOffset.left, storedCanvasOffset.top);
 
         // fire up an event to make myself available to the app
         this.dispatchEvent(new CustomEvent('editorWorkspaceReady', { detail: this, bubbles: true, composed: true }))

@@ -21,6 +21,7 @@ class ToolPan extends Tool {
     this.toolInit = (app) => {
       // do stuff on initialization
       const ws = app.workspace
+      this.app = app;
       ws && ws.deactivateSelection()
     }
     this.toolDestroy = (app) => {
@@ -34,20 +35,21 @@ class ToolPan extends Tool {
         top: ws.canvasOffsetTop
       }
 
+      this._downEvent = e;
+
       this._inputDown = { ...iaArgs }
     }
     this.inputMove = (e) => {
       // get the workspace instance
       const ws = e.target
 
-      // get the deltas from the input
-      const deltaX = e.detail.delta.x
-      const deltaY = e.detail.delta.y
+      const deltaX = e.detail.mouseEvent.clientX - this._downEvent.detail.mouseEvent.clientX
+      const deltaY = e.detail.mouseEvent.clientY - this._downEvent.detail.mouseEvent.clientY
 
       const newLeft = this._inputDown.left + deltaX
       const newTop = this._inputDown.top + deltaY
 
-      ws.canvasOffset(newLeft, newTop)
+      ws.canvasOffset(newLeft, newTop);
     }
     this.inputEnd = (e) => {
       // const ws = e.target;

@@ -57,3 +57,7 @@ body{
     grid-row-end: 4;
     position: relative;
 }
+
+.layout__sidebar{
+    border-inline-start: 1px solid var(--layout-border-color);
+}

@@ -72,6 +72,7 @@ class ToolSelect extends Tool {
         this.name = "select";
         this.icon = "near_me";
         this.iconClass = "reflect";
+        this.key = "v";
 
         this.isAdding = false;
         this.isCopying = false;
@@ -299,11 +300,7 @@ class ToolSelect extends Tool {
 
                 // i obtain the new area width calculatinng the initial width
                 // multiplied by the new proportion of the x axis
-                const newAreaMag = Math.round(
-                    (
-                        areaStartMag * proportions[o]
-
-                    ) * 10) / 10;
+                const newAreaMag = this.applyFilters(areaStartMag * proportions[o])
 
                 if (newAreaMag > 0) {
                     const newAreaDelta = newAreaMag - areaStartMag;
@@ -317,17 +314,15 @@ class ToolSelect extends Tool {
                         const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
                         const newStart = areaStart[start] + (newAreaMag * pctStart)
 
-                        element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
+                        element.style[start] = Math.round(newStart) + 'px'; // add filtering/grid here
 
                         // calculate new end position
                         const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
                         const newEnd = pickAreaEnd + (newAreaMag * pctEnd)
 
-                        element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
+                        element.style[end] = newEnd + 'px'; // add filtering/grid here
                     });
-                    this.pickAreaElement.style[end] = Math.floor(
-                        pickAreaEnd
-                    ) + 'px';
+                    this.pickAreaElement.style[end] = Math.round(pickAreaEnd) + 'px';
 
                     // store the doc
                     this.appReference.storeDocument();
@@ -376,18 +371,16 @@ class ToolSelect extends Tool {
                         const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
                         const newStart = pickAreaStart + (newAreaMag * pctStart);
 
-                        element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
+                        element.style[start] = newStart + 'px'; // add filtering/grid here
 
                         // calculate new end position
                         const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
                         const newEnd = areaStart[end] + (newAreaMag * pctEnd)
 
-                        element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
+                        element.style[end] = newEnd + 'px'; // add filtering/grid here
                     });
 
-                    this.pickAreaElement.style[start] = Math.floor(
-                        pickAreaStart
-                    ) + 'px';
+                    this.pickAreaElement.style[start] = pickAreaStart + 'px';
 
                     // store the doc
                     this.appReference.storeDocument();
@@ -417,6 +410,8 @@ class ToolSelect extends Tool {
             const resize = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+
+                this.pickAreaElement.style.opacity = 0;
 
                 const zoomScale = this.appReference.zoomScale;
 
@@ -468,6 +463,8 @@ class ToolSelect extends Tool {
                 e.preventDefault();
                 e.stopPropagation();
 
+                this.pickAreaElement.style.opacity = 1;
+
                 this.resizing = false;
                 this.resizeV = null;
                 this.resizeH = null;
@@ -484,8 +481,6 @@ class ToolSelect extends Tool {
             document.addEventListener('mousemove', resize);
             document.addEventListener('touchmove', resize);
         }
-
-        this.resize = (e, dir) => { }
 
         this.toolInit = (app) => {
             // do stuff on initialization
@@ -617,6 +612,26 @@ class ToolSelect extends Tool {
                 this.pickAreaElement.style.opacity = 1;
                 this.pickAreaHidden = false;
             }
+        }
+        this.onToolReady = (app) => {
+            this.app.registerKeyboardShortcut({
+                key: 'Escape',
+                action: () => {
+                    this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }));
+                }
+            })
+            this.app.registerKeyboardShortcut({
+                key: 'Delete',
+                action: () => {
+                    this.pick.forEach((element) => {
+                        this.app.workspace.removeElement(element);
+                    })
+                    this.deselectAll();
+
+                    // store the doc
+                    this.app.storeDocument();
+                }
+            })
         }
     }
 

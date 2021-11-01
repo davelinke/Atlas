@@ -1,3 +1,5 @@
+import { debounce } from './lib-tools.js'
+
 class EditorApp extends HTMLElement {
   /**
      * the button constructor
@@ -13,13 +15,19 @@ class EditorApp extends HTMLElement {
 
     this.gridSize = 10
 
-    this.gridActive = true;
+    this.gridActive = false;
 
     this.workspace = null
 
-    this.toolDefault = 'select'
+    this.toolDefault = 'select';
+
+    this.toolDefaultInstance = null;
 
     this.toolActive = null
+
+    this.keyboardShortcuts = {};
+
+    this.keyboardShortcutsActive = true;
 
     Object.defineProperty(this, 'zoomScale', {
       get: () => {
@@ -53,10 +61,20 @@ class EditorApp extends HTMLElement {
       return this.workspace
     }
 
-    this.storeDocument = () => {
+    this.storeDocument = debounce(() => {
       const docHTML = this.workspace.getDocumentHTML();
       window.localStorage.setItem('currentDocument', docHTML);
+    })
+
+    this.storeOffset = debounce((e) => {
+      window.localStorage.setItem('canvasOffset', JSON.stringify(e));
+    })
+
+    this.registerKeyboardShortcut = (args) => {
+      this.keyboardShortcuts[args.key] = args.action;
     }
+
+    this.loadDefaultTool = () => { }
 
     // EVENT LISTENERS
 
@@ -72,8 +90,10 @@ class EditorApp extends HTMLElement {
 
     // what to do when tools become available
     this.addEventListener('toolReady', (e) => {
+      e.detail.registerApp(this);
       if ((this.toolActive === null) && (this.toolDefault === e.detail.name)) {
         this.toolActive = e.detail
+        this.toolDefaultInstance = e.detail;
         this.toolActive.activateTool(this)
       }
     })
@@ -117,6 +137,28 @@ class EditorApp extends HTMLElement {
           }
         )
       )
+    })
+
+    this.addEventListener('editorCanvasOffset', (e) => {
+      this.storeOffset(e.detail);
+    })
+
+    window.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(e.key)
+      if (this.keyboardShortcutsActive) {
+        this.keyboardShortcuts[e.key] && this.keyboardShortcuts[e.key](e);
+      }
+
+    })
+
+    this.addEventListener('toggleKeyboardShortcuts', (e) => {
+      if (e.detail !== 'null' && (typeof (e.detail) === 'boolean')) {
+        this.keyboardShortcutsActive = e.detail;
+      } else {
+        this.keyboardShortcutsActive = !this.keyboardShortcutsActive;
+      }
     })
 
     // THE DOM STRUCTURE

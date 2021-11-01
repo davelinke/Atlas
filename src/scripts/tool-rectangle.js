@@ -37,10 +37,10 @@ class ToolRectangle extends Tool {
             const gridActive = this.app.gridActive;
 
             const id = {
-                top:e.detail.coords.top - ws.canvasOffsetTop,
-                left:e.detail.coords.left - ws.canvasOffsetLeft,
-                bottom:ws.viewportDim - (e.detail.coords.top - ws.canvasOffsetTop),
-                right:ws.viewportDim - (e.detail.coords.left - ws.canvasOffsetLeft)
+                top: e.detail.coords.top - ws.canvasOffsetTop,
+                left: e.detail.coords.left - ws.canvasOffsetLeft,
+                bottom: ws.viewportDim - (e.detail.coords.top - ws.canvasOffsetTop),
+                right: ws.viewportDim - (e.detail.coords.left - ws.canvasOffsetLeft)
             }
             this._inputDown = id;
 
@@ -74,10 +74,10 @@ class ToolRectangle extends Tool {
             const id = this._inputDown;
 
             const im = {
-                top:e.detail.coords.top - ws.canvasOffsetTop,
-                left:e.detail.coords.left - ws.canvasOffsetLeft,
-                bottom:ws.viewportDim - (e.detail.coords.top - ws.canvasOffsetTop),
-                right:ws.viewportDim - (e.detail.coords.left - ws.canvasOffsetLeft)
+                top: e.detail.coords.top - ws.canvasOffsetTop,
+                left: e.detail.coords.left - ws.canvasOffsetLeft,
+                bottom: ws.viewportDim - (e.detail.coords.top - ws.canvasOffsetTop),
+                right: ws.viewportDim - (e.detail.coords.left - ws.canvasOffsetLeft)
             }
 
             // define the dimension variables
@@ -130,12 +130,25 @@ class ToolRectangle extends Tool {
 
             if (this._tentativeRectangle) {
                 ws.addElement(this._tentativeRectangle)
+
+                // store the doc
+                this.app.storeDocument();
             }
 
             this._inputDown = null
             this._tentativeRectangle = null
 
-            ws.inputAreaClear()
+            ws.inputAreaClear();
+            
+            this.dispatchEvent(new CustomEvent('toolChange', { detail: this.app.toolDefaultInstance, bubbles: true, composed: true }));
+        }
+        this.onToolReady = (app) => {
+            this.app.registerKeyboardShortcut({
+                key: 'r',
+                action: () => {
+                    this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }));
+                }
+            })
         }
     }
 }
