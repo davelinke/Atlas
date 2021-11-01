@@ -151,8 +151,8 @@ class EditorWorkspace extends HTMLElement {
 
             const left = e.clientX - rect.left // x position within the element.
             const top = e.clientY - rect.top // y position within the element.
-            const right = viewportDim - left
-            const bottom = viewportDim - top
+            const right = viewportDim - (e.clientX - rect.left);
+            const bottom = viewportDim - (e.clientY - rect.top);
 
             const coords = {
                 left,

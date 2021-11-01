@@ -1,5 +1,5 @@
 import Tool from "./tool.js";
-import { coordsFilterFn } from './lib-filters.js'
+import { filterCoord } from './lib-filters.js'
 
 const CssPa = `
 .editor-workspace-pa {
@@ -85,6 +85,8 @@ class ToolSelect extends Tool {
         this.appReference = null;
         this.pickStart = null;
 
+        this.inputStartPos = null;
+
         // METHODS
 
         // lets return the specific element that was clicked
@@ -104,6 +106,9 @@ class ToolSelect extends Tool {
         }
 
         this.resizePickArea = () => {
+            const viewportDim = this.appReference.workspace.viewportDim;
+
+
             let lowestX = null;
             let lowestY = null;
             let highestX = null;
@@ -131,10 +136,19 @@ class ToolSelect extends Tool {
 
             });
 
-            this.pickAreaElement.style.left = lowestX + 'px';
-            this.pickAreaElement.style.top = lowestY + 'px';
-            this.pickAreaElement.style.width = (highestX - lowestX) + 'px';
-            this.pickAreaElement.style.height = (highestY - lowestY) + 'px';
+            const left = lowestX;
+            const top = lowestY;
+            const width = highestX - lowestX;
+            const height = highestY - lowestY;
+            const right = viewportDim - (lowestX + width);
+            const bottom = viewportDim - (lowestY + height);
+
+            this.pickAreaElement.style.left = left + 'px';
+            this.pickAreaElement.style.top = top + 'px';
+            // this.pickAreaElement.style.width = (highestX - lowestX) + 'px';
+            // this.pickAreaElement.style.height = (highestY - lowestY) + 'px';
+            this.pickAreaElement.style.right = right + 'px';
+            this.pickAreaElement.style.bottom = bottom + 'px';
         }
 
         this.addToPick = (element) => {
@@ -151,6 +165,7 @@ class ToolSelect extends Tool {
 
         // defines if an element should be added or not to the elements being modified
         this.pickRegister = (element) => {
+            const viewportDim = this.appReference.workspace.viewportDim;
             if (element.picked) {
                 if (this.isAdding) {
                     this.removeFormPick(element);
@@ -164,11 +179,15 @@ class ToolSelect extends Tool {
                 this.addToPick(element);
             }
             this.pickStart = this.pick.map((element) => {
+                const left = parseInt(element.style.left.replace('px', ''), 10);
+                const top = parseInt(element.style.top.replace('px', ''), 10);
                 return {
-                    left: parseInt(element.style.left.replace('px', ''), 10),
-                    top: parseInt(element.style.top.replace('px', ''), 10),
+                    left: left,
+                    top: top,
                     width: element.offsetWidth,
-                    height: element.offsetHeight
+                    height: element.offsetHeight,
+                    right: viewportDim - (left + element.offsetWidth),
+                    bottom: viewportDim - (top + element.offsetHeight)
                 }
             });
         }
@@ -186,21 +205,37 @@ class ToolSelect extends Tool {
 
         // the mod task for moving objects
         this.modTasks['mod'] = (element, i, e) => {
-            // const zoomedDelta = {
-            //     x: e.detail.delta.x,
-            //     y: e.detail.delta.y
-            // }
+            const delta = {
+                x: (e.detail.mouseEvent.clientX - this.inputStartPos.x) / this.appReference.zoomScale,
+                y: (e.detail.mouseEvent.clientY - this.inputStartPos.y)  / this.appReference.zoomScale,
+            }
 
-            // const newX = this.pickStart[i].left + zoomedDelta.x;
-            // const newY = this.pickStart[i].top + zoomedDelta.y;
+            const newLeft = this.pickStart[i].left + delta.x;
+            const newTop = this.pickStart[i].top + delta.y;
 
-            // element.style.left = newX + 'px';
-            // element.style.top = newY + 'px';
+            const newRight = this.pickStart[i].right - delta.x;
+            const newBottom = this.pickStart[i].bottom - delta.y;
+
+            element.style.left = this.applyFilters(newLeft) + 'px';
+            element.style.top = this.applyFilters(newTop) + 'px';
+
+            element.style.right = this.applyFilters(newRight) + 'px';
+            element.style.bottom = this.applyFilters(newBottom) + 'px';
+        }
+
+        this.applyFilters = (value) => {
+            const gridActive = this.appReference.gridActive;
+            const gridSize = this.appReference.gridSize;
+
+            if (gridActive) {
+                return Math.round(value / gridSize) * gridSize;
+            }
+
+            return value;
         }
 
         this.startResize = (e) => {
             // prevent the propagation of the event
-            console.log('hello')
             e.preventDefault();
             e.stopPropagation();
 
@@ -237,6 +272,8 @@ class ToolSelect extends Tool {
 
             // a function for resizing forwards (when locked side is either left or top)
             const resizeFw = (o, proportions) => {
+                const viewportDim = this.appReference.workspace.viewportDim;
+
                 const dims = {
                     y: {
                         start: 'top',
@@ -249,33 +286,41 @@ class ToolSelect extends Tool {
                 }
 
                 const start = dims[o].start;
-                const mag = dims[o].mag;
+                const end = dims[o].end;
+
+                const areaStartMag = (viewportDim - areaStart[end]) - areaStart[start];
+
+
 
                 // i obtain the new area width calculatinng the initial width
                 // multiplied by the new proportion of the x axis
                 const newAreaMag = Math.round(
                     (
-                        areaStart[mag] * proportions[o]
+                        areaStartMag * proportions[o]
 
                     ) * 10) / 10;
+                const newAreaDelta = newAreaMag - areaStartMag;
+
+                // and of course we need to update the width of the pick area
+                const pickAreaEnd = this.applyFilters(areaStart[end] - newAreaDelta);
 
                 // with this information i can calculate teh new left and widths of all the elements
                 this.pick.forEach((element, i) => {
-                    // width of the pick equals the 100% of the transformation
-                    // i got to calculate my initial position translated to a percentage (multiple) of the 100%
-                    const pctStart = ((pickStart[i][start] - areaStart[start]) * 1) / areaStart[mag];
-                    // then i get the new area width
-                    // and since i know the multiple of my starting position before the resize
-                    // i can calculate the new position of the element
-                    const newStart = Math.floor(areaStart[start] + (newAreaMag * pctStart));
+                    // calculate new start position
+                    const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag;
+                    const newStart = areaStart[start] + (newAreaMag * pctStart)
 
-                    // then i set the new styles of the elements
-                    element.style[start] = newStart + 'px';
-                    element.style[mag] = Math.ceil(pickStart[i][mag] * proportions[o]) + 'px';
+                    element.style[start] = this.applyFilters(newStart) + 'px'; // add filtering/grid here
+
+                    // calculate new end position
+                    const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag;
+                    const newEnd = pickAreaEnd + (newAreaMag * pctEnd)
+
+                    element.style[end] = this.applyFilters(newEnd) + 'px'; // add filtering/grid here
                 });
-
-                // and of course we need to update the width of the pick area
-                this.pickAreaElement.style[mag] = Math.ceil(newAreaMag) + 'px';
+                this.pickAreaElement.style[end] = Math.floor(
+                    pickAreaEnd
+                ) + 'px';
 
             }
 
@@ -354,41 +399,43 @@ class ToolSelect extends Tool {
 
                 const zoomScale = this.appReference.zoomScale;
 
+                const viewportDim = this.appReference.workspace.viewportDim;
+
                 const proportions = {
                     x: null,
                     y: null
                 }
 
-                const filteredCoords = coordsFilterFn({left:e.clientX, top:e.clientY}, this.appReference.gridActive, this.appReference.gridSize, this.appReference.zoomScale, false);
+                //const filteredCoords = coordsFilterFn({ left: e.clientX, top: e.clientY }, this.appReference.gridActive, this.appReference.gridSize, this.appReference.zoomScale, false);
 
                 if (this.resizeV === 's') {
-                    const asEnd = this.appReference.workspace.viewportDim - areaStart.bottom;
-                    const asHeight = asEnd - areaStart.top;
+                    const areaStartHeight = (viewportDim - areaStart.top) - areaStart.bottom;
                     proportions.y = (
-                        asHeight +
-                        ((filteredCoords.top - this.resizeDownCoords.y) / zoomScale)
-                    ) / asHeight;
+                        areaStartHeight +
+                        ((e.clientY - this.resizeDownCoords.y) / zoomScale)
+                    ) / areaStartHeight;
                 }
                 if (this.resizeV === 'n') {
-                    const asEnd = this.appReference.workspace.viewportDim - areaStart.bottom;
-                    const asHeight = asEnd - areaStart.top;
-                    proportions.y = (
-                        asHeight -
-                        ((filteredCoords.left - this.resizeDownCoords.y) / zoomScale)
-                    ) / asHeight;
+                    // const asEnd = this.appReference.workspace.viewportDim - areaStart.bottom;
+                    // const asHeight = asEnd - areaStart.top;
+                    // proportions.y = (
+                    //     asHeight -
+                    //     ((filteredCoords.left - this.resizeDownCoords.y) / zoomScale)
+                    // ) / asHeight;
                 }
 
                 if (this.resizeH === 'e') {
+                    const areaStartWidth = (viewportDim - areaStart.right) - areaStart.left;
                     proportions.x = (
-                        areaStart.width +
-                        ((filteredCoords.left - this.resizeDownCoords.x) / zoomScale)
-                    ) / areaStart.width;
+                        areaStartWidth +
+                        ((e.clientX - this.resizeDownCoords.x) / zoomScale)
+                    ) / areaStartWidth;
                 }
                 if (this.resizeH === 'w') {
-                    proportions.x = (
-                        areaStart.width -
-                        ((filteredCoords.left - this.resizeDownCoords.x) / zoomScale)
-                    ) / areaStart.width;
+                    // proportions.x = (
+                    //     areaStart.width -
+                    //     ((filteredCoords.left - this.resizeDownCoords.x) / zoomScale)
+                    // ) / areaStart.width;
                 }
 
                 this.resizeV && resizeFunctions[this.resizeV](e, proportions);
@@ -500,6 +547,11 @@ class ToolSelect extends Tool {
             const shiftKey = e.detail.mouseEvent.shiftKey;
             const ctrlKey = e.detail.mouseEvent.ctrlKey;
             const altKey = e.detail.mouseEvent.altKey;
+
+            this.inputStartPos = {
+                x: e.detail.mouseEvent.clientX,
+                y: e.detail.mouseEvent.clientY
+            }
 
             this.modTask = this.getModTask(e.detail.mouseEvent.path);
 
