@@ -98,6 +98,10 @@ class EditorApp extends HTMLElement {
       }
     })
 
+    this.addEventListener('editorMenuActivated', (e) => {
+      e.detail.registerApp(this);
+    })
+
     this.addEventListener('toolChange', (e) => {
       this.toolActive = e.detail
       this.toolActive.activateTool(this)

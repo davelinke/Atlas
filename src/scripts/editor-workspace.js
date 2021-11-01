@@ -173,8 +173,6 @@ class EditorWorkspace extends HTMLElement {
             return returnValue
         }
 
-
-
         this.startInput = (e) => {
             e.stopPropagation()
             e.preventDefault()
@@ -299,6 +297,14 @@ class EditorWorkspace extends HTMLElement {
             return element
         }
 
+        this.insertElement = (element, fireEvent = true) => {
+            this._canvas.appendChild(element)
+
+            if (fireEvent) {
+                this.dispatchEvent(new CustomEvent('editorElementAdded', { detail: element, bubbles: true, composed: true }))
+            }
+        }
+
         this.removeElement = (element) => {
             this._canvas.removeChild(element);
         }
@@ -333,6 +339,34 @@ class EditorWorkspace extends HTMLElement {
             return doc.innerHTML;
         }
 
+        this.clearCanvas = () => {
+            this._canvas.querySelectorAll('editor-element').forEach(el => {
+                this.removeElement(el)
+            })
+        }
+
+        this.loadDocumentHTML = (html) => {
+            console.log(html);
+            const canvasHelpers = [];
+            this._canvas.childNodes.forEach(el => {
+                if (el.tagName === 'DIV') {
+                    canvasHelpers.push(el)
+                }
+            })
+
+            this._canvas.innerHTML = html;
+
+            canvasHelpers.forEach(el => {
+                this._canvas.appendChild(el)
+            })
+
+            this.canvasOffset(0,0);
+
+            this.dispatchEvent(new CustomEvent('editorDocumentLoaded', { bubbles: true, composed: true }))
+
+            this.app.storeDocument();
+        }
+
         // STRUCTURE
 
         this._shadow = this.attachShadow({ mode: 'open' })
@@ -357,7 +391,7 @@ class EditorWorkspace extends HTMLElement {
 
         // get the store document
         const storedDocument = window.localStorage.getItem('currentDocument');
-        storedDocument && (this._canvas.innerHTML = storedDocument);
+        storedDocument && this.loadDocumentHTML(storedDocument);
         this._workspace.appendChild(this._canvas)
 
         this._inputArea = document.createElement('div')
