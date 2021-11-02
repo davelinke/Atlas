@@ -4,7 +4,7 @@ class EditorApp extends HTMLElement {
   /**
      * the button constructor
      */
-  constructor() {
+  constructor () {
     super()
 
     // PROPS
@@ -15,19 +15,21 @@ class EditorApp extends HTMLElement {
 
     this.gridSize = 10
 
-    this.gridActive = false;
+    this.gridActive = false
 
     this.workspace = null
 
-    this.toolDefault = 'select';
+    this.toolDefault = 'select'
 
-    this.toolDefaultInstance = null;
+    this.toolDefaultInstance = null
 
     this.toolActive = null
 
-    this.keyboardShortcuts = {};
+    this.keyboardShortcuts = {}
 
-    this.keyboardShortcutsActive = true;
+    this.keyboardShortcutsUp = {}
+
+    this.keyboardShortcutsActive = true
 
     Object.defineProperty(this, 'zoomScale', {
       get: () => {
@@ -62,16 +64,16 @@ class EditorApp extends HTMLElement {
     }
 
     this.storeDocument = debounce(() => {
-      const docHTML = this.workspace.getDocumentHTML();
-      window.localStorage.setItem('currentDocument', docHTML);
+      const docHTML = this.workspace.getDocumentHTML()
+      window.localStorage.setItem('currentDocument', docHTML)
     })
 
     this.storeOffset = debounce((e) => {
-      window.localStorage.setItem('canvasOffset', JSON.stringify(e));
+      window.localStorage.setItem('canvasOffset', JSON.stringify(e))
     })
 
     this.registerKeyboardShortcut = (args) => {
-      this.keyboardShortcuts[args.key] = args.action;
+      this.keyboardShortcuts[args.key] = args.action
     }
 
     this.loadDefaultTool = () => { }
@@ -86,20 +88,21 @@ class EditorApp extends HTMLElement {
     // what to do when the editor becomes available
     this.addEventListener('editorWorkspaceReady', (e) => {
       this.workspace = e.detail
+      this.workspace.initWorkspace(this)
     })
 
     // what to do when tools become available
     this.addEventListener('toolReady', (e) => {
-      e.detail.registerApp(this);
+      e.detail.registerApp(this)
       if ((this.toolActive === null) && (this.toolDefault === e.detail.name)) {
         this.toolActive = e.detail
-        this.toolDefaultInstance = e.detail;
+        this.toolDefaultInstance = e.detail
         this.toolActive.activateTool(this)
       }
     })
 
     this.addEventListener('editorMenuActivated', (e) => {
-      e.detail.registerApp(this);
+      e.detail.registerApp(this)
     })
 
     this.addEventListener('toolChange', (e) => {
@@ -144,24 +147,32 @@ class EditorApp extends HTMLElement {
     })
 
     this.addEventListener('editorCanvasOffset', (e) => {
-      this.storeOffset(e.detail);
+      this.storeOffset(e.detail)
     })
 
     window.addEventListener('keydown', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault()
+      e.stopPropagation()
       console.log(e.key)
       if (this.keyboardShortcutsActive) {
-        this.keyboardShortcuts[e.key] && this.keyboardShortcuts[e.key](e);
+        this.keyboardShortcuts[e.key] && this.keyboardShortcuts[e.key](e)
       }
+    })
 
+    window.addEventListener('keyup', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      console.log(e.key)
+      if (this.keyboardShortcutsActive) {
+        this.keyboardShortcutsUp[e.key] && this.keyboardShortcutsUp[e.key](e)
+      }
     })
 
     this.addEventListener('toggleKeyboardShortcuts', (e) => {
       if (e.detail !== 'null' && (typeof (e.detail) === 'boolean')) {
-        this.keyboardShortcutsActive = e.detail;
+        this.keyboardShortcutsActive = e.detail
       } else {
-        this.keyboardShortcutsActive = !this.keyboardShortcutsActive;
+        this.keyboardShortcutsActive = !this.keyboardShortcutsActive
       }
     })
 

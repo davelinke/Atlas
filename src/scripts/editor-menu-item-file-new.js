@@ -10,7 +10,7 @@ class EditorMenuItemFileNew extends EditorMenuItem {
     this._button.innerHTML = this.echo('New')
     this._button.addEventListener('click', () => {
       // this._modal.open = true;
-      this.app.workspace.loadDocumentHTML('');
+      this.app.workspace.loadDocumentHTML('')
     })
 
     // LOAD DEPENDENCIES

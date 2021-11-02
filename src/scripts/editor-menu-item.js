@@ -28,10 +28,10 @@ class EditorMenuItem extends CustomElement {
   /**
      * the button constructor
      */
-  constructor() {
+  constructor () {
     super()
 
-    this.app = null;
+    this.app = null
 
     // METHODS
     this._onClick = (e) => {
@@ -42,7 +42,7 @@ class EditorMenuItem extends CustomElement {
     }
 
     this.registerApp = (app) => {
-      this.app = app;
+      this.app = app
     }
 
     // attach shadow dom
@@ -60,7 +60,7 @@ class EditorMenuItem extends CustomElement {
     this._shadow.appendChild(this._button)
   }
 
-  connectedCallback() {
+  connectedCallback () {
     this.dispatchEvent(new CustomEvent('editorMenuActivated', {
       detail: this,
       bubbles: true,

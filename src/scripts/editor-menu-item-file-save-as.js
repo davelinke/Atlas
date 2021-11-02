@@ -5,26 +5,26 @@ class EditorMenuItemFileSaveAs extends EditorMenuItem {
   /**
      * the button constructor
      */
-  constructor() {
-    super();
+  constructor () {
+    super()
 
     this._button.innerHTML = this.echo('Save As')
     this._button.addEventListener('click', () => {
-      var element = document.createElement('a');
-      const fileContents = window.localStorage.getItem('currentDocument');
-      let filename = window.localStorage.getItem('currentDocumentName');
+      const element = document.createElement('a')
+      const fileContents = window.localStorage.getItem('currentDocument')
+      let filename = window.localStorage.getItem('currentDocumentName')
       if (!filename) {
         filename = 'document.html'
       }
-      element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(fileContents));
-      element.setAttribute('download', filename);
+      element.setAttribute('href', 'data:text/html;charset=utf-8,' + encodeURIComponent(fileContents))
+      element.setAttribute('download', filename)
 
-      element.style.display = 'none';
-      document.body.appendChild(element);
+      element.style.display = 'none'
+      document.body.appendChild(element)
 
-      element.click();
+      element.click()
 
-      document.body.removeChild(element);
+      document.body.removeChild(element)
     })
   }
 }
