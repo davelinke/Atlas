@@ -321,7 +321,6 @@ class EditorWorkspace extends HTMLElement {
     }
 
     this.loadDocumentHTML = (html) => {
-      console.log(html)
       const canvasHelpers = []
       this._canvas.childNodes.forEach(el => {
         if (el.tagName === 'DIV') {

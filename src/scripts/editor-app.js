@@ -91,6 +91,12 @@ class EditorApp extends HTMLElement {
       this.workspace.initWorkspace(this)
     })
 
+    // what to do when the editor becomes available
+    this.addEventListener('sidebarReady', (e) => {
+      const sidebar = e.detail
+      sidebar.initSidebar && sidebar.initSidebar(this);
+    })
+
     // what to do when tools become available
     this.addEventListener('toolReady', (e) => {
       e.detail.registerApp(this)

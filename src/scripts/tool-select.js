@@ -64,7 +64,7 @@ const CssPa = `
 `
 
 class ToolSelect extends Tool {
-  constructor () {
+  constructor() {
     super()
 
     this.name = 'select'
@@ -147,16 +147,22 @@ class ToolSelect extends Tool {
       this.pickAreaElement.style.bottom = bottom + 'px'
     }
 
+    this.firePickChangeEvent = () => {
+      this.dispatchEvent(new CustomEvent('pickChange', { detail: this.pick, bubbles: true, composed: true }))
+    }
+
     this.addToPick = (element) => {
       element.picked = true
       this.pick.push(element)
       this.resizePickArea()
+      this.firePickChangeEvent()
     }
 
     this.removeFormPick = (element) => {
       element.picked = false
       this.pick.splice(this.pick.indexOf(element), 1)
       this.resizePickArea()
+      this.firePickChangeEvent()
     }
 
     // defines if an element should be added or not to the elements being modified
@@ -411,14 +417,14 @@ class ToolSelect extends Tool {
           const areaStartHeight = (viewportDim - areaStart.top) - areaStart.bottom
           proportions.y = (
             areaStartHeight +
-                        ((e.clientY - this.resizeDownCoords.y) / zoomScale)
+            ((e.clientY - this.resizeDownCoords.y) / zoomScale)
           ) / areaStartHeight
         }
         if (this.resizeV === 'n') {
           const areaStartHeight = (viewportDim - areaStart.top) - areaStart.bottom
           proportions.y = (
             areaStartHeight +
-                        ((this.resizeDownCoords.y - e.clientY) / zoomScale)
+            ((this.resizeDownCoords.y - e.clientY) / zoomScale)
           ) / areaStartHeight
         }
 
@@ -426,14 +432,14 @@ class ToolSelect extends Tool {
           const areaStartWidth = (viewportDim - areaStart.right) - areaStart.left
           proportions.x = (
             areaStartWidth +
-                        ((e.clientX - this.resizeDownCoords.x) / zoomScale)
+            ((e.clientX - this.resizeDownCoords.x) / zoomScale)
           ) / areaStartWidth
         }
         if (this.resizeH === 'w') {
           const areaStartWidth = (viewportDim - areaStart.right) - areaStart.left
           proportions.x = (
             areaStartWidth +
-                        ((this.resizeDownCoords.x - e.clientX) / zoomScale)
+            ((this.resizeDownCoords.x - e.clientX) / zoomScale)
           ) / areaStartWidth
         }
 
@@ -564,6 +570,7 @@ class ToolSelect extends Tool {
           this.pickRegister(element)
         } else {
           this.deselectAll()
+          this.firePickChangeEvent();
         }
       }
     }
@@ -602,6 +609,7 @@ class ToolSelect extends Tool {
           this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
         }
       })
+
       this.app.registerKeyboardShortcut({
         key: 'Delete',
         action: () => {
@@ -613,6 +621,16 @@ class ToolSelect extends Tool {
           // store the doc
           this.app.storeDocument()
         }
+      })
+
+      this.app.addEventListener('selectPickAdd', (e) => {
+        const elementsToPick = e.detail;
+        elementsToPick.forEach((element) => {
+          this.pickRegister(element)
+        })
+
+        this.pickAreaElement.style.opacity = 1
+        this.pickAreaHidden = false
       })
     }
   }

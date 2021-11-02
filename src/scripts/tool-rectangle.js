@@ -127,8 +127,10 @@ class ToolRectangle extends Tool {
     this.inputEnd = (e) => {
       const ws = e.target
 
+      let addedElement = null
+
       if (this._tentativeRectangle) {
-        ws.addElement(this._tentativeRectangle)
+        addedElement = ws.addElement(this._tentativeRectangle)
 
         // store the doc
         this.app.storeDocument()
@@ -140,6 +142,7 @@ class ToolRectangle extends Tool {
       ws.inputAreaClear()
 
       this.dispatchEvent(new CustomEvent('toolChange', { detail: this.app.toolDefaultInstance, bubbles: true, composed: true }))
+      addedElement && this.dispatchEvent(new CustomEvent('selectPickAdd', { detail: [addedElement], bubbles: true, composed: true }))
     }
     this.onToolReady = (app) => {
       this.app.registerKeyboardShortcut({
