@@ -4,7 +4,7 @@ class EditorApp extends HTMLElement {
   /**
      * the button constructor
      */
-  constructor () {
+  constructor() {
     super()
 
     // PROPS
@@ -25,9 +25,11 @@ class EditorApp extends HTMLElement {
 
     this.toolActive = null
 
-    this.keyboardShortcuts = {}
+    this.keyDownShortcuts = {}
 
-    this.keyboardShortcutsUp = {}
+    this.keyDownLast = null
+
+    this.keyUpShortcuts = {}
 
     this.keyboardShortcutsActive = true
 
@@ -72,8 +74,12 @@ class EditorApp extends HTMLElement {
       window.localStorage.setItem('canvasOffset', JSON.stringify(e))
     })
 
-    this.registerKeyboardShortcut = (args) => {
-      this.keyboardShortcuts[args.key] = args.action
+    this.registerKeyDownShortcut = (args) => {
+      this.keyDownShortcuts[args.key] = args.action
+    }
+
+    this.registerKeyUpShortcut = (args) => {
+      this.keyUpShortcuts[args.key] = args.action
     }
 
     this.loadDefaultTool = () => { }
@@ -105,6 +111,10 @@ class EditorApp extends HTMLElement {
         this.toolDefaultInstance = e.detail
         this.toolActive.activateTool(this)
       }
+    })
+    this.addEventListener('handShake', (e) => {
+      const element = e.detail;
+      element.onHandShake && element.onHandShake(this);
     })
 
     this.addEventListener('editorMenuActivated', (e) => {
@@ -140,6 +150,7 @@ class EditorApp extends HTMLElement {
     // what to do when workspace moves input
     this.addEventListener('setZoom', (e) => {
       this.zoomScale = e.detail
+      window.localStorage.setItem('zoomScale', this.zoomScale)
       this.dispatchEvent(
         new CustomEvent(
           'zoomChange',
@@ -156,31 +167,57 @@ class EditorApp extends HTMLElement {
       this.storeOffset(e.detail)
     })
 
-    window.addEventListener('keydown', (e) => {
+    this.onKeyDown = (e) => {
+      console.log(this)
       e.preventDefault()
       e.stopPropagation()
-      console.log(e.key)
-      if (this.keyboardShortcutsActive) {
-        this.keyboardShortcuts[e.key] && this.keyboardShortcuts[e.key](e)
-      }
-    })
+      console.log('keydown', e.key)
+      this.keyDownLast = e.key;
+      this.keyDownShortcuts[e.key] && this.keyDownShortcuts[e.key](e)
+    }
 
-    window.addEventListener('keyup', (e) => {
+    this.boundKeyDown = this.onKeyDown.bind(this)
+
+    this.onKeyUp = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      console.log(e.key)
-      if (this.keyboardShortcutsActive) {
-        this.keyboardShortcutsUp[e.key] && this.keyboardShortcutsUp[e.key](e)
-      }
-    })
+      this.keyDownLast = null;
+      this.keyUpShortcuts[e.key] && this.keyUpShortcuts[e.key](e)
+    }
+    this.boundKeyUp = this.onKeyUp.bind(this)
+
+    this.addKeyShorcuts = () => {
+      this.keyDownEventListener = window.addEventListener('keydown', this.boundKeyDown);
+      this.keyUpEventListener = window.addEventListener('keyup', this.boundKeyUp);
+    }
+
+    this.removeKeyShorcuts = () => {
+      window.removeEventListener('keydown', this.boundKeyDown)
+      window.removeEventListener('keyup', this.boundKeyUp)
+
+      this.keyDownEventListener = null
+      this.keyUpEventListener = null
+    }
 
     this.addEventListener('toggleKeyboardShortcuts', (e) => {
       if (e.detail !== 'null' && (typeof (e.detail) === 'boolean')) {
-        this.keyboardShortcutsActive = e.detail
+        if (e.detail) {
+          this.addKeyShorcuts()
+        } else {
+          this.removeKeyShorcuts()
+        }
       } else {
-        this.keyboardShortcutsActive = !this.keyboardShortcutsActive
+        if (this.keyDownEventListener) {
+          this.removeKeyShorcuts()
+        } else {
+          this.addKeyShorcuts()
+        }
       }
     })
+
+    // turn keyboard shortcuts on
+    this.addKeyShorcuts();
+
 
     // THE DOM STRUCTURE
 

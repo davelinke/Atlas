@@ -63,6 +63,24 @@ class ToolPan extends Tool {
 
       // ws.inputAreaClear();
     }
+    this.onToolReady = () => {
+
+      this.app.registerKeyDownShortcut({
+        key: ' ',
+        action: () => {
+          this.previousTool = this.app.toolActive;
+          
+          this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
+        }
+      })
+
+      this.app.registerKeyUpShortcut({
+        key: ' ',
+        action: () => {
+          this.dispatchEvent(new CustomEvent('toolChange', { detail: this.previousTool , bubbles: true, composed: true }))
+        }
+      })
+    }
   }
 }
 

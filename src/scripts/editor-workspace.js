@@ -106,7 +106,7 @@ class EditorWorkspace extends HTMLElement {
   /**
        * the button constructor
        */
-  constructor () {
+  constructor() {
     super()
 
     // LOAD DEPENDENCIES
@@ -152,6 +152,10 @@ class EditorWorkspace extends HTMLElement {
     this.startInput = (e) => {
       e.stopPropagation()
       e.preventDefault()
+
+      // so any input focused blurs
+      this._canvas.focus()
+      
       if (e.button === 0) {
         const downEvent = e
         const scale = this.app.zoomScale
@@ -320,7 +324,18 @@ class EditorWorkspace extends HTMLElement {
       })
     }
 
-    this.loadDocumentHTML = (html) => {
+    this.setSavedWorkspace = () => {
+
+        // set the initial offset
+        const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'))
+        storedCanvasOffset && this.canvasOffset(storedCanvasOffset.left, storedCanvasOffset.top)
+
+        // set the initial zoom
+        const storedZoom = JSON.parse(window.localStorage.getItem('zoomScale'))
+        storedZoom && this.dispatchEvent(new CustomEvent('setZoom', { detail: storedZoom, bubbles: true, composed: true }))
+    }
+
+    this.loadDocumentHTML = (html, isAutoSave = false) => {
       const canvasHelpers = []
       this._canvas.childNodes.forEach(el => {
         if (el.tagName === 'DIV') {
@@ -334,7 +349,11 @@ class EditorWorkspace extends HTMLElement {
         this._canvas.appendChild(el)
       })
 
-      this.canvasOffset(0, 0)
+      if (!isAutoSave) {
+        this.canvasOffset(0, 0)
+      } else {
+        this.setSavedWorkspace();
+      }
 
       this.dispatchEvent(new CustomEvent('editorDocumentLoaded', { bubbles: true, composed: true }))
 
@@ -349,7 +368,7 @@ class EditorWorkspace extends HTMLElement {
       })
 
       const storedDocument = window.localStorage.getItem('currentDocument')
-      storedDocument && this.loadDocumentHTML(storedDocument)
+      storedDocument && this.loadDocumentHTML(storedDocument, true)
     }
 
     // STRUCTURE
@@ -372,6 +391,7 @@ class EditorWorkspace extends HTMLElement {
 
     this._canvas = document.createElement('div')
     this._canvas.classList.add('canvas')
+    this._canvas.setAttribute('tabindex', '0');
 
     // get the store document
     this._workspace.appendChild(this._canvas)
@@ -386,15 +406,10 @@ class EditorWorkspace extends HTMLElement {
 
   // LIFE CYCLE
 
-  connectedCallback () {
+  connectedCallback() {
     // scroll to middle if it's not defined
     this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
-
-    // set the initial offset
-    const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'))
-
-    storedCanvasOffset && this.canvasOffset(storedCanvasOffset.left, storedCanvasOffset.top)
 
     // fire up an event to make myself available to the app
     this.dispatchEvent(new CustomEvent('editorWorkspaceReady', { detail: this, bubbles: true, composed: true }))

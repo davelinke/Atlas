@@ -43,7 +43,6 @@ class SidebarPanel extends HTMLElement {
             }
         }
 
-        console.log('panel constructor')
         // STRUCTURE
         this._shadow = this.attachShadow({ mode: 'open' });
 

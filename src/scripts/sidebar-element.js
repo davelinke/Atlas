@@ -9,8 +9,6 @@ class SidebarDocument extends SidebarPanel {
             return pick.length ===1;
         };
         this.isDefaultPanel = false;
-
-        console.log('element constructor')
     }
 
     async onInit() {

@@ -144,8 +144,8 @@ class ToolRectangle extends Tool {
       this.dispatchEvent(new CustomEvent('toolChange', { detail: this.app.toolDefaultInstance, bubbles: true, composed: true }))
       addedElement && this.dispatchEvent(new CustomEvent('selectPickAdd', { detail: [addedElement], bubbles: true, composed: true }))
     }
-    this.onToolReady = (app) => {
-      this.app.registerKeyboardShortcut({
+    this.onToolReady = () => {
+      this.app.registerKeyDownShortcut({
         key: 'r',
         action: () => {
           this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))

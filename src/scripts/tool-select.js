@@ -602,15 +602,15 @@ class ToolSelect extends Tool {
         this.pickAreaHidden = false
       }
     }
-    this.onToolReady = (app) => {
-      this.app.registerKeyboardShortcut({
+    this.onToolReady = () => {
+      this.app.registerKeyDownShortcut({
         key: 'Escape',
         action: () => {
           this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
         }
       })
 
-      this.app.registerKeyboardShortcut({
+      this.app.registerKeyDownShortcut({
         key: 'Delete',
         action: () => {
           this.pick.forEach((element) => {
