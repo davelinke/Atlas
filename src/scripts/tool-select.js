@@ -1,4 +1,5 @@
 import Tool from './tool.js'
+import { fireEvent } from './lib-events.js'
 
 const CssPa = `
 .editor-workspace-pa {
@@ -228,6 +229,8 @@ class ToolSelect extends Tool {
       element.style.right = this.applyFilters(newRight) + 'px'
       element.style.bottom = this.applyFilters(newBottom) + 'px'
 
+      // fire the events
+
       // store the doc
       this.appReference.storeDocument()
     }
@@ -247,6 +250,8 @@ class ToolSelect extends Tool {
       // prevent the propagation of the event
       e.preventDefault()
       e.stopPropagation()
+
+      fireEvent(this, 'canvasModStart', this.pick)
 
       // flag that we are resizing
       this.resizing = true
@@ -467,6 +472,8 @@ class ToolSelect extends Tool {
         document.removeEventListener('touchmove', resize)
         document.removeEventListener('mouseup', stopResize)
         document.removeEventListener('touchend', stopResize)
+
+        fireEvent(this, 'canvasModEnd', this.pick)
       }
 
       // the event listerners for the subsequent move and mouseup events
@@ -557,6 +564,10 @@ class ToolSelect extends Tool {
       //   const ctrlKey = e.detail.mouseEvent.ctrlKey
       //   const altKey = e.detail.mouseEvent.altKey
 
+
+
+      fireEvent(this, 'canvasModStart', this.pick);
+
       this.inputStartPos = {
         x: e.detail.mouseEvent.clientX,
         y: e.detail.mouseEvent.clientY
@@ -606,6 +617,8 @@ class ToolSelect extends Tool {
         this.pickAreaElement.style.opacity = 1
         this.pickAreaHidden = false
       }
+
+      fireEvent(this, 'canvasModEnd', this.pick);
     }
     this.onToolReady = () => {
       this.app.registerKeyDownShortcut({
@@ -636,6 +649,10 @@ class ToolSelect extends Tool {
           this.firePickChangeEvent()
         }
       });
+
+      this.app.addEventListener('resizePickArea', (e) => {
+        this.resizePickArea()
+      })
     }
   }
 }

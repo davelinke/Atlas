@@ -1,4 +1,4 @@
-import {fireEvent} from './lib-events.js'
+import { fireEvent } from './lib-events.js'
 
 const Css = `
 input{
@@ -31,7 +31,7 @@ class SettingZoom extends HTMLElement {
     this.onHandShake = (app) => {
       this.app = app;
       const currentZoom = app._zoomScale;
-      this.onZoomChange({detail:currentZoom})
+      this.onZoomChange({ detail: currentZoom })
       this.app.addEventListener('zoomChange', this.onZoomChange);
     }
 
@@ -43,7 +43,7 @@ class SettingZoom extends HTMLElement {
     this._shadow.appendChild(styles)
 
     const zoomInput = document.createElement('input')
-    
+
     this.zoomInput = zoomInput
 
     zoomInput.setAttribute('type', 'number')
@@ -54,24 +54,24 @@ class SettingZoom extends HTMLElement {
 
     zoomInput.addEventListener('focus', (e) => {
       console.log('focus')
-      fireEvent(this,'toggleKeyboardShortcuts',false)
+      fireEvent(this, 'toggleKeyboardShortcuts', false)
     })
 
     zoomInput.addEventListener('blur', (e) => {
       console.log('blur')
-      fireEvent(this,'toggleKeyboardShortcuts',true)
+      fireEvent(this, 'toggleKeyboardShortcuts', true)
     })
 
     zoomInput.addEventListener('change', (e) => {
       const zoom = e.target.value / 100
-      fireEvent(this,'setZoom',zoom);
+      fireEvent(this, 'setZoom', zoom);
     })
 
     this._shadow.appendChild(zoomInput)
   }
 
   connectedCallback() {
-    fireEvent(this,'handShake',this);
+    fireEvent(this, 'handShake', this);
   }
 }
 

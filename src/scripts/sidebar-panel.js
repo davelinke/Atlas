@@ -1,3 +1,5 @@
+import { fireEvent } from './lib-events.js'
+
 const Css = `
 :host{
     display: block;
@@ -34,6 +36,19 @@ class SidebarPanel extends HTMLElement {
             this.app = app;
         }
 
+        this.pickChange = (e)=>{
+            this.showHide(e);
+            this.onPickChange && this.onPickChange(e);
+        }
+
+        this.pickModEnd = (e)=>{
+            this.onPickModEnd && this.onPickModEnd(e);
+        }
+
+        this.pickModStart = (e)=>{
+            this.onPickModStart&& this.onPickModStart(e);
+        }
+
         this.showHide = (e)=>{
             const pick = e.detail;
             if (this.pickLengthShow(pick)) {
@@ -60,9 +75,13 @@ class SidebarPanel extends HTMLElement {
 
         this.mainHeading && (this.mainHeadingElement.innerHTML = this.mainHeading);
 
-        this.dispatchEvent(new CustomEvent('sidebarReady', { detail: this, bubbles: true, composed: true }));
+        fireEvent(this, 'sidebarReady', this);
 
-        this.app.addEventListener('pickChange', this.showHide);
+        this.app.addEventListener('pickChange', this.pickChange);
+
+        this.app.addEventListener('canvasModEnd', this.pickModEnd);
+
+        this.app.addEventListener('canvasModStart', this.pickModStart);
 
         this.onInit && this.onInit();
     }
