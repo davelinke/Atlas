@@ -105,46 +105,49 @@ class ToolSelect extends Tool {
     }
 
     this.resizePickArea = () => {
-      const viewportDim = this.appReference.workspace.viewportDim
+      if (this.pick.length > 0) {
+        const viewportDim = this.appReference.workspace.viewportDim
 
-      let lowestX = null
-      let lowestY = null
-      let highestX = null
-      let highestY = null
-      this.pick.forEach(element => {
-        const x = parseInt(element.style.left.replace('px', ''), 10)
-        const y = parseInt(element.style.top.replace('px', ''), 10)
+        let lowestX = null
+        let lowestY = null
+        let highestX = null
+        let highestY = null
+        this.pick.forEach(element => {
+          const x = parseInt(element.style.left.replace('px', ''), 10)
+          const y = parseInt(element.style.top.replace('px', ''), 10)
 
-        const xw = x + element.offsetWidth
-        const yh = y + element.offsetHeight
+          const xw = x + element.offsetWidth
+          const yh = y + element.offsetHeight
 
-        if (lowestX === null || x < lowestX) {
-          lowestX = x
-        }
-        if (lowestY === null || y < lowestY) {
-          lowestY = y
-        }
-        if (highestX === null || xw > highestX) {
-          highestX = xw
-        }
-        if (highestY === null || yh > highestY) {
-          highestY = yh
-        }
-      })
+          if (lowestX === null || x < lowestX) {
+            lowestX = x
+          }
+          if (lowestY === null || y < lowestY) {
+            lowestY = y
+          }
+          if (highestX === null || xw > highestX) {
+            highestX = xw
+          }
+          if (highestY === null || yh > highestY) {
+            highestY = yh
+          }
+        })
 
-      const left = lowestX
-      const top = lowestY
-      const width = highestX - lowestX
-      const height = highestY - lowestY
-      const right = viewportDim - (lowestX + width)
-      const bottom = viewportDim - (lowestY + height)
+        const left = lowestX
+        const top = lowestY
+        const width = highestX - lowestX
+        const height = highestY - lowestY
+        const right = viewportDim - (lowestX + width)
+        const bottom = viewportDim - (lowestY + height)
 
-      this.pickAreaElement.style.left = left + 'px'
-      this.pickAreaElement.style.top = top + 'px'
-      // this.pickAreaElement.style.width = (highestX - lowestX) + 'px';
-      // this.pickAreaElement.style.height = (highestY - lowestY) + 'px';
-      this.pickAreaElement.style.right = right + 'px'
-      this.pickAreaElement.style.bottom = bottom + 'px'
+        this.pickAreaElement.style.left = left + 'px'
+        this.pickAreaElement.style.top = top + 'px'
+        this.pickAreaElement.style.right = right + 'px'
+        this.pickAreaElement.style.bottom = bottom + 'px'
+      } else {
+        this.pickAreaElement.style.opacity = 0
+      }
+
     }
 
     this.firePickChangeEvent = () => {
@@ -159,10 +162,12 @@ class ToolSelect extends Tool {
     }
 
     this.removeFormPick = (element) => {
+      console.log('removeFormPick', element)
       element.picked = false
       this.pick.splice(this.pick.indexOf(element), 1)
       this.resizePickArea()
       this.firePickChangeEvent()
+      console.log(this.pick)
     }
 
     // defines if an element should be added or not to the elements being modified
@@ -198,7 +203,7 @@ class ToolSelect extends Tool {
         element.picked = false
       }
       this.pick = []
-      this.pickAreaElement.style.opacity = 0
+      this.resizePickArea()
     }
 
     // keeping all modifier tasks inside an object
@@ -610,19 +615,6 @@ class ToolSelect extends Tool {
         }
       })
 
-      this.app.registerKeyDownShortcut({
-        key: 'Delete',
-        action: () => {
-          this.pick.forEach((element) => {
-            this.app.workspace.removeElement(element)
-          })
-          this.deselectAll()
-
-          // store the doc
-          this.app.storeDocument()
-        }
-      })
-
       this.app.addEventListener('selectPickAdd', (e) => {
         const elementsToPick = e.detail;
         elementsToPick.forEach((element) => {
@@ -632,6 +624,18 @@ class ToolSelect extends Tool {
         this.pickAreaElement.style.opacity = 1
         this.pickAreaHidden = false
       })
+
+      this.app.addEventListener('editorElementRemoved', (e) => {
+        console.log('editorElementRemoved')
+        console.log(this.pick.includes(e.detail))
+        if (this.pick.includes(e.detail)) {
+          const newPick = [...this.pick]
+          newPick.splice(this.pick.indexOf(e.detail), 1)
+          this.pick = newPick;
+          this.resizePickArea()
+          this.firePickChangeEvent()
+        }
+      });
     }
   }
 }

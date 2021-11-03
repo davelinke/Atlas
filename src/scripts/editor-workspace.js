@@ -286,6 +286,8 @@ class EditorWorkspace extends HTMLElement {
     }
 
     this.removeElement = (element) => {
+      console.log('remove element', element)
+      this.dispatchEvent(new CustomEvent('editorElementRemoved', { detail: element, bubbles: true, composed: true }))
       this._canvas.removeChild(element)
     }
 

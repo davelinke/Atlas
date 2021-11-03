@@ -171,7 +171,7 @@ class EditorApp extends HTMLElement {
       console.log(this)
       e.preventDefault()
       e.stopPropagation()
-      console.log('keydown', e.key)
+      //console.log('keydown', e.key)
       this.keyDownLast = e.key;
       this.keyDownShortcuts[e.key] && this.keyDownShortcuts[e.key](e)
     }
