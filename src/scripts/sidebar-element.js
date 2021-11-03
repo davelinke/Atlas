@@ -42,29 +42,33 @@ class SidebarDocument extends SidebarPanel {
                 right: pxWidthToNumber(element.style.right)
             }
 
+            const resizePickArea = () => {
+                fireEvent(this, 'resizePickArea', null);
+            }
+
             switch (dimension) {
                 case 'top':
                     const currentHeight = ((wsDim - currentDims.bottom) - currentDims.top);
-                    const newTop = ((wsDim/2) + parseInt(input.value))
+                    const newTop = ((wsDim / 2) + parseInt(input.value))
                     element.style.top = newTop + 'px';
                     element.style.bottom = (wsDim - (newTop + currentHeight)) + 'px';
-                    fireEvent(this,'resizePickArea',null);
+                    resizePickArea()
                     break;
                 case 'left':
                     const currentWidth = ((wsDim - currentDims.right) - currentDims.left);
-                    const newLeft = ((wsDim/2) + parseInt(input.value))
+                    const newLeft = ((wsDim / 2) + parseInt(input.value))
                     element.style.left = newLeft + 'px';
                     element.style.right = (wsDim - (newLeft + currentWidth)) + 'px';
-                    fireEvent(this,'resizePickArea',null);
+                    resizePickArea()
                     break;
                 case 'width':
-                    
+
                     element.style.right = (wsDim - (currentDims.left + parseInt(input.value))) + 'px';
-                    fireEvent(this,'resizePickArea',null);
+                    resizePickArea()
                     break;
                 case 'height':
                     element.style.bottom = (wsDim - (currentDims.top + parseInt(input.value))) + 'px';
-                    fireEvent(this,'resizePickArea',null);
+                    resizePickArea()
                     break;
             }
         }
@@ -74,7 +78,7 @@ class SidebarDocument extends SidebarPanel {
                 fireEvent(this, 'toggleKeyboardShortcuts', false)
             })
 
-            input.addEventListener('change',this.modifyElement)
+            input.addEventListener('change', this.modifyElement)
 
             input.addEventListener('blur', (e) => {
                 fireEvent(this, 'toggleKeyboardShortcuts', true)
