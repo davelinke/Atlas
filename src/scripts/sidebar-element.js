@@ -2,6 +2,34 @@ import SidebarPanel from './sidebar-panel.js';
 import { pxWidthToNumber, createNumInput } from './lib-utils.js';
 import { fireEvent } from './lib-events.js'
 
+const Css = `
+input[type=number] {
+    width: 50px;
+    border: none;
+    background-color: #efefef;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 12px;
+    padding: 0.25rem;
+}
+input[type=number][disabled]{
+    opacity: 0.5;
+}
+.input-wrap{
+    display: inline-flex;
+    margin-inline-end: 1rem;
+    margin-block-end: 0.5rem;
+}
+.input-label{
+    display: inline-flex;
+    width: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+`;
+
 class SidebarDocument extends SidebarPanel {
 
     constructor() {
@@ -12,19 +40,41 @@ class SidebarDocument extends SidebarPanel {
         };
         this.isDefaultPanel = false;
 
-        const topInput = createNumInput('top');
+        this.createInput = (name, initial, icon = null) => {
+            const wrap = document.createElement('div');
+            wrap.classList.add('input-wrap');
+            wrap.setAttribute('title', name);
+            const label = document.createElement('label');
+            label.classList.add('input-label');
+            label.setAttribute('for', name);
+            label.innerHTML = icon ? icon : initial;
+            const input = createNumInput(name);
+        
+            wrap.appendChild(label);
+            wrap.appendChild(input);
 
-        const leftInput = createNumInput('left');
+            this._shadow.appendChild(wrap);
+        
+            return input;
+        }
 
-        const widthInput = createNumInput('width');
+        const topInput = this.createInput('top','T');
 
-        const heightInput = createNumInput('height');
+        const leftInput = this.createInput('left', 'L');
+
+        const widthInput = this.createInput('width', 'W');
+
+        const heightInput = this.createInput('height', 'H');
 
         this.shadowAppend = (elements) => {
             elements.forEach(element => {
                 this._shadow.appendChild(element);
             })
         }
+
+        const styles = document.createElement('style')
+        styles.innerHTML = Css
+        this.shadowAppend([styles])
 
         this.inputs = [topInput, leftInput, heightInput, widthInput];
 
@@ -85,7 +135,7 @@ class SidebarDocument extends SidebarPanel {
             })
         })
 
-        this.shadowAppend(this.inputs);
+        //this.shadowAppend(this.inputs);
 
         this.disableInputs = () => {
             this.inputs.forEach(input => {
