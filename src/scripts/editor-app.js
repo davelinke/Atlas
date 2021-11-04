@@ -1,3 +1,4 @@
+import { fireEvent } from './lib-events.js'
 import { debounce } from './lib-tools.js'
 
 class EditorApp extends HTMLElement {
@@ -46,21 +47,6 @@ class EditorApp extends HTMLElement {
 
     // METHODS
 
-    this.setModel = (key, value) => {
-      this[key] = value
-      // broadcast model change event
-      this.dispatchEvent(
-        new CustomEvent(
-          'modelChange',
-          {
-            detail: { key: key, value: value },
-            bubbles: true,
-            composed: true
-          }
-        )
-      )
-    }
-
     this.getWorkspace = () => {
       return this.workspace
     }
@@ -86,27 +72,9 @@ class EditorApp extends HTMLElement {
 
     // EVENT LISTENERS
 
-    // setting the model through bubbled events
-    this.addEventListener('setModel', (e) => {
-      this.setModel(e.detail.key, e.detail.value)
-    })
-
-    // what to do when tools become available
-    this.addEventListener('toolReady', (e) => {
-      e.detail.registerApp(this)
-      if ((this.toolActive === null) && (this.toolDefault === e.detail.name)) {
-        this.toolActive = e.detail
-        this.toolDefaultInstance = e.detail
-        this.toolActive.activateTool(this)
-      }
-    })
     this.addEventListener('handShake', (e) => {
       const element = e.detail;
       element.onHandShake && element.onHandShake(this);
-    })
-
-    this.addEventListener('editorMenuActivated', (e) => {
-      e.detail.registerApp(this)
     })
 
     this.addEventListener('toolChange', (e) => {
@@ -139,16 +107,7 @@ class EditorApp extends HTMLElement {
     this.addEventListener('setZoom', (e) => {
       this.zoomScale = e.detail
       window.localStorage.setItem('zoomScale', this.zoomScale)
-      this.dispatchEvent(
-        new CustomEvent(
-          'zoomChange',
-          {
-            detail: this.zoomScale,
-            bubbles: true,
-            composed: true
-          }
-        )
-      )
+      fireEvent(this, 'zoomChange', this.zoomScale)
     })
 
     this.addEventListener('editorCanvasOffset', (e) => {
