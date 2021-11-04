@@ -32,9 +32,6 @@ class SidebarPanel extends HTMLElement {
         this.mainHeading = null;
 
         // METHODS
-        this.initSidebar = (app)=>{
-            this.app = app;
-        }
 
         this.pickChange = (e)=>{
             this.showHide(e);
@@ -58,6 +55,16 @@ class SidebarPanel extends HTMLElement {
             }
         }
 
+        this.onHandShake = (app)=>{
+            this.app = app;
+
+            this.app.addEventListener('pickChange', this.pickChange);
+    
+            this.app.addEventListener('canvasModEnd', this.pickModEnd);
+    
+            this.app.addEventListener('canvasModStart', this.pickModStart);
+        }
+
         // STRUCTURE
         this._shadow = this.attachShadow({ mode: 'open' });
 
@@ -75,15 +82,7 @@ class SidebarPanel extends HTMLElement {
 
         this.mainHeading && (this.mainHeadingElement.innerHTML = this.mainHeading);
 
-        fireEvent(this, 'sidebarReady', this);
-
-        this.app.addEventListener('pickChange', this.pickChange);
-
-        this.app.addEventListener('canvasModEnd', this.pickModEnd);
-
-        this.app.addEventListener('canvasModStart', this.pickModStart);
-
-        this.onInit && this.onInit();
+        fireEvent(this,'handShake',this);
     }
 }
 

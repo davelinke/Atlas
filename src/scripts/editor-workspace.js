@@ -1,6 +1,8 @@
 import { GenerateId } from './lib-strings.js'
 import { LoadParticles } from './lib-loader.js'
 import { coordsFilterFn } from './lib-filters.js'
+import { fireEvent } from './lib-events.js'
+
 
 const viewportDim = 30000
 
@@ -163,31 +165,14 @@ class EditorWorkspace extends HTMLElement {
 
         // fire start event listener
 
-        this.dispatchEvent(
-          new CustomEvent(
-            'workspaceInputStart',
-            {
-              detail: {
-                mouseEvent: e,
-                coords: downEventDetail
-              },
-              bubbles: true,
-              composed: true
-            }
-          )
-        )
+        fireEvent(this,'workspaceInputStart',{
+          mouseEvent: e,
+          coords: downEventDetail
+        })
 
         const stopInput = () => {
           // fire end event listener
-          this.dispatchEvent(
-            new CustomEvent(
-              'workspaceInputEnd',
-              {
-                bubbles: true,
-                composed: true
-              }
-            )
-          )
+          fireEvent(this,'workspaceInputEnd',null)
 
           document.removeEventListener('mouseup', stopInput)
           document.removeEventListener('touchend', stopInput)
@@ -202,18 +187,9 @@ class EditorWorkspace extends HTMLElement {
             mouseEvent: e,
             coords: coords
           }
+          
           // fire move event listener
-
-          this.dispatchEvent(
-            new CustomEvent(
-              'workspaceInputMove',
-              {
-                detail: moveEventDetail,
-                bubbles: true,
-                composed: true
-              }
-            )
-          )
+          fireEvent(this,'workspaceInputMove',moveEventDetail)
         }
 
         document.addEventListener('mouseup', stopInput)
@@ -272,22 +248,21 @@ class EditorWorkspace extends HTMLElement {
       }
       this._canvas.appendChild(element)
 
-      this.dispatchEvent(new CustomEvent('editorElementAdded', { detail: element, bubbles: true, composed: true }))
+      fireEvent(this,'editorElementAdded',element)
 
       return element
     }
 
-    this.insertElement = (element, fireEvent = true) => {
+    this.insertElement = (element, popEvent = true) => {
       this._canvas.appendChild(element)
 
-      if (fireEvent) {
-        this.dispatchEvent(new CustomEvent('editorElementAdded', { detail: element, bubbles: true, composed: true }))
+      if (popEvent) {
+        fireEvent(this,'editorElementAdded',element)
       }
     }
 
     this.removeElement = (element) => {
-      console.log('remove element', element)
-      this.dispatchEvent(new CustomEvent('editorElementRemoved', { detail: element, bubbles: true, composed: true }))
+      fireEvent(this,'editorElementRemoved',element)
       this._canvas.removeChild(element)
     }
 
@@ -300,7 +275,7 @@ class EditorWorkspace extends HTMLElement {
       c.style.left = `${newLeft}px`
       c.style.top = `${newTop}px`
 
-      this.dispatchEvent(new CustomEvent('editorCanvasOffset', { detail: { left: newLeft, top: newTop }, bubbles: true, composed: true }))
+      fireEvent(this,'editorCanvasOffset',{ left: newLeft, top: newTop })
     }
 
     this.activateSelection = () => {
@@ -334,7 +309,7 @@ class EditorWorkspace extends HTMLElement {
 
         // set the initial zoom
         const storedZoom = JSON.parse(window.localStorage.getItem('zoomScale'))
-        storedZoom && this.dispatchEvent(new CustomEvent('setZoom', { detail: storedZoom, bubbles: true, composed: true }))
+        storedZoom && fireEvent(this, 'setZoom', storedZoom)
     }
 
     this.loadDocumentHTML = (html, isAutoSave = false) => {
@@ -357,13 +332,12 @@ class EditorWorkspace extends HTMLElement {
         this.setSavedWorkspace();
       }
 
-      this.dispatchEvent(new CustomEvent('editorDocumentLoaded', { bubbles: true, composed: true }))
+      fireEvent(this,'editorDocumentLoaded',null)
 
       this.app.storeDocument()
     }
 
-    this.initWorkspace = (app) => {
-      this.app = app
+    this.initWorkspace = () => {
       this.app.addEventListener('zoomChange', (e) => {
         // set the transform origin at the center of the viewport
         this._workspace.style.transform = `scale(${this.app.zoomScale})`
@@ -371,6 +345,12 @@ class EditorWorkspace extends HTMLElement {
 
       const storedDocument = window.localStorage.getItem('currentDocument')
       storedDocument && this.loadDocumentHTML(storedDocument, true)
+    }
+
+    this.onHandShake = (app) => {
+      this.app = app;
+      app.workspace = this;
+      this.initWorkspace()
     }
 
     // STRUCTURE
@@ -414,7 +394,7 @@ class EditorWorkspace extends HTMLElement {
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
 
     // fire up an event to make myself available to the app
-    this.dispatchEvent(new CustomEvent('editorWorkspaceReady', { detail: this, bubbles: true, composed: true }))
+    fireEvent(this, 'handShake', this)
   }
 }
 

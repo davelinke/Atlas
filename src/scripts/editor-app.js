@@ -91,18 +91,6 @@ class EditorApp extends HTMLElement {
       this.setModel(e.detail.key, e.detail.value)
     })
 
-    // what to do when the editor becomes available
-    this.addEventListener('editorWorkspaceReady', (e) => {
-      this.workspace = e.detail
-      this.workspace.initWorkspace(this)
-    })
-
-    // what to do when the editor becomes available
-    this.addEventListener('sidebarReady', (e) => {
-      const sidebar = e.detail
-      sidebar.initSidebar && sidebar.initSidebar(this);
-    })
-
     // what to do when tools become available
     this.addEventListener('toolReady', (e) => {
       e.detail.registerApp(this)
@@ -168,7 +156,6 @@ class EditorApp extends HTMLElement {
     })
 
     this.onKeyDown = (e) => {
-      console.log(this)
       e.preventDefault()
       e.stopPropagation()
       //console.log('keydown', e.key)

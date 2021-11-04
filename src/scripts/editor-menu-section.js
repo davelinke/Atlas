@@ -1,4 +1,5 @@
 import CustomElement from './element.js'
+import { fireEvent } from './lib-events.js'
 
 const Css = `
 :host{
@@ -32,15 +33,11 @@ button{
 `
 
 class EditorMenuSection extends CustomElement {
-  /**
-     * workspace attributes to be observed
-     */
-  // static get observedAttributes() { return ['variant', 'href', 'target', 'disabled', 'elevation'] }
 
   /**
-     * the button constructor
-     */
-  constructor () {
+   * the button constructor
+   */
+  constructor() {
     super()
 
     // METHODS
@@ -49,22 +46,14 @@ class EditorMenuSection extends CustomElement {
       this.setAttribute('open', 'true')
       this.setAttribute('aria-expanded', 'true')
 
-      const event = new CustomEvent('editorMenuOpen', {
-        bubbles: true,
-        composed: true
-      })
-      this.dispatchEvent(event)
+      fireEvent(this, 'editorMenuOpen', null)
     }
 
     this.close = () => {
       this.removeAttribute('open')
       this.setAttribute('aria-expanded', 'false')
 
-      const event = new CustomEvent('editorMenuClose', {
-        bubbles: true,
-        composed: true
-      })
-      this.dispatchEvent(event)
+      fireEvent(this, 'editorMenuClose', null)
     }
 
     this._buttonClick = () => {

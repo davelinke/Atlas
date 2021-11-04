@@ -26,7 +26,6 @@ input[type=number][disabled]{
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    font-weight: bold;
 }
 `;
 

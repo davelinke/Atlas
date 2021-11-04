@@ -1,4 +1,5 @@
 import CustomElement from './element.js'
+import { fireEvent } from './lib-events.js'
 
 const Css = `
 :host{
@@ -41,6 +42,10 @@ class EditorMenuItem extends CustomElement {
       }))
     }
 
+    this.onHandShake = (app) => {
+      this.app = app
+    }
+
     this.registerApp = (app) => {
       this.app = app
     }
@@ -61,11 +66,7 @@ class EditorMenuItem extends CustomElement {
   }
 
   connectedCallback () {
-    this.dispatchEvent(new CustomEvent('editorMenuActivated', {
-      detail: this,
-      bubbles: true,
-      composed: true
-    }))
+    fireEvent(this, 'handShake', this);
   }
 }
 

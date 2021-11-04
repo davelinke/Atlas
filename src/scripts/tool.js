@@ -1,3 +1,5 @@
+import { fireEvent } from './lib-events.js'
+
 const Css = `
 button {
     display: inline-block;
@@ -42,12 +44,8 @@ class Tool extends HTMLElement {
 
     // METHODS
 
-    this.registerApp = (app) => {
-      this.app = app
-      this.onToolReady && this.onToolReady()
-    }
-
-    this.activateTool = (app) => {
+    this.activateTool = () => {
+      const app = this.app
       // deactivate active sibling
       const activeSibling = this.parentNode.querySelector('[active]')
       if (activeSibling && activeSibling !== this) {
@@ -66,6 +64,18 @@ class Tool extends HTMLElement {
       if (this.toolDestroy) {
         this.toolDestroy(app)
       }
+    }
+
+    this.onHandShake = (app) => {
+      this.app = app
+
+      if ((app.toolActive === null) && (app.toolDefault === this.name)) {
+        app.toolActive = this
+        app.toolDefaultInstance = this
+        this.activateTool()
+      }
+
+      this.onToolReady && this.onToolReady()
     }
 
     // attach shadow dom
@@ -91,7 +101,7 @@ class Tool extends HTMLElement {
 
   connectedCallback () {
     // fire up an event to make myself available to the app
-    this.dispatchEvent(new CustomEvent('toolReady', { detail: this, bubbles: true, composed: true }))
+    fireEvent(this, 'handShake', this)
 
     this.innerHTML = `<i class="material-icons ${this.iconClass ? this.iconClass : ''}">${this.icon}</i>`
   }

@@ -1,5 +1,6 @@
 import Tool from './tool.js'
 import { filterCoord } from './lib-filters.js'
+import { fireEvent } from './lib-events.js'
 
 class ToolRectangle extends Tool {
   /**
@@ -141,14 +142,14 @@ class ToolRectangle extends Tool {
 
       ws.inputAreaClear()
 
-      this.dispatchEvent(new CustomEvent('toolChange', { detail: this.app.toolDefaultInstance, bubbles: true, composed: true }))
-      addedElement && this.dispatchEvent(new CustomEvent('selectPickAdd', { detail: [addedElement], bubbles: true, composed: true }))
+      fireEvent(this,'toolChange',this.app.toolDefaultInstance)
+      addedElement && fireEvent(this,'selectPickAdd',[addedElement])
     }
     this.onToolReady = () => {
       this.app.registerKeyDownShortcut({
         key: 'r',
         action: () => {
-          this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
+          fireEvent(this,'toolChange',this)
         }
       })
     }

@@ -152,7 +152,7 @@ class ToolSelect extends Tool {
     }
 
     this.firePickChangeEvent = () => {
-      this.dispatchEvent(new CustomEvent('pickChange', { detail: this.pick, bubbles: true, composed: true }))
+      fireEvent(this, 'pickChange', this.pick)
     }
 
     this.addToPick = (element) => {
@@ -163,12 +163,10 @@ class ToolSelect extends Tool {
     }
 
     this.removeFormPick = (element) => {
-      console.log('removeFormPick', element)
       element.picked = false
       this.pick.splice(this.pick.indexOf(element), 1)
       this.resizePickArea()
       this.firePickChangeEvent()
-      console.log(this.pick)
     }
 
     // defines if an element should be added or not to the elements being modified
@@ -257,8 +255,8 @@ class ToolSelect extends Tool {
       this.resizing = true
 
       // find out the orientations of the resize
-      this.resizeV = e.target.dataset.resizeV ? e.target.dataset.resizeV : false
-      this.resizeH = e.target.dataset.resizeH ? e.target.dataset.resizeH : false
+      this.resizeV = e.target.dataset.resizeV!=='' ? e.target.dataset.resizeV : false
+      this.resizeH = e.target.dataset.resizeH!=='' ? e.target.dataset.resizeH : false
 
       // save the coords of the down event
       this.resizeDownCoords = {
@@ -453,8 +451,16 @@ class ToolSelect extends Tool {
           ) / areaStartWidth
         }
 
-        this.resizeV && resizeFunctions[this.resizeV](e, proportions)
-        this.resizeH && resizeFunctions[this.resizeH](e, proportions)
+
+
+        console.log(this.resizeV, this.resizeH);
+
+        if (this.resizeV) {
+          resizeFunctions[this.resizeV](e, proportions)
+        }
+        if (this.resizeH) {
+          resizeFunctions[this.resizeH](e, proportions)
+        }
       }
 
       // the stop resize function that clears event listeners and resets the flags
@@ -496,57 +502,30 @@ class ToolSelect extends Tool {
       paStyles.innerHTML = CssPa
       this.pickAreaElement.appendChild(paStyles)
 
-      this.paNW = document.createElement('div')
-      this.paNW.setAttribute('class', 'editor-workspace-pa-handle nw')
-      this.paNW.dataset.resizeV = 'n'
-      this.paNW.dataset.resizeH = 'w'
-      this.paNW.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paNW)
+      const createHandle = (v,h)=>{
+        const handle = document.createElement('div')
+        handle.classList.add('editor-workspace-pa-handle')
+        const classString = (v?v:'') + (h?h:'')
+        handle.classList.add(classString)
+        handle.dataset.resizeV = v
+        handle.dataset.resizeH = h
+        handle.addEventListener('mousedown', this.startResize)
+        this.pickAreaElement.appendChild(handle)
+      }
+      const handles = [
+        ['n','w'],
+        ['n',''],
+        ['n','e'],
+        ['','w'],
+        ['','e'],
+        ['s','w'],
+        ['s',''],
+        ['s','e']
+      ];
 
-      this.paN = document.createElement('div')
-      this.paN.setAttribute('class', 'editor-workspace-pa-handle n')
-      this.paN.dataset.resizeV = 'n'
-      this.paN.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paN)
-
-      this.paNE = document.createElement('div')
-      this.paNE.setAttribute('class', 'editor-workspace-pa-handle ne')
-      this.paNE.dataset.resizeV = 'n'
-      this.paNE.dataset.resizeH = 'e'
-      this.paNE.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paNE)
-
-      this.paW = document.createElement('div')
-      this.paW.setAttribute('class', 'editor-workspace-pa-handle w')
-      this.paW.dataset.resizeH = 'w'
-      this.paW.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paW)
-
-      this.paE = document.createElement('div')
-      this.paE.setAttribute('class', 'editor-workspace-pa-handle e')
-      this.paE.dataset.resizeH = 'e'
-      this.paE.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paE)
-
-      this.paSW = document.createElement('div')
-      this.paSW.setAttribute('class', 'editor-workspace-pa-handle sw')
-      this.paSW.dataset.resizeV = 's'
-      this.paSW.dataset.resizeH = 'w'
-      this.paSW.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paSW)
-
-      this.paS = document.createElement('div')
-      this.paS.setAttribute('class', 'editor-workspace-pa-handle s')
-      this.paS.dataset.resizeV = 's'
-      this.paS.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paS)
-
-      this.paSE = document.createElement('div')
-      this.paSE.setAttribute('class', 'editor-workspace-pa-handle se')
-      this.paSE.dataset.resizeV = 's'
-      this.paSE.dataset.resizeH = 'e'
-      this.paSE.addEventListener('mousedown', this.startResize)
-      this.pickAreaElement.appendChild(this.paSE)
+      handles.forEach(h=>{
+        createHandle(h[0],h[1])
+      })
 
       ws._canvas.appendChild(this.pickAreaElement)
 
@@ -624,7 +603,7 @@ class ToolSelect extends Tool {
       this.app.registerKeyDownShortcut({
         key: 'Escape',
         action: () => {
-          this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
+          fireEvent(this, 'toolChange', this);
         }
       })
 

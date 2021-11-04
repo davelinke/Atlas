@@ -1,4 +1,5 @@
 import Tool from './tool.js'
+import { fireEvent } from './lib-events.js'
 
 class ToolPan extends Tool {
   constructor () {
@@ -9,6 +10,8 @@ class ToolPan extends Tool {
     this.icon = 'pan_tool'
 
     this.cursor = 'grab'
+
+    this.downFlag = false
 
     // STATE
 
@@ -52,32 +55,25 @@ class ToolPan extends Tool {
       ws.canvasOffset(newLeft, newTop)
     }
     this.inputEnd = (e) => {
-      // const ws = e.target;
-
-      // if (this._tentativeRectangle) {
-      //     ws.addElement(this._tentativeRectangle);
-      // }
-
-      // this._inputDown = null;
-      // this._tentativeRectangle = null;
-
-      // ws.inputAreaClear();
     }
     this.onToolReady = () => {
 
       this.app.registerKeyDownShortcut({
         key: ' ',
         action: () => {
-          this.previousTool = this.app.toolActive;
-          
-          this.dispatchEvent(new CustomEvent('toolChange', { detail: this, bubbles: true, composed: true }))
+          if(!this.downFlag){
+            this.previousTool = this.app.toolActive;
+          }
+          this.downFlag = true;
+          fireEvent(this, 'toolChange', this)
         }
       })
 
       this.app.registerKeyUpShortcut({
         key: ' ',
         action: () => {
-          this.dispatchEvent(new CustomEvent('toolChange', { detail: this.previousTool , bubbles: true, composed: true }))
+          this.downFlag = false;
+          fireEvent(this, 'toolChange', this.previousTool)
         }
       })
     }
