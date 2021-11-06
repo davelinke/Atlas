@@ -1,5 +1,6 @@
 import Tool from './tool.js'
 import { fireEvent } from './lib-events.js'
+import { pxWidthToNumber } from './lib-utils.js';
 
 const CssPa = `
 .editor-workspace-pa {
@@ -62,6 +63,18 @@ const CssPa = `
     left: -5px;
     cursor: ew-resize;
 }
+
+.editor-workspace-da{
+  border: 1px dotted #ccc;
+  position: fixed;
+  z-index: 50001;
+  pointer-events: none;
+  box-sizing: border-box;
+  opacity:0;
+  
+  outline: 1px solid transparent;
+  -webkit-backface-visibility: hidden;
+}
 `
 
 class ToolSelect extends Tool {
@@ -86,6 +99,8 @@ class ToolSelect extends Tool {
     this.pickStart = null
 
     this.inputStartPos = null
+
+    this.dragSelect = false
 
     // METHODS
 
@@ -255,8 +270,8 @@ class ToolSelect extends Tool {
       this.resizing = true
 
       // find out the orientations of the resize
-      this.resizeV = e.target.dataset.resizeV!=='' ? e.target.dataset.resizeV : false
-      this.resizeH = e.target.dataset.resizeH!=='' ? e.target.dataset.resizeH : false
+      this.resizeV = e.target.dataset.resizeV !== '' ? e.target.dataset.resizeV : false
+      this.resizeH = e.target.dataset.resizeH !== '' ? e.target.dataset.resizeH : false
 
       // save the coords of the down event
       this.resizeDownCoords = {
@@ -498,14 +513,18 @@ class ToolSelect extends Tool {
       this.pickAreaElement = document.createElement('div')
       this.pickAreaElement.classList.add('editor-workspace-pa')
 
+      // create the drag area
+      this.selectAreaElement = document.createElement('div')
+      this.selectAreaElement.classList.add('editor-workspace-da')
+
       const paStyles = document.createElement('style')
       paStyles.innerHTML = CssPa
       this.pickAreaElement.appendChild(paStyles)
 
-      const createHandle = (v,h)=>{
+      const createHandle = (v, h) => {
         const handle = document.createElement('div')
         handle.classList.add('editor-workspace-pa-handle')
-        const classString = (v?v:'') + (h?h:'')
+        const classString = (v ? v : '') + (h ? h : '')
         handle.classList.add(classString)
         handle.dataset.resizeV = v
         handle.dataset.resizeH = h
@@ -513,62 +532,166 @@ class ToolSelect extends Tool {
         this.pickAreaElement.appendChild(handle)
       }
       const handles = [
-        ['n','w'],
-        ['n',''],
-        ['n','e'],
-        ['','w'],
-        ['','e'],
-        ['s','w'],
-        ['s',''],
-        ['s','e']
+        ['n', 'w'],
+        ['n', ''],
+        ['n', 'e'],
+        ['', 'w'],
+        ['', 'e'],
+        ['s', 'w'],
+        ['s', ''],
+        ['s', 'e']
       ];
 
-      handles.forEach(h=>{
-        createHandle(h[0],h[1])
+      handles.forEach(h => {
+        createHandle(h[0], h[1])
       })
 
       ws._canvas.appendChild(this.pickAreaElement)
+      ws._shadow.appendChild(this.selectAreaElement)
 
       ws && ws.activateSelection()
     }
     this.toolDestroy = (app) => {
       const ws = app.workspace
       ws._canvas.removeChild(this.pickAreaElement)
+      ws._shadow.removeChild(this.selectAreaElement)
       this.pickAreaElement = null
       // do stuff on destruction
     }
+
+    this.dragPick = () => {
+      this.dragCoveredElements = [];
+      const aVal = {};
+      const elements = this.appReference.workspace.getElements()
+      const pickArea = this._tentativeRectangle;
+      const viewportDim = this.appReference.workspace.viewportDim;
+
+      elements.forEach(element => {
+
+        const elRectX = pxWidthToNumber(element.style.left);
+        const elRectY = pxWidthToNumber(element.style.top);
+        const elRectW = (viewportDim - pxWidthToNumber(element.style.right) - elRectX);
+        const elRectH = (viewportDim - pxWidthToNumber(element.style.bottom) - elRectY);
+
+        const elRectX2 = elRectX + elRectW;
+        const elRectY2 = elRectY + elRectH;
+
+        const pickAreaX = pickArea.left;
+        const pickAreaY = pickArea.top;
+        const pickAreaW = (viewportDim - pickArea.right) - pickAreaX;
+        const pickAreaH = (viewportDim - pickArea.bottom) - pickAreaY;
+
+        const pickAreaX2 = pickAreaX + pickAreaW;
+        const pickAreaY2 = pickAreaY + pickAreaH;
+
+        if (
+          elRectX <= pickAreaX2 &&
+          elRectX2 >= pickAreaX &&
+          elRectY <= pickAreaY2 &&
+          elRectY2 >= pickAreaY
+        ) {
+          this.dragCoveredElements.push(element);
+        }
+      })
+
+    }
+
     this.inputStart = (e) => {
+      const me = e.detail.mouseEvent;
       const element = this.getCompElement(e.detail.mouseEvent.path)
       const shiftKey = e.detail.mouseEvent.shiftKey
-      //   const ctrlKey = e.detail.mouseEvent.ctrlKey
-      //   const altKey = e.detail.mouseEvent.altKey
-
-
+      //   const ctrlKey = me.ctrlKey
+      //   const altKey = me.altKey
 
       fireEvent(this, 'canvasModStart', this.pick);
 
       this.inputStartPos = {
-        x: e.detail.mouseEvent.clientX,
-        y: e.detail.mouseEvent.clientY
+        x: me.clientX,
+        y: me.clientY
       }
 
-      this.modTask = this.getModTask(e.detail.mouseEvent.path)
+      this.modTask = this.getModTask(me.path)
 
-      if (shiftKey) {
-        this.isAdding = true
-        if (element) {
+      // to determine the future of the pick after the drag i have to compare it to it's actual state so let's hold it in memory
+      this.pickBeforeDrag = [...this.pick];
+
+
+      if (element) {
+        // either i am (adding/removing) an element
+
+        this.isAdding = shiftKey; // shift key determines if it's adding or not
+
+        if (shiftKey) { // i am definitely adding or removing
+
           this.pickRegister(element)
+
+        } else { // no shift means i am clearing the selection and starting with an element
+
+          this.deselectAll() // clear the pick
+
+          this.pickRegister(element)
+
+          this.firePickChangeEvent(); // fire the change event
+
         }
+
       } else {
-        this.isAdding = false
-        if (element) {
-          this.pickRegister(element)
-        } else {
-          this.deselectAll()
-          this.firePickChangeEvent();
+        // or i am either clearing the pick or starting a drag
+
+        this.dragSelect = true; // flag the drag
+
+
+
+
+        //taken from rectangle to create the drag area
+
+        const ws = e.target
+
+        const id = {
+          top: e.detail.coords.top - ws.canvasOffsetTop,
+          left: e.detail.coords.left - ws.canvasOffsetLeft,
+          bottom: ws.viewportDim - (e.detail.coords.top - ws.canvasOffsetTop),
+          right: ws.viewportDim - (e.detail.coords.left - ws.canvasOffsetLeft)
+        }
+        this._inputDown = id
+
+        let top, left, bottom, right
+
+
+        top = id.top
+        left = id.left
+        bottom = id.bottom
+        right = id.right
+
+
+        const iaArgs = {
+          top: top,
+          left: left,
+          right: right,
+          bottom: bottom
+        }
+        ws.inputAreaStart({ ...iaArgs, variant: 'drag-area' })
+
+        //end
+
+
+
+
+        if (shiftKey) { // i may be starting a drag add/remove
+
+        } else { // no shift means i have to clear the pick and start a drag
+
+          this.deselectAll() // clear the pick
+
+          this.firePickChangeEvent(); // fire the change event
+
         }
       }
+
     }
+
+
+
     this.inputMove = (e) => {
       const shiftKey = e.detail.mouseEvent.shiftKey
       //   const ctrlKey = e.detail.mouseEvent.ctrlKey
@@ -577,20 +700,119 @@ class ToolSelect extends Tool {
         this.pickAreaElement.style.opacity = 0
       }
 
-      if (shiftKey) {
-        this.constrainAngle = true
-      } else {
-        this.constrainAngle = false
+      // i have to determine if this is a dragselect to either move or manage the pick
+
+      if (!this.dragSelect) { // if it's not a drag select, means i clicked on an element and i have to MOVE THE PICK
+
+        this.constrainAngle = shiftKey  // if the shift key is pressed it means that my movements are restrained in angles of 45 degrees
+
+
+        this.pick.forEach((element, i) => {
+          this.modTasks[this.modTask](element, i, e)
+        })
+      } else { // if it's a drag select, means i have to MANAGE THE PICK
+
+
+
+
+        //taken from rectangel to resize the drag area
+
+        // get the workspace instance
+        const ws = e.target
+
+        // get the initial point of input (mousedown, touchstart)
+        const id = this._inputDown
+
+        const im = {
+          top: e.detail.coords.top - ws.canvasOffsetTop,
+          left: e.detail.coords.left - ws.canvasOffsetLeft,
+          bottom: ws.viewportDim - (e.detail.coords.top - ws.canvasOffsetTop),
+          right: ws.viewportDim - (e.detail.coords.left - ws.canvasOffsetLeft)
+        }
+
+        // define the dimension variables
+        let top, left, right, bottom
+
+        // if the current position is smaller than the initial position (X axis)
+        if (im.left < id.left) {
+          left = im.left
+          right = id.right
+        } else { // if the current position is greater than the initial position (X axis)
+          left = id.left
+          right = im.right
+        }
+
+        // if the current position is smaller than the initial position (Y axis)
+        if (im.top < id.top) {
+          top = im.top
+          bottom = id.bottom
+        } else { // if the current position is greater than the initial position (Y axis)
+          top = id.top
+          bottom = im.bottom
+        }
+
+        // if the grid is active
+        if (this.app.gridActive) {
+          // filter the coordinates
+          top = filterCoord(top, this.app.gridSize)
+          left = filterCoord(left, this.app.gridSize)
+          bottom = filterCoord(bottom, this.app.gridSize)
+          right = filterCoord(right, this.app.gridSize)
+        }
+
+        // set the tentative rectangle
+        const iArgs = {
+          top: top,
+          left: left,
+          right: right,
+          bottom: bottom
+        }
+
+        // hold this in the state
+        this._tentativeRectangle = iArgs
+
+        // update the dummy rectangle in the workspace
+        ws.inputAreaResize(iArgs)
+
+        this.dragPick();
+
       }
 
-      this.pick.forEach((element, i) => {
-        this.modTasks[this.modTask](element, i, e)
-      })
+      // resize the pick area to it's new position and dimensions
       this.resizePickArea()
     }
+
+
+
     this.inputEnd = (e) => {
       this.moveIncrementX = null
       this.moveIncrementY = null
+
+      // lets flag the dragselection off
+
+      if (this.dragSelect) {
+        const ws = e.target
+
+        this.dragCoveredElements.forEach(element => {
+          console.log(this.pickBeforeDrag)
+          if (this.pickBeforeDrag.includes(element)) {
+            console.log('woot')
+            this.removeFormPick(element)
+          } else {
+            this.addToPick(element)
+          }
+        })
+
+        this.pickBeforeDrag = [];
+        this.dragCoveredElements = [];
+
+        this._inputDown = null
+        this._tentativeRectangle = null
+
+        this.dragSelect = false;
+
+        ws.inputAreaClear()
+      }
 
       if (this.pick.length > 0) {
         this.pickAreaElement.style.opacity = 1
@@ -599,6 +821,9 @@ class ToolSelect extends Tool {
 
       fireEvent(this, 'canvasModEnd', this.pick);
     }
+
+
+
     this.onToolReady = () => {
       this.app.registerKeyDownShortcut({
         key: 'Escape',

@@ -102,6 +102,12 @@ const Css = `
     border-style:solid;
     background-color: var(--workspace-input-area-solid-background-color, #fff);
 }
+.input-area.drag-area {
+    opacity:1;
+    border-style:solid;
+    background-color: rgba(0,0,255,0.1);
+    border-color: rgba(0,0,255,1);
+}
 `
 
 class EditorWorkspace extends HTMLElement {
@@ -172,7 +178,15 @@ class EditorWorkspace extends HTMLElement {
 
         const stopInput = () => {
           // fire end event listener
-          fireEvent(this,'workspaceInputEnd',null)
+          const scale = this.app.zoomScale
+          const coords = this.mouseCoords(e, scale)
+
+          const upEventDetail = {
+            mouseEvent: e,
+            coords: coords
+          }
+
+          fireEvent(this,'workspaceInputEnd',upEventDetail)
 
           document.removeEventListener('mouseup', stopInput)
           document.removeEventListener('touchend', stopInput)
@@ -351,6 +365,13 @@ class EditorWorkspace extends HTMLElement {
       this.app = app;
       app.workspace = this;
       this.initWorkspace()
+    }
+
+    this.getElements = () => {
+      const elements = Array.from(this._canvas.childNodes);
+      return elements.filter(el => {
+        return (el.tagName === 'EDITOR-ELEMENT')
+      })
     }
 
     // STRUCTURE
