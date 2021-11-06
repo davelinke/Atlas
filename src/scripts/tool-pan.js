@@ -57,14 +57,13 @@ class ToolPan extends Tool {
     this.inputEnd = (e) => {
     }
     this.onToolReady = () => {
-
       this.app.registerKeyDownShortcut({
         key: ' ',
         action: () => {
-          if(!this.downFlag){
-            this.previousTool = this.app.toolActive;
+          if (!this.downFlag) {
+            this.previousTool = this.app.toolActive
           }
-          this.downFlag = true;
+          this.downFlag = true
           fireEvent(this, 'toolChange', this)
         }
       })
@@ -72,7 +71,7 @@ class ToolPan extends Tool {
       this.app.registerKeyUpShortcut({
         key: ' ',
         action: () => {
-          this.downFlag = false;
+          this.downFlag = false
           fireEvent(this, 'toolChange', this.previousTool)
         }
       })

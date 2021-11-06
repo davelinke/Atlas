@@ -1,19 +1,18 @@
-import SidebarPanel from './sidebar-panel.js';
+import SidebarPanel from './sidebar-panel.js'
 
 class SidebarDocument extends SidebarPanel {
-
-    constructor() {
-        super()
-        this.mainHeading = 'Multiple Elements';
-        this.pickLengthShow = function(pick){
-            return pick.length > 1
-        };
-        this.isDefaultPanel = false;
+  constructor () {
+    super()
+    this.mainHeading = 'Multiple Elements'
+    this.pickLengthShow = function (pick) {
+      return pick.length > 1
     }
+    this.isDefaultPanel = false
+  }
 
-    async onInit() {
-        
-    }
+  async onInit () {
+
+  }
 }
 
 export default SidebarDocument

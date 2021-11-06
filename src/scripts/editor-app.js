@@ -5,7 +5,7 @@ class EditorApp extends HTMLElement {
   /**
      * the button constructor
      */
-  constructor() {
+  constructor () {
     super()
 
     // PROPS
@@ -73,8 +73,8 @@ class EditorApp extends HTMLElement {
     // EVENT LISTENERS
 
     this.addEventListener('handShake', (e) => {
-      const element = e.detail;
-      element.onHandShake && element.onHandShake(this);
+      const element = e.detail
+      element.onHandShake && element.onHandShake(this)
     })
 
     this.addEventListener('toolChange', (e) => {
@@ -117,8 +117,8 @@ class EditorApp extends HTMLElement {
     this.onKeyDown = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      //console.log('keydown', e.key)
-      this.keyDownLast = e.key;
+      // console.log('keydown', e.key)
+      this.keyDownLast = e.key
       this.keyDownShortcuts[e.key] && this.keyDownShortcuts[e.key](e)
     }
 
@@ -127,14 +127,14 @@ class EditorApp extends HTMLElement {
     this.onKeyUp = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      this.keyDownLast = null;
+      this.keyDownLast = null
       this.keyUpShortcuts[e.key] && this.keyUpShortcuts[e.key](e)
     }
     this.boundKeyUp = this.onKeyUp.bind(this)
 
     this.addKeyShorcuts = () => {
-      this.keyDownEventListener = window.addEventListener('keydown', this.boundKeyDown);
-      this.keyUpEventListener = window.addEventListener('keyup', this.boundKeyUp);
+      this.keyDownEventListener = window.addEventListener('keydown', this.boundKeyDown)
+      this.keyUpEventListener = window.addEventListener('keyup', this.boundKeyUp)
     }
 
     this.removeKeyShorcuts = () => {
@@ -162,8 +162,7 @@ class EditorApp extends HTMLElement {
     })
 
     // turn keyboard shortcuts on
-    this.addKeyShorcuts();
-
+    this.addKeyShorcuts()
 
     // THE DOM STRUCTURE
 

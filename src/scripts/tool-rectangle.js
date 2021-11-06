@@ -142,14 +142,14 @@ class ToolRectangle extends Tool {
 
       ws.inputAreaClear()
 
-      fireEvent(this,'toolChange',this.app.toolDefaultInstance)
-      addedElement && fireEvent(this,'selectPickAdd',[addedElement])
+      fireEvent(this, 'toolChange', this.app.toolDefaultInstance)
+      addedElement && fireEvent(this, 'selectPickAdd', [addedElement])
     }
     this.onToolReady = () => {
       this.app.registerKeyDownShortcut({
         key: 'r',
         action: () => {
-          fireEvent(this,'toolChange',this)
+          fireEvent(this, 'toolChange', this)
         }
       })
     }

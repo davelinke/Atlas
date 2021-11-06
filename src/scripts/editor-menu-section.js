@@ -33,11 +33,10 @@ button{
 `
 
 class EditorMenuSection extends CustomElement {
-
   /**
    * the button constructor
    */
-  constructor() {
+  constructor () {
     super()
 
     // METHODS

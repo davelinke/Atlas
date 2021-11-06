@@ -66,7 +66,7 @@ class EditorMenuItem extends CustomElement {
   }
 
   connectedCallback () {
-    fireEvent(this, 'handShake', this);
+    fireEvent(this, 'handShake', this)
   }
 }
 

@@ -15,24 +15,24 @@ input{
 `
 
 class SettingZoom extends HTMLElement {
-  constructor() {
+  constructor () {
     super()
 
     // STATE
 
-    this.zoomInput = null;
+    this.zoomInput = null
 
-    //METHODS
+    // METHODS
 
     this.onZoomChange = (e) => {
       this.zoomInput.value = e.detail * 100
     }
 
     this.onHandShake = (app) => {
-      this.app = app;
-      const currentZoom = app._zoomScale;
+      this.app = app
+      const currentZoom = app._zoomScale
       this.onZoomChange({ detail: currentZoom })
-      this.app.addEventListener('zoomChange', this.onZoomChange);
+      this.app.addEventListener('zoomChange', this.onZoomChange)
     }
 
     // attach shadow dom
@@ -64,14 +64,14 @@ class SettingZoom extends HTMLElement {
 
     zoomInput.addEventListener('change', (e) => {
       const zoom = e.target.value / 100
-      fireEvent(this, 'setZoom', zoom);
+      fireEvent(this, 'setZoom', zoom)
     })
 
     this._shadow.appendChild(zoomInput)
   }
 
-  connectedCallback() {
-    fireEvent(this, 'handShake', this);
+  connectedCallback () {
+    fireEvent(this, 'handShake', this)
   }
 }
 

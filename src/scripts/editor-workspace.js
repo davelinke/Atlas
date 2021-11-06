@@ -4,10 +4,7 @@ import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
 import { propUnitsJs } from './lib-units.js'
 
-
 const viewportDim = 30000
-
-
 
 const Css = `
 :host{
@@ -70,7 +67,7 @@ class EditorWorkspace extends HTMLElement {
   /**
        * the button constructor
        */
-  constructor() {
+  constructor () {
     super()
 
     // LOAD DEPENDENCIES
@@ -119,7 +116,7 @@ class EditorWorkspace extends HTMLElement {
 
       // so any input focused blurs
       this._canvas.focus()
-      
+
       if (e.button === 0) {
         const downEvent = e
         const scale = this.app.zoomScale
@@ -127,7 +124,7 @@ class EditorWorkspace extends HTMLElement {
 
         // fire start event listener
 
-        fireEvent(this,'workspaceInputStart',{
+        fireEvent(this, 'workspaceInputStart', {
           mouseEvent: e,
           coords: downEventDetail
         })
@@ -142,7 +139,7 @@ class EditorWorkspace extends HTMLElement {
             coords: coords
           }
 
-          fireEvent(this,'workspaceInputEnd',upEventDetail)
+          fireEvent(this, 'workspaceInputEnd', upEventDetail)
 
           document.removeEventListener('mouseup', stopInput)
           document.removeEventListener('touchend', stopInput)
@@ -157,9 +154,9 @@ class EditorWorkspace extends HTMLElement {
             mouseEvent: e,
             coords: coords
           }
-          
+
           // fire move event listener
-          fireEvent(this,'workspaceInputMove',moveEventDetail)
+          fireEvent(this, 'workspaceInputMove', moveEventDetail)
         }
 
         document.addEventListener('mouseup', stopInput)
@@ -212,8 +209,8 @@ class EditorWorkspace extends HTMLElement {
 
       element.setAttribute('id', elementId)
 
-      element.currentState = 'default';
-      element.setState('default',args);
+      element.currentState = 'default'
+      element.setState('default', args)
 
       for (const prop in args) {
         const unit = propUnitsJs[prop] ? propUnitsJs[prop] : ''
@@ -221,7 +218,7 @@ class EditorWorkspace extends HTMLElement {
       }
       this._canvas.appendChild(element)
 
-      fireEvent(this,'editorElementAdded',element)
+      fireEvent(this, 'editorElementAdded', element)
 
       return element
     }
@@ -230,12 +227,12 @@ class EditorWorkspace extends HTMLElement {
       this._canvas.appendChild(element)
 
       if (popEvent) {
-        fireEvent(this,'editorElementAdded',element)
+        fireEvent(this, 'editorElementAdded', element)
       }
     }
 
     this.removeElement = (element) => {
-      fireEvent(this,'editorElementRemoved',element)
+      fireEvent(this, 'editorElementRemoved', element)
       this._canvas.removeChild(element)
     }
 
@@ -248,7 +245,7 @@ class EditorWorkspace extends HTMLElement {
       c.style.left = `${newLeft}px`
       c.style.top = `${newTop}px`
 
-      fireEvent(this,'editorCanvasOffset',{ left: newLeft, top: newTop })
+      fireEvent(this, 'editorCanvasOffset', { left: newLeft, top: newTop })
     }
 
     this.activateSelection = () => {
@@ -275,14 +272,13 @@ class EditorWorkspace extends HTMLElement {
     }
 
     this.setSavedWorkspace = () => {
+      // set the initial offset
+      const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'))
+      storedCanvasOffset && this.canvasOffset(storedCanvasOffset.left, storedCanvasOffset.top)
 
-        // set the initial offset
-        const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'))
-        storedCanvasOffset && this.canvasOffset(storedCanvasOffset.left, storedCanvasOffset.top)
-
-        // set the initial zoom
-        const storedZoom = JSON.parse(window.localStorage.getItem('zoomScale'))
-        storedZoom && fireEvent(this, 'setZoom', storedZoom)
+      // set the initial zoom
+      const storedZoom = JSON.parse(window.localStorage.getItem('zoomScale'))
+      storedZoom && fireEvent(this, 'setZoom', storedZoom)
     }
 
     this.loadDocumentHTML = (html, isAutoSave = false) => {
@@ -302,10 +298,10 @@ class EditorWorkspace extends HTMLElement {
       if (!isAutoSave) {
         this.canvasOffset(0, 0)
       } else {
-        this.setSavedWorkspace();
+        this.setSavedWorkspace()
       }
 
-      fireEvent(this,'editorDocumentLoaded',null)
+      fireEvent(this, 'editorDocumentLoaded', null)
 
       this.app.storeDocument()
     }
@@ -321,13 +317,13 @@ class EditorWorkspace extends HTMLElement {
     }
 
     this.onHandShake = (app) => {
-      this.app = app;
-      app.workspace = this;
+      this.app = app
+      app.workspace = this
       this.initWorkspace()
     }
 
     this.getElements = () => {
-      const elements = Array.from(this._canvas.childNodes);
+      const elements = Array.from(this._canvas.childNodes)
       return elements.filter(el => {
         return (el.tagName === 'EDITOR-ELEMENT')
       })
@@ -353,7 +349,7 @@ class EditorWorkspace extends HTMLElement {
 
     this._canvas = document.createElement('div')
     this._canvas.classList.add('canvas')
-    this._canvas.setAttribute('tabindex', '0');
+    this._canvas.setAttribute('tabindex', '0')
 
     // get the store document
     this._workspace.appendChild(this._canvas)
@@ -368,7 +364,7 @@ class EditorWorkspace extends HTMLElement {
 
   // LIFE CYCLE
 
-  connectedCallback() {
+  connectedCallback () {
     // scroll to middle if it's not defined
     this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
