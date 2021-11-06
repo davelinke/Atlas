@@ -1,3 +1,5 @@
+import { propUnitsJs } from "./lib-units.js";
+
 const Css = `
 :host {
     user-select: none;
@@ -40,6 +42,10 @@ class EditorElement extends HTMLElement {
 
     this._picked = false
 
+    this.states = {};
+
+    this.currentState = 'default';
+
     // PROPS
     Object.defineProperty(this, 'picked', {
       get: () => {
@@ -51,6 +57,23 @@ class EditorElement extends HTMLElement {
         this.classList[classListFn]('picked')
       }
     })
+
+    // METHODS
+
+    this.setState = (state, props) => {
+        this.states[state] = props;
+        this.setAttribute(`data-states-${state}`, JSON.stringify(props));
+    }
+
+    this.getDimensions = () => {
+        return this.states[this.currentState];
+    }
+
+    this.setProp = (prop, value) => {
+        this.states[this.currentState][prop] = value;
+        this.setAttribute(`data-states-${this.currentState}`, JSON.stringify(this.states[this.currentState]));
+        this.style[prop] = value + propUnitsJs[prop];
+    }
 
     // attach shadow dom
     this._shadow = this.attachShadow({ mode: 'open' })
@@ -67,6 +90,14 @@ class EditorElement extends HTMLElement {
     this.modGrid.classList.add('mod')
 
     this._shadow.append(this.modGrid)
+  }
+
+  connectedCallback () {
+    for (const [key, value] of Object.entries(this.dataset)) {
+      const statename = key.replace('states', '').toLowerCase();
+      const props = JSON.parse(value);
+      this.setState(statename, props);
+    }
   }
 }
 

@@ -2,56 +2,12 @@ import { GenerateId } from './lib-strings.js'
 import { LoadParticles } from './lib-loader.js'
 import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
+import { propUnitsJs } from './lib-units.js'
 
 
 const viewportDim = 30000
 
-const propUnitsJs = {
-  backgroundPosition: 'px',
-  backgroundPositionX: 'px',
-  backgroundPositionY: 'px',
-  border: 'px',
-  borderBottom: 'px',
-  borderBottomWidth: 'px',
-  borderLeft: 'px',
-  borderLeftWidth: 'px',
-  borderRadius: 'px',
-  borderRight: 'px',
-  borderRightWidth: 'px',
-  borderSpacing: 'px',
-  borderTop: 'px',
-  borderTopWidth: 'px',
-  borderWidth: 'px',
-  bottom: 'px',
-  fontSize: 'px',
-  fontSizeAdjust: 'px',
-  height: 'px',
-  left: 'px',
-  letterSpacing: 'px',
-  lineHeight: 'px',
-  margin: 'px',
-  marginBottom: 'px',
-  marginLeft: 'px',
-  marginRight: 'px',
-  marginTop: 'px',
-  maxHeight: 'px',
-  maxWidth: 'px',
-  minHeight: 'px',
-  minWidth: 'px',
-  outline: 'px',
-  outlineWidth: 'px',
-  padding: 'px',
-  paddingBottom: 'px',
-  paddingLeft: 'px',
-  paddingRight: 'px',
-  paddingTop: 'px',
-  right: 'px',
-  top: 'px',
-  width: 'px',
-  wordSpacing: 'px',
-  transitionDuration: 'ms',
-  transitionDelay: 'ms'
-}
+
 
 const Css = `
 :host{
@@ -233,7 +189,7 @@ class EditorWorkspace extends HTMLElement {
       ia.setAttribute('class', 'input-area')
     }
 
-    this.addElement = (props = {}) => {
+    this.addElement = (props = {}, state = 'default') => {
       const args = {
         ...{
           left: 15000,
@@ -255,6 +211,9 @@ class EditorWorkspace extends HTMLElement {
       const elementId = GenerateId()
 
       element.setAttribute('id', elementId)
+
+      element.currentState = 'default';
+      element.setState('default',args);
 
       for (const prop in args) {
         const unit = propUnitsJs[prop] ? propUnitsJs[prop] : ''

@@ -1,6 +1,5 @@
 import Tool from './tool.js'
 import { fireEvent } from './lib-events.js'
-import { pxWidthToNumber } from './lib-utils.js';
 
 const CssPa = `
 .editor-workspace-pa {
@@ -241,11 +240,11 @@ class ToolSelect extends Tool {
       const newRight = this.pickStart[i].right - delta.x
       const newBottom = this.pickStart[i].bottom - delta.y
 
-      element.style.left = this.applyFilters(newLeft) + 'px'
-      element.style.top = this.applyFilters(newTop) + 'px'
-
-      element.style.right = this.applyFilters(newRight) + 'px'
-      element.style.bottom = this.applyFilters(newBottom) + 'px'
+      element.setProp('left', this.applyFilters(newLeft));
+      element.setProp('top', this.applyFilters(newTop));
+      
+      element.setProp('right', this.applyFilters(newRight));
+      element.setProp('bottom', this.applyFilters(newBottom));
 
       // fire the events
 
@@ -337,14 +336,14 @@ class ToolSelect extends Tool {
             // calculate new start position
             const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag
             const newStart = areaStart[start] + (newAreaMag * pctStart)
-
-            element.style[start] = Math.round(newStart) + 'px' // add filtering/grid here
+            
+            element.setProp(start, Math.round(newStart))// add filtering/grid here
 
             // calculate new end position
             const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag
             const newEnd = pickAreaEnd + (newAreaMag * pctEnd)
-
-            element.style[end] = newEnd + 'px' // add filtering/grid here
+            
+            element.setProp(end, newEnd)// add filtering/grid here
           })
           this.pickAreaElement.style[end] = Math.round(pickAreaEnd) + 'px'
 
@@ -391,13 +390,13 @@ class ToolSelect extends Tool {
             const pctStart = (pickStart[i][start] - areaStart[start]) / areaStartMag
             const newStart = pickAreaStart + (newAreaMag * pctStart)
 
-            element.style[start] = newStart + 'px' // add filtering/grid here
+            element.setProp(start, newStart); // add filtering/grid here
 
             // calculate new end position
             const pctEnd = (pickStart[i][end] - areaStart[end]) / areaStartMag
             const newEnd = areaStart[end] + (newAreaMag * pctEnd)
 
-            element.style[end] = newEnd + 'px' // add filtering/grid here
+            element.setProp(end, newEnd); // add filtering/grid here
           })
 
           this.pickAreaElement.style[start] = pickAreaStart + 'px'
@@ -471,10 +470,6 @@ class ToolSelect extends Tool {
           ) / areaStartWidth
         }
 
-
-
-        console.log(this.resizeV, this.resizeH);
-
         if (this.resizeV) {
           resizeFunctions[this.resizeV](e, proportions)
         }
@@ -494,6 +489,8 @@ class ToolSelect extends Tool {
         this.resizeV = null
         this.resizeH = null
         this.resizeDownCoords = null
+
+        this.pickStartUpdate();
         document.removeEventListener('mousemove', resize)
         document.removeEventListener('touchmove', resize)
         document.removeEventListener('mouseup', stopResize)
@@ -573,10 +570,12 @@ class ToolSelect extends Tool {
 
       elements.forEach(element => {
 
-        const elRectX = pxWidthToNumber(element.style.left);
-        const elRectY = pxWidthToNumber(element.style.top);
-        const elRectW = (viewportDim - pxWidthToNumber(element.style.right) - elRectX);
-        const elRectH = (viewportDim - pxWidthToNumber(element.style.bottom) - elRectY);
+        const eDims = element.getDimensions();
+
+        const elRectX = eDims.left;
+        const elRectY = eDims.top;
+        const elRectW = (viewportDim - eDims.right - elRectX);
+        const elRectH = (viewportDim - eDims.bottom - elRectY);
 
         const elRectX2 = elRectX + elRectW;
         const elRectY2 = elRectY + elRectH;
@@ -801,15 +800,10 @@ class ToolSelect extends Tool {
 
       // lets flag the dragselection off
 
-      if (this.dragSelect) {
+      if (this.dragSelect && this.dragCoveredElements) {
         const ws = e.target
 
         this.dragCoveredElements.forEach(element => {
-          // if (this.pickBeforeDrag.includes(element)) {
-          //   this.removeFormPick(element)
-          // } else {
-          //   this.addToPick(element)
-          // }
           this.isAdding = true;
           this.pickRegister(element)
           this.isAdding = false;
@@ -859,8 +853,6 @@ class ToolSelect extends Tool {
       })
 
       this.app.addEventListener('editorElementRemoved', (e) => {
-        console.log('editorElementRemoved')
-        console.log(this.pick.includes(e.detail))
         if (this.pick.includes(e.detail)) {
           const newPick = [...this.pick]
           newPick.splice(this.pick.indexOf(e.detail), 1)

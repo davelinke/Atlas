@@ -1,5 +1,5 @@
 import SidebarPanel from './sidebar-panel.js';
-import { pxWidthToNumber, createNumInput } from './lib-utils.js';
+import { createNumInput } from './lib-utils.js';
 import { fireEvent } from './lib-events.js'
 
 const Css = `
@@ -84,11 +84,13 @@ class SidebarDocument extends SidebarPanel {
 
             const element = this.pick[0];
 
+            const elementDims = element.getDimensions()
+
             const currentDims = {
-                left: pxWidthToNumber(element.style.left),
-                top: pxWidthToNumber(element.style.top),
-                bottom: pxWidthToNumber(element.style.bottom),
-                right: pxWidthToNumber(element.style.right)
+                left: elementDims.left,
+                top: elementDims.top,
+                bottom: elementDims.bottom,
+                right: elementDims.right
             }
 
             const resizePickArea = () => {
@@ -99,24 +101,23 @@ class SidebarDocument extends SidebarPanel {
                 case 'top':
                     const currentHeight = ((wsDim - currentDims.bottom) - currentDims.top);
                     const newTop = ((wsDim / 2) + parseInt(input.value))
-                    element.style.top = newTop + 'px';
-                    element.style.bottom = (wsDim - (newTop + currentHeight)) + 'px';
+                    element.setProp('top', newTop)
+                    element.setProp('bottom',wsDim - (newTop + currentHeight))
                     resizePickArea()
                     break;
                 case 'left':
                     const currentWidth = ((wsDim - currentDims.right) - currentDims.left);
                     const newLeft = ((wsDim / 2) + parseInt(input.value))
-                    element.style.left = newLeft + 'px';
-                    element.style.right = (wsDim - (newLeft + currentWidth)) + 'px';
+                    element.setProp('left', newLeft)
+                    element.setProp('right',wsDim - (newLeft + currentWidth))
                     resizePickArea()
                     break;
                 case 'width':
-
-                    element.style.right = (wsDim - (currentDims.left + parseInt(input.value))) + 'px';
+                    element.setProp('right', wsDim - (currentDims.left + parseInt(input.value)))
                     resizePickArea()
                     break;
                 case 'height':
-                    element.style.bottom = (wsDim - (currentDims.top + parseInt(input.value))) + 'px';
+                    element.setProp('bottom', wsDim - (currentDims.top + parseInt(input.value)))
                     resizePickArea()
                     break;
             }
@@ -153,12 +154,13 @@ class SidebarDocument extends SidebarPanel {
             this.disableInputs();
 
             const wsDim = this.app.workspace.viewportDim;
-            const realLeft = pxWidthToNumber(element.style.left)
-            const realTop = pxWidthToNumber(element.style.top)
+            const elementDims = element.getDimensions()
+            const realLeft = elementDims.left
+            const realTop = elementDims.top
             topInput.value = realTop - (wsDim / 2)
             leftInput.value = realLeft - (wsDim / 2)
-            widthInput.value = (wsDim - pxWidthToNumber(element.style.right)) - realLeft
-            heightInput.value = (wsDim - pxWidthToNumber(element.style.bottom)) - realTop
+            widthInput.value = (wsDim - elementDims.right) - realLeft
+            heightInput.value = (wsDim - elementDims.bottom) - realTop
         }
 
         this.onPickModStart = (e) => {
