@@ -184,21 +184,9 @@ class ToolSelect extends Tool {
       this.firePickChangeEvent()
     }
 
-    // defines if an element should be added or not to the elements being modified
-    this.pickRegister = (element) => {
+    this.pickStartUpdate = () => {
       const viewportDim = this.appReference.workspace.viewportDim
-      if (element.picked) {
-        if (this.isAdding) {
-          this.removeFormPick(element)
-        }
-      } else {
-        // if no shift key is pressed, clear the pick
-        if (!this.isAdding) {
-          this.deselectAll()
-        }
-        // and add the element to the pick
-        this.addToPick(element)
-      }
+
       this.pickStart = this.pick.map((element) => {
         const left = parseInt(element.style.left.replace('px', ''), 10)
         const top = parseInt(element.style.top.replace('px', ''), 10)
@@ -211,6 +199,23 @@ class ToolSelect extends Tool {
           bottom: viewportDim - (top + element.offsetHeight)
         }
       })
+    }
+
+    // defines if an element should be added or not to the elements being modified
+    this.pickRegister = (element) => {
+      if (element.picked) {
+        if (this.isAdding) {
+          this.removeFormPick(element)
+        }
+      } else {
+        // if no shift key is pressed, clear the pick
+        if (!this.isAdding) {
+          this.deselectAll()
+        }
+        // and add the element to the pick
+        this.addToPick(element)
+      }
+      this.pickStartUpdate();
     }
     this.deselectAll = () => {
       for (const element of this.pick) {
@@ -627,11 +632,17 @@ class ToolSelect extends Tool {
 
         } else { // no shift means i am clearing the selection and starting with an element
 
-          this.deselectAll() // clear the pick
+          if (this.pick.includes(element)) {
+            // just move
+          } else {
 
-          this.pickRegister(element)
+            this.deselectAll() // clear the pick
 
-          this.firePickChangeEvent(); // fire the change event
+            this.pickRegister(element)
+
+            this.firePickChangeEvent(); // fire the change event
+
+          }
 
         }
 
@@ -794,13 +805,14 @@ class ToolSelect extends Tool {
         const ws = e.target
 
         this.dragCoveredElements.forEach(element => {
-          console.log(this.pickBeforeDrag)
-          if (this.pickBeforeDrag.includes(element)) {
-            console.log('woot')
-            this.removeFormPick(element)
-          } else {
-            this.addToPick(element)
-          }
+          // if (this.pickBeforeDrag.includes(element)) {
+          //   this.removeFormPick(element)
+          // } else {
+          //   this.addToPick(element)
+          // }
+          this.isAdding = true;
+          this.pickRegister(element)
+          this.isAdding = false;
         })
 
         this.pickBeforeDrag = [];
@@ -813,6 +825,10 @@ class ToolSelect extends Tool {
 
         ws.inputAreaClear()
       }
+
+      // update pickstart
+
+      this.pickStartUpdate();
 
       if (this.pick.length > 0) {
         this.pickAreaElement.style.opacity = 1
