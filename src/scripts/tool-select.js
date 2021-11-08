@@ -158,17 +158,12 @@ class ToolSelect extends Tool {
         const right = viewportDim - (lowestX + width)
         const bottom = viewportDim - (lowestY + height)
 
-        // this.pickAreaElement.style.left = left + 'px'
-        // this.pickAreaElement.style.top = top + 'px'
-        // this.pickAreaElement.style.right = right + 'px'
-        // this.pickAreaElement.style.bottom = bottom + 'px'
         this.pickAreaElement.setDimension('left',left);
         this.pickAreaElement.setDimension('top',top);
         this.pickAreaElement.setDimension('right',right);
         this.pickAreaElement.setDimension('bottom',bottom);
       } else {
         this.pickAreaElement.setDimension('opacity',0);
-        // this.pickAreaElement.style.opacity = 0
       }
     }
 
@@ -350,7 +345,6 @@ class ToolSelect extends Tool {
             element.setProp(end, newEnd)// add filtering/grid here
           })
           this.pickAreaElement.setDimension(end, pickAreaEnd);
-          // this.pickAreaElement.style[end] = Math.round(pickAreaEnd) + 'px'
 
           // store the doc
           this.appReference.storeDocument()
@@ -405,7 +399,6 @@ class ToolSelect extends Tool {
           })
 
           this.pickAreaElement.setDimension(start, pickAreaStart);
-          // this.pickAreaElement.style[start] = pickAreaStart + 'px'
 
           // store the doc
           this.appReference.storeDocument()
@@ -434,7 +427,6 @@ class ToolSelect extends Tool {
         e.stopPropagation()
 
         this.pickAreaElement.setDimension('opacity',0)
-        // this.pickAreaElement.style.opacity = 0
 
         const zoomScale = this.appReference.zoomScale
 
@@ -444,8 +436,6 @@ class ToolSelect extends Tool {
           x: null,
           y: null
         }
-
-        // const filteredCoords = coordsFilterFn({ left: e.clientX, top: e.clientY }, this.appReference.gridActive, this.appReference.gridSize, this.appReference.zoomScale, false);
 
         if (this.resizeV === 's') {
           const areaStartHeight = (viewportDim - areaStart.top) - areaStart.bottom
@@ -490,7 +480,6 @@ class ToolSelect extends Tool {
         e.preventDefault()
         e.stopPropagation()
 
-        // this.pickAreaElement.style.opacity = 1
         this.pickAreaElement.setDimension('opacity',1)
 
         this.resizing = false
@@ -707,7 +696,6 @@ class ToolSelect extends Tool {
       //   const altKey = e.detail.mouseEvent.altKey
       if (!this.pickAreaHidden) {
         this.pickAreaElement.setDimension('opacity',0);
-        //this.pickAreaElement.style.opacity = 0
       }
 
       // i have to determine if this is a dragselect to either move or manage the pick
@@ -838,8 +826,7 @@ class ToolSelect extends Tool {
           this.pickRegister(element)
         })
 
-        this.pickAreaElement.setDimension('opacity',1);
-        // this.pickAreaElement.style.opacity = 1
+        this.pickAreaElement.setDimension('opacity',1)
         this.pickAreaHidden = false
       })
 
