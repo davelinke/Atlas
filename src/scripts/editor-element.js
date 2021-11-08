@@ -72,7 +72,8 @@ class EditorElement extends HTMLElement {
     this.setProp = (prop, value) => {
       this.states[this.currentState][prop] = value
       this.setAttribute(`data-states-${this.currentState}`, JSON.stringify(this.states[this.currentState]))
-      this.style[prop] = value + propUnitsJs[prop]
+      const units = propUnitsJs[prop]?propUnitsJs[prop]:'';
+      this.style[prop] = value + units
     }
 
     // attach shadow dom

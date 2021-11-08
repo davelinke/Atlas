@@ -77,6 +77,10 @@ class EditorApp extends HTMLElement {
       element.onHandShake && element.onHandShake(this)
     })
 
+    this.addEventListener('storeDocument', (e) => {
+      this.storeDocument();
+    })
+
     this.addEventListener('toolChange', (e) => {
       this.toolActive = e.detail
       this.toolActive.activateTool(this)

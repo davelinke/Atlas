@@ -1,5 +1,5 @@
 import SidebarPanel from './sidebar-panel.js'
-import { createNumInput } from './lib-utils.js'
+import { createInput as ci } from './lib-utils.js'
 import { fireEvent } from './lib-events.js'
 
 const Css = `
@@ -33,12 +33,14 @@ class SidebarDocument extends SidebarPanel {
   constructor () {
     super()
     this.mainHeading = 'Element'
+
     this.pickLengthShow = function (pick) {
       return pick.length === 1
     }
+
     this.isDefaultPanel = false
 
-    this.createInput = (name, initial, icon = null) => {
+    this.createInput = (name, initial, icon = null, type = 'number') => {
       const wrap = document.createElement('div')
       wrap.classList.add('input-wrap')
       wrap.setAttribute('title', name)
@@ -46,7 +48,8 @@ class SidebarDocument extends SidebarPanel {
       label.classList.add('input-label')
       label.setAttribute('for', name)
       label.innerHTML = icon || initial
-      const input = createNumInput(name)
+
+      const input = ci(type,name);
 
       wrap.appendChild(label)
       wrap.appendChild(input)
@@ -56,25 +59,64 @@ class SidebarDocument extends SidebarPanel {
       return input
     }
 
-    const topInput = this.createInput('top', 'T')
-
-    const leftInput = this.createInput('left', 'L')
-
-    const widthInput = this.createInput('width', 'W')
-
-    const heightInput = this.createInput('height', 'H')
-
     this.shadowAppend = (elements) => {
       elements.forEach(element => {
         this._shadow.appendChild(element)
       })
     }
 
-    const styles = document.createElement('style')
-    styles.innerHTML = Css
-    this.shadowAppend([styles])
 
-    this.inputs = [topInput, leftInput, heightInput, widthInput]
+    this.disableInputs = () => {
+      this.inputs.forEach(input => {
+        input.setAttribute('disabled', 'disabled')
+      })
+    }
+
+    this.enableInputs = () => {
+      this.inputs.forEach(input => {
+        input.removeAttribute('disabled')
+      })
+    }
+
+    this.modifyLayoutInputs = (element) => {
+      this.disableInputs()
+
+      const wsDim = this.app.workspace.viewportDim
+      const elementDims = element.getDimensions()
+      const realLeft = elementDims.left
+      const realTop = elementDims.top
+      topInput.value = realTop - (wsDim / 2)
+      leftInput.value = realLeft - (wsDim / 2)
+      widthInput.value = (wsDim - elementDims.right) - realLeft
+      heightInput.value = (wsDim - elementDims.bottom) - realTop
+      colorInput.value = elementDims.backgroundColor
+      borderColorInput.value = elementDims.borderColor
+    }
+
+    this.onPickModStart = (e) => {
+      const pick = e.detail
+      if (pick.length > 0 && pick.length < 2) {
+        this.disableInputs()
+      }
+    }
+
+    this.onPickModEnd = (e) => {
+      const pick = e.detail
+      if (pick.length > 0 && pick.length < 2) {
+        const element = pick[0]
+        this.modifyLayoutInputs(element)
+        this.enableInputs()
+      }
+    }
+
+    this.onPickChange = function (e) {
+      const pick = e.detail
+      this.pick = pick
+      if (pick.length > 0 && pick.length < 2) {
+        const element = pick[0]
+        this.modifyLayoutInputs(element)
+      }
+    }
 
     this.modifyElement = (e) => {
       const input = e.target
@@ -123,8 +165,32 @@ class SidebarDocument extends SidebarPanel {
           resizePickArea()
           break
         }
+        default: {
+          element.setProp(dimension, input.value)
+          fireEvent(this, 'storeDocument', null)
+        }
       }
     }
+
+    // STRUCTURE
+
+    const styles = document.createElement('style')
+    styles.innerHTML = Css
+    this.shadowAppend([styles])
+
+    const topInput = this.createInput('top', 'T')
+
+    const leftInput = this.createInput('left', 'L')
+
+    const widthInput = this.createInput('width', 'W')
+
+    const heightInput = this.createInput('height', 'H')
+
+    const colorInput = this.createInput('backgroundColor', 'BG', null,'color')
+
+    const borderColorInput = this.createInput('borderColor', 'BD', null,'color')
+
+    this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput]
 
     this.inputs.forEach(input => {
       input.addEventListener('focus', (e) => {
@@ -132,63 +198,12 @@ class SidebarDocument extends SidebarPanel {
       })
 
       input.addEventListener('change', this.modifyElement)
+      input.addEventListener('input', this.modifyElement)
 
       input.addEventListener('blur', (e) => {
         fireEvent(this, 'toggleKeyboardShortcuts', true)
       })
     })
-
-    // this.shadowAppend(this.inputs);
-
-    this.disableInputs = () => {
-      this.inputs.forEach(input => {
-        input.setAttribute('disabled', 'disabled')
-      })
-    }
-
-    this.enableInputs = () => {
-      this.inputs.forEach(input => {
-        input.removeAttribute('disabled')
-      })
-    }
-
-    this.modifyLayoutInputs = (element) => {
-      this.disableInputs()
-
-      const wsDim = this.app.workspace.viewportDim
-      const elementDims = element.getDimensions()
-      const realLeft = elementDims.left
-      const realTop = elementDims.top
-      topInput.value = realTop - (wsDim / 2)
-      leftInput.value = realLeft - (wsDim / 2)
-      widthInput.value = (wsDim - elementDims.right) - realLeft
-      heightInput.value = (wsDim - elementDims.bottom) - realTop
-    }
-
-    this.onPickModStart = (e) => {
-      const pick = e.detail
-      if (pick.length > 0 && pick.length < 2) {
-        this.disableInputs()
-      }
-    }
-
-    this.onPickModEnd = (e) => {
-      const pick = e.detail
-      if (pick.length > 0 && pick.length < 2) {
-        const element = pick[0]
-        this.modifyLayoutInputs(element)
-        this.enableInputs()
-      }
-    }
-
-    this.onPickChange = function (e) {
-      const pick = e.detail
-      this.pick = pick
-      if (pick.length > 0 && pick.length < 2) {
-        const element = pick[0]
-        this.modifyLayoutInputs(element)
-      }
-    }
   }
 
   async onInit () {
