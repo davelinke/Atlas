@@ -12,7 +12,7 @@ class ToolRectangle extends Tool {
     // PROPS
     this.name = 'rectangle'
 
-    this.icon = 'crop_din'
+    this.iconClass = 'fa-regular fa-square'
 
     // STATE
 

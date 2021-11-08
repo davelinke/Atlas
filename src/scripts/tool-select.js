@@ -84,7 +84,7 @@ class ToolSelect extends Tool {
 
     this.name = 'select'
     this.icon = 'near_me'
-    this.iconClass = 'reflect'
+    this.iconClass = 'fa-solid fa-arrow-pointer'
     this.key = 'v'
 
     this.isAdding = false

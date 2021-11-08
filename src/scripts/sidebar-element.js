@@ -1,9 +1,9 @@
 import SidebarPanel from './sidebar-panel.js'
-import { createInput as ci } from './lib-utils.js'
 import { fireEvent } from './lib-events.js'
 
 const Css = `
-input[type=number] {
+input[type=number],
+input[type=color] {
     width: 50px;
     border: none;
     background-color: #efefef;
@@ -17,8 +17,6 @@ input[type=number][disabled]{
 }
 .input-wrap{
     display: inline-flex;
-    margin-inline-end: 1rem;
-    margin-block-end: 0.5rem;
 }
 .input-label{
     display: inline-flex;
@@ -39,25 +37,6 @@ class SidebarDocument extends SidebarPanel {
     }
 
     this.isDefaultPanel = false
-
-    this.createInput = (name, initial, icon = null, type = 'number') => {
-      const wrap = document.createElement('div')
-      wrap.classList.add('input-wrap')
-      wrap.setAttribute('title', name)
-      const label = document.createElement('label')
-      label.classList.add('input-label')
-      label.setAttribute('for', name)
-      label.innerHTML = icon || initial
-
-      const input = ci(type,name);
-
-      wrap.appendChild(label)
-      wrap.appendChild(input)
-
-      this._shadow.appendChild(wrap)
-
-      return input
-    }
 
     this.shadowAppend = (elements) => {
       elements.forEach(element => {
@@ -91,6 +70,7 @@ class SidebarDocument extends SidebarPanel {
       heightInput.value = (wsDim - elementDims.bottom) - realTop
       colorInput.value = elementDims.backgroundColor
       borderColorInput.value = elementDims.borderColor
+      opacityInput.value = elementDims.opacity? elementDims.opacity : 1
     }
 
     this.onPickModStart = (e) => {
@@ -178,19 +158,102 @@ class SidebarDocument extends SidebarPanel {
     styles.innerHTML = Css
     this.shadowAppend([styles])
 
-    const topInput = this.createInput('top', 'T')
+    const topInput = this.createInput({
+      input: {
+        name: 'top',
+        type: 'number'
+      },
+      label: {
+        initial: 'T',
+      }
+    })
 
-    const leftInput = this.createInput('left', 'L')
+    const leftInput = this.createInput(
+      {
+        input: {
+          name: 'left',
+          type: 'number'
+        },
+        label: {
+          initial: 'L',
+        }
+      }
+    )
 
-    const widthInput = this.createInput('width', 'W')
+    const widthInput = this.createInput({
+      input: {
+        name: 'width',
+        type: 'number'
+      },
+      label: {
+        initial: 'W',
+      }
+    })
 
-    const heightInput = this.createInput('height', 'H')
+    const heightInput = this.createInput({
+      input: {
+        name: 'height',
+        type: 'number'
+      },
+      label: {
+        initial: 'H',
+      }
+    })
 
-    const colorInput = this.createInput('backgroundColor', 'BG', null,'color')
+    this.addSeparator();
 
-    const borderColorInput = this.createInput('borderColor', 'BD', null,'color')
+    this.addHeading('Fill');
 
-    this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput]
+    const opacityInput = this.createInput({
+      //'opacity', 'BG', 'fa-regular fa-eye' ,'range'
+      wrap:{
+        class: 'span-2'
+      },
+      input: {
+        name: 'opacity',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        initial: 1
+      },
+      label: {
+        initial: 'O',
+        icon: 'fa-regular fa-eye'
+      }
+    })
+
+    this.addSeparator();
+
+    this.addHeading('Fill');
+
+    const colorInput = this.createInput({
+      //'backgroundColor', 'BG', null,'color'
+      input: {
+        name: 'backgroundColor',
+        type: 'color',
+      },
+      label: {
+        initial: 'BG',
+      }
+    })
+
+    this.addSeparator();
+
+    this.addHeading('Border');
+
+    const borderColorInput = this.createInput({
+      //'borderColor', 'BD', null,'color'
+      input: {
+        name: 'borderColor',
+        type: 'color',
+      },
+      label: {
+        initial: 'BD',
+      }
+    })
+
+    this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput]
 
     this.inputs.forEach(input => {
       input.addEventListener('focus', (e) => {
