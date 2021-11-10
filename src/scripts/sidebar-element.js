@@ -1,5 +1,6 @@
 import SidebarPanel from './sidebar-panel.js'
 import { fireEvent } from './lib-events.js'
+import { LoadParticles } from "./lib-loader.js";
 
 const Css = `
 input[type=number],
@@ -32,6 +33,8 @@ class SidebarDocument extends SidebarPanel {
     super()
     this.mainHeading = 'Element'
 
+    LoadParticles(['ptc-color-picker']);
+
     this.pickLengthShow = function (pick) {
       return pick.length === 1
     }
@@ -59,7 +62,6 @@ class SidebarDocument extends SidebarPanel {
 
     this.modifyLayoutInputs = (element) => {
       this.disableInputs()
-
       const wsDim = this.app.workspace.viewportDim
       const elementDims = element.getDimensions()
       const realLeft = elementDims.left
@@ -69,6 +71,7 @@ class SidebarDocument extends SidebarPanel {
       widthInput.value = (wsDim - elementDims.right) - realLeft
       heightInput.value = (wsDim - elementDims.bottom) - realTop
       colorInput.value = elementDims.backgroundColor
+
       borderColorInput.value = elementDims.borderColor
       opacityInput.value = elementDims.opacity? elementDims.opacity : 1
     }
@@ -146,7 +149,8 @@ class SidebarDocument extends SidebarPanel {
           break
         }
         default: {
-          element.setProp(dimension, input.value)
+          const value = input.value ? input.value : (e.detail ? e.detail.value : null);
+          element.setProp(dimension, value)
           fireEvent(this, 'storeDocument', null)
         }
       }
@@ -202,7 +206,7 @@ class SidebarDocument extends SidebarPanel {
 
     this.addSeparator();
 
-    this.addHeading('Fill');
+    this.addHeading('Opacity');
 
     const opacityInput = this.createInput({
       //'opacity', 'BG', 'fa-regular fa-eye' ,'range'
@@ -227,31 +231,19 @@ class SidebarDocument extends SidebarPanel {
 
     this.addHeading('Fill');
 
-    const colorInput = this.createInput({
-      //'backgroundColor', 'BG', null,'color'
-      input: {
-        name: 'backgroundColor',
-        type: 'color',
-      },
-      label: {
-        initial: 'BG',
-      }
-    })
+    const colorInput = document.createElement('ptc-color-picker');
+    colorInput.setAttribute('name','backgroundColor');
+    colorInput.classList.add('span-2')
+    this.grid.appendChild(colorInput)
 
     this.addSeparator();
 
     this.addHeading('Border');
 
-    const borderColorInput = this.createInput({
-      //'borderColor', 'BD', null,'color'
-      input: {
-        name: 'borderColor',
-        type: 'color',
-      },
-      label: {
-        initial: 'BD',
-      }
-    })
+    const borderColorInput = document.createElement('ptc-color-picker');
+    borderColorInput.setAttribute('name','borderColor');
+    borderColorInput.classList.add('span-2')
+    this.grid.appendChild(borderColorInput)
 
     this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput]
 
