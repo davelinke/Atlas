@@ -26,6 +26,10 @@ input[type=number][disabled]{
     justify-content: center;
     font-size: 12px;
 }
+select{
+  border: none;
+  background-color: #efefef;
+}
 `
 
 class SidebarDocument extends SidebarPanel {
@@ -34,6 +38,7 @@ class SidebarDocument extends SidebarPanel {
     this.mainHeading = 'Element'
 
     LoadParticles(['ptc-color-picker']);
+    LoadParticles(['ptc-shadow-picker']);
 
     this.pickLengthShow = function (pick) {
       return pick.length === 1
@@ -71,9 +76,13 @@ class SidebarDocument extends SidebarPanel {
       widthInput.value = (wsDim - elementDims.right) - realLeft
       heightInput.value = (wsDim - elementDims.bottom) - realTop
       colorInput.value = elementDims.backgroundColor
+      borderWidthInput.value = elementDims.borderWidth
+      borderStyleInput.value = elementDims.borderStyle
 
       borderColorInput.value = elementDims.borderColor
       opacityInput.value = elementDims.opacity? elementDims.opacity : 1
+      // shadowInput.value = elementDims.boxShadow
+      shadowInput.value = 'inset 0 3px 3px 0 rgba(0,0,0,0.1), 0 0 0 2px rgb(255,255,255), 1px 1px 1px 0 rgba(0,0,0,0.3)'
     }
 
     this.onPickModStart = (e) => {
@@ -234,6 +243,7 @@ class SidebarDocument extends SidebarPanel {
     const colorInput = document.createElement('ptc-color-picker');
     colorInput.setAttribute('name','backgroundColor');
     colorInput.classList.add('span-2')
+    colorInput.setAttribute('initial', 'C')
     this.grid.appendChild(colorInput)
 
     this.addSeparator();
@@ -242,10 +252,49 @@ class SidebarDocument extends SidebarPanel {
 
     const borderColorInput = document.createElement('ptc-color-picker');
     borderColorInput.setAttribute('name','borderColor');
+    borderColorInput.setAttribute('initial','C');
     borderColorInput.classList.add('span-2')
     this.grid.appendChild(borderColorInput)
 
-    this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput]
+    const borderWidthInput = this.createInput({
+      input: {
+        name: 'borderWidth',
+        type: 'number',
+        min: 0,
+      },
+      label: {
+        initial: 'W',
+      }
+    });
+
+    const borderStyleInput = document.createElement('select');
+    borderStyleInput.setAttribute('name','borderStyle');
+    borderStyleInput.addEventListener('change', (e) => {
+      this.modifyElement(e);
+    })
+    const borderOptions = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset'];
+    borderOptions.forEach(option => {
+      const optionEl = document.createElement('option');
+      optionEl.value = option;
+      optionEl.innerText = option;
+      borderStyleInput.appendChild(optionEl);
+    });
+
+
+    this.grid.appendChild(borderStyleInput);
+
+    this.addSeparator();
+
+    this.addHeading('Shadow');
+
+    const shadowInput = document.createElement('ptc-shadow-picker');
+    shadowInput.setAttribute('name','shadow');
+    shadowInput.classList.add('span-2')
+    this.grid.appendChild(shadowInput)
+    console.log(shadowInput)
+    shadowInput.value = '0px 0px 0px 0px rgba(0,0,0,0)';
+
+    this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput, borderWidthInput, shadowInput]
 
     this.inputs.forEach(input => {
       input.addEventListener('focus', (e) => {

@@ -35,6 +35,14 @@ const Css = `
     top:0;
     left:0;
 }
+
+.initial{
+    display: inline-flex;
+    width: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
 `
 export default class PtcColorPicker extends HTMLElement {
 
@@ -49,12 +57,28 @@ export default class PtcColorPicker extends HTMLElement {
 
         this._name = null;
 
+        this._initial = null;
+
+        Object.defineProperty(this, 'initial', {
+            get: () => {
+                return this._initial;
+            },
+            set: (val) => {
+                console.log(val)
+                if (val) {
+                    this._initial = val;
+                    this.setAttribute('initial', val);
+                } else {
+                    this.removeAttribute('initial');
+                }
+            }
+        })
+
         Object.defineProperty(this, 'name', {
             get: () => {
                 return this._name;
             },
             set: (val) => {
-                console.log(val);
                 if (val) {
                     this._name = val;
                     this.setAttribute('name', val);
@@ -126,6 +150,14 @@ export default class PtcColorPicker extends HTMLElement {
         styles.innerHTML = Css
         this._shadow.appendChild(styles)
 
+        this.initial = this.getAttribute('initial');
+        if (this.initial) {
+            const initial = document.createElement('div')
+            initial.classList.add('initial')
+            initial.innerHTML = this.initial
+            this._shadow.appendChild(initial)
+        }
+
         const swatchWrapper = document.createElement('div')
         swatchWrapper.classList.add('swatch-wrapper');
 
@@ -136,7 +168,6 @@ export default class PtcColorPicker extends HTMLElement {
         this.swatch.style.backgroundColor = this._color;
 
         this._name = this.getAttribute('name')
-        console.log(this._name)
 
         this.colorInput = document.createElement('input')
         this.colorInput.classList.add('color-input')
