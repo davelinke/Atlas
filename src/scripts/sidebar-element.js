@@ -81,8 +81,7 @@ class SidebarDocument extends SidebarPanel {
 
       borderColorInput.value = elementDims.borderColor
       opacityInput.value = elementDims.opacity? elementDims.opacity : 1
-      // shadowInput.value = elementDims.boxShadow
-      shadowInput.value = 'inset 0 3px 3px 0 rgba(0,0,0,0.1), 0 0 0 2px rgb(255,255,255), 1px 1px 1px 0 rgba(0,0,0,0.3)'
+      shadowInput.value = elementDims.boxShadow
     }
 
     this.onPickModStart = (e) => {
@@ -159,6 +158,7 @@ class SidebarDocument extends SidebarPanel {
         }
         default: {
           const value = input.value ? input.value : (e.detail ? e.detail.value : null);
+          console.log(dimension, value)
           element.setProp(dimension, value)
           fireEvent(this, 'storeDocument', null)
         }
@@ -285,14 +285,13 @@ class SidebarDocument extends SidebarPanel {
 
     this.addSeparator();
 
-    this.addHeading('Shadow');
+    this.addHeading('Shadows');
 
     const shadowInput = document.createElement('ptc-shadow-picker');
-    shadowInput.setAttribute('name','shadow');
+    shadowInput.setAttribute('name','boxShadow');
     shadowInput.classList.add('span-2')
     this.grid.appendChild(shadowInput)
-    console.log(shadowInput)
-    shadowInput.value = '0px 0px 0px 0px rgba(0,0,0,0)';
+    // shadowInput.value = '0px 0px 0px 0px rgba(0,0,0,0)';
 
     this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput, borderWidthInput, shadowInput]
 

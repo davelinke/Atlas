@@ -64,7 +64,6 @@ export default class PtcColorPicker extends HTMLElement {
                 return this._initial;
             },
             set: (val) => {
-                console.log(val)
                 if (val) {
                     this._initial = val;
                     this.setAttribute('initial', val);
