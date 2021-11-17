@@ -33,7 +33,7 @@ select{
 `
 
 class SidebarDocument extends SidebarPanel {
-  constructor () {
+  constructor() {
     super()
     this.mainHeading = 'Element'
 
@@ -80,8 +80,8 @@ class SidebarDocument extends SidebarPanel {
       borderStyleInput.value = elementDims.borderStyle
 
       borderColorInput.value = elementDims.borderColor
-      opacityInput.value = elementDims.opacity? elementDims.opacity : 1
-      shadowInput.value = elementDims.boxShadow
+      opacityInput.value = elementDims.opacity ? elementDims.opacity : 1
+      shadowInput.value = elementDims.boxShadow ? elementDims.boxShadow : null
     }
 
     this.onPickModStart = (e) => {
@@ -219,7 +219,7 @@ class SidebarDocument extends SidebarPanel {
 
     const opacityInput = this.createInput({
       //'opacity', 'BG', 'fa-regular fa-eye' ,'range'
-      wrap:{
+      wrap: {
         class: 'span-2'
       },
       input: {
@@ -241,7 +241,7 @@ class SidebarDocument extends SidebarPanel {
     this.addHeading('Fill');
 
     const colorInput = document.createElement('ptc-color-picker');
-    colorInput.setAttribute('name','backgroundColor');
+    colorInput.setAttribute('name', 'backgroundColor');
     colorInput.classList.add('span-2')
     colorInput.setAttribute('initial', 'C')
     this.grid.appendChild(colorInput)
@@ -251,8 +251,8 @@ class SidebarDocument extends SidebarPanel {
     this.addHeading('Border');
 
     const borderColorInput = document.createElement('ptc-color-picker');
-    borderColorInput.setAttribute('name','borderColor');
-    borderColorInput.setAttribute('initial','C');
+    borderColorInput.setAttribute('name', 'borderColor');
+    borderColorInput.setAttribute('initial', 'C');
     borderColorInput.classList.add('span-2')
     this.grid.appendChild(borderColorInput)
 
@@ -268,7 +268,7 @@ class SidebarDocument extends SidebarPanel {
     });
 
     const borderStyleInput = document.createElement('select');
-    borderStyleInput.setAttribute('name','borderStyle');
+    borderStyleInput.setAttribute('name', 'borderStyle');
     borderStyleInput.addEventListener('change', (e) => {
       this.modifyElement(e);
     })
@@ -285,13 +285,21 @@ class SidebarDocument extends SidebarPanel {
 
     this.addSeparator();
 
-    this.addHeading('Shadows');
+    const shadowHeading = this.addHeading('Shadows', true);
+    shadowHeading.addEventListener('click', () => {
+      const element = this.pick[0]
+      const elementDims = element.getDimensions()
+      const currentShadow = elementDims.boxShadow;
+      const newShadow = (currentShadow ? currentShadow + ', ' : '') + `0px 2px 3px 0 rgba(0,0,0, 0.25)`
+      element.setProp('boxShadow', newShadow)
+      fireEvent(this, 'storeDocument', null)
+      this.modifyLayoutInputs(element)
+    })
 
     const shadowInput = document.createElement('ptc-shadow-picker');
-    shadowInput.setAttribute('name','boxShadow');
+    shadowInput.setAttribute('name', 'boxShadow');
     shadowInput.classList.add('span-2')
     this.grid.appendChild(shadowInput)
-    // shadowInput.value = '0px 0px 0px 0px rgba(0,0,0,0)';
 
     this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput, borderWidthInput, shadowInput]
 
@@ -309,7 +317,7 @@ class SidebarDocument extends SidebarPanel {
     })
   }
 
-  async onInit () {
+  async onInit() {
 
   }
 }

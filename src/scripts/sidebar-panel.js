@@ -4,6 +4,8 @@ import { createInput as ci } from './lib-utils.js'
 const Css = `
 :host{
     font-family: inherit;
+    height: 100%;
+    display:block;
 }
 :host(.hidden){
     position: absolute;
@@ -33,6 +35,14 @@ h3{
   font-size: 0.75rem;
   text-transform: uppercase;
   grid-column: span 2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.heading button{
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 .border-bottom{
   border-bottom: 1px solid var(--sidebar-separator-border-color, #e0e0e0);
@@ -40,6 +50,10 @@ h3{
 .separator{
   border-bottom: 1px solid var(--sidebar-separator-border-color, #e0e0e0);
   grid-column: span 2;
+}
+.scroller{
+  height: 100%;
+  overflow-y: auto;
 }
 `
 class SidebarPanel extends HTMLElement {
@@ -104,11 +118,18 @@ class SidebarPanel extends HTMLElement {
       this.grid.appendChild(separator);
     }
 
-    this.addHeading = (text)=>{
+    this.addHeading = (text, addbutton = false)=>{
       const heading = document.createElement('div');
       heading.classList.add('heading');
       heading.innerHTML = text;
+      if(addbutton){
+        const button = document.createElement('button');
+        button.classList.add('add-button');
+        button.innerHTML = '<i class="fa-solid fa-plus"></i>';
+        heading.appendChild(button);
+      }
       this.grid.appendChild(heading);
+      return heading;
     }
 
     this.onHandShake = (app) => {

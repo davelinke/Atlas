@@ -15,7 +15,7 @@ const Css = `
     border-radius:3px;
     height:24px;
     overflow:hidden;
-    box-size:border-box;
+    box-sizing:border-box;
     border:1px solid #ccc;
 }
 .swatch{
