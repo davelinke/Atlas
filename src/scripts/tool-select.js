@@ -615,7 +615,8 @@ class ToolSelect extends Tool {
 
     this.inputStart = (e) => {
       const me = e.detail.mouseEvent
-      const element = this.getCompElement(e.detail.mouseEvent.path)
+      const ePath = me.path || (me.composedPath && me.composedPath());
+      const element = this.getCompElement(ePath)
       const shiftKey = e.detail.mouseEvent.shiftKey
       //   const ctrlKey = me.ctrlKey
       //   const altKey = me.altKey
@@ -627,7 +628,7 @@ class ToolSelect extends Tool {
         y: me.clientY
       }
 
-      this.modTask = this.getModTask(me.path)
+      this.modTask = this.getModTask(ePath)
 
       // to determine the future of the pick after the drag i have to compare it to it's actual state so let's hold it in memory
       this.pickBeforeDrag = [...this.pick]
