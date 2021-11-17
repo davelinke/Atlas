@@ -5,21 +5,36 @@ const Css = `
 .instance-container{
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-row-gap:0.75rem;
+    grid-row-gap:6px;
     font-size: 12px;
-    margin-block-start: 1.25rem;
+    margin-block-start: 8px;
+    background-color: #fbfbfb;
+    border-radius: 4px;
+    padding: 4px 6px 6px;
+    margin-inline: -6px;
 }
 .instance-container:first-child{
     margin-block-start: 0;
 }
+.input-container{
+    display:inline-flex;
+    background-color: #ffffff;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    height:24px;
+}
 input[type=number] {
-    width: 25px;
+    width: 100%;
     border: none;
-    background-color: #efefef;
+    background-color: transparent;
     border-radius: 3px;
     font-family: inherit;
     font-size: 12px;
-    padding: 0.25rem;
+    padding: 0 4px;
+    text-align: end;
+    outline: none;
+    height:100%;
 }
 input[type="number"] {
     -webkit-appearance: textfield;
@@ -31,19 +46,20 @@ input[type="number"] {
     -webkit-appearance: none;
   }
 label{
-    display: inline-block;
-    margin-inline: 4px;
+    padding-inline: 4px;
+    display: flex;
+    height: 100%;
+    align-items: center;
 }
 ptc-color-picker{
     flex:1 1 auto;
 }
 .iodiv{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     width: 100%;
-    grid-column: span 4;
     align-items: center;
     padding-inline-start: 11px;
+    justify-content: flex-end;
 }
 .iodiv > div {
     display:flex;
@@ -61,9 +77,6 @@ ptc-color-picker{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #fbfbfb;
-    padding: 4px 4px 4px 6px;
-    border-radius: 4px;
 }
 .shadow-header h4{
     margin:0;
@@ -77,6 +90,21 @@ ptc-color-picker{
     font-size: 14px;
     font-weight: bold;
     color: #333;
+    margin-top: -4px;
+    margin-right: -4px;
+    display: flex;
+    height: 24px;
+    width: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.input-rows{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-column: span 4;
+    grid-column-gap: 4px;
+    width: 100%;
 }
 `
 export default class PtcShadowPicker extends HTMLElement {
@@ -207,6 +235,7 @@ export default class PtcShadowPicker extends HTMLElement {
                     inputElement.min = min
                 }
                 const container = document.createElement('div')
+                container.classList.add('input-container')
                 container.appendChild(labelElement)
                 container.appendChild(inputElement)
                 return container
@@ -218,18 +247,23 @@ export default class PtcShadowPicker extends HTMLElement {
                 fireEvent(this, 'change', newValue);
             }
 
+            const inputRows = document.createElement('div');
+            inputRows.classList.add('input-rows')
+
+            instanceContainer.appendChild(inputRows)
+
             const hoi = createShadowInput('X', (e) => { changeShadowArg('horizontalOffset', e) }, instanceValue.horizontalOffset)
-            instanceContainer.appendChild(hoi)
+            inputRows.appendChild(hoi)
 
 
             const voi = createShadowInput('Y', (e) => { changeShadowArg('verticalOffset', e) }, instanceValue.verticalOffset)
-            instanceContainer.appendChild(voi)
+            inputRows.appendChild(voi)
 
             const bli = createShadowInput('B', (e) => { changeShadowArg('blur', e) }, instanceValue.blur, 0)
-            instanceContainer.appendChild(bli)
+            inputRows.appendChild(bli)
 
             const spi = createShadowInput('S', (e) => { changeShadowArg('spread', e) }, instanceValue.spread, 0)
-            instanceContainer.appendChild(spi)
+            inputRows.appendChild(spi)
 
             const cow = document.createElement('div');
             cow.classList.add('flex')
@@ -239,10 +273,6 @@ export default class PtcShadowPicker extends HTMLElement {
             if (attrName) {
                 this.name = attrName;
             }
-
-            const cowLabel = document.createElement('label')
-            cowLabel.innerHTML = 'C'
-            cow.appendChild(cowLabel)
 
             const coli = document.createElement('ptc-color-picker');
             coli.value = instanceValue.color;
@@ -268,7 +298,7 @@ export default class PtcShadowPicker extends HTMLElement {
                 const newValue = this.createShadowString()
                 fireEvent(this, 'change', newValue)
             })
-            instanceContainer.appendChild(iodiv)
+            cow.appendChild(iodiv)
 
             this.shadowsContainer.appendChild(instanceContainer)
         }
