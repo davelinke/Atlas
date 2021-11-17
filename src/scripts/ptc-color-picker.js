@@ -1,3 +1,4 @@
+import * as ColorPicker from './lib-color-picker.js'
 const Css = `
 :host{
     display: inline-flex;
@@ -10,16 +11,16 @@ const Css = `
         linear-gradient(-45deg, transparent 75%, #aaaaaa 75%);
     background-size:16px 16px;
     background-position:0 0,0 8px,8px -8px,8px 0px;
-    display: inline-block;
-    width: 48px;
+    display: block;
+    width: 32px;
     border-radius:3px;
     height:24px;
     overflow:hidden;
     box-sizing:border-box;
     border:1px solid #ccc;
+    flex: 0 0 auto;
 }
 .swatch{
-    position:relative;
     width:100%;
     height:100%;
 }
@@ -42,6 +43,24 @@ const Css = `
     align-items: center;
     justify-content: center;
     font-size: 12px;
+}
+.color-overlay{
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+
+    z-index: 1;
+    padding: 12px;
+    background-color: #fff;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 25%);
+    border-radius: 4px;
+    right:17px;
+
+    margin-block-start:26px;
+}
+.color-overlay.visible{
+    opacity:1;
+    pointer-events:auto;
 }
 `
 export default class PtcColorPicker extends HTMLElement {
@@ -97,16 +116,9 @@ export default class PtcColorPicker extends HTMLElement {
                     this._value = val;
                     this.setAttribute('value', val);
                     this.swatch.style.backgroundColor = val;
-                    
-                    // split between solid color and opacity
-                    const color = tinycolor(val);
-                    this._opacity = color.getAlpha();
-                    this.opacityInput.value = this._opacity;
+                    this.colorInput.value = val;
 
-                    const solidColor = color.setAlpha(1).toHexString();
-                    this.colorInput.value = solidColor;
-
-                    this._color = solidColor;
+                    this._color = val;
                 } else {
                     this.removeAttribute('value');
                     this.swatch.style.backgroundColor = 'transparent';
@@ -114,12 +126,8 @@ export default class PtcColorPicker extends HTMLElement {
             }
         })
 
-        this.setColor = ()=>{
-            const TinyColor = window.tinycolor;
-            const color = TinyColor(this._color);
-            color.setAlpha(this._opacity);
-
-            this.value = color.toRgbString();
+        this.setColor = () => {
+            this.value = this._color
             this.swatch.style.backgroundColor = this.value;
 
             this.dispatchEvent(new CustomEvent('change', {
@@ -135,11 +143,7 @@ export default class PtcColorPicker extends HTMLElement {
             this._color = e.target.value;
             this.setColor();
         }
-        this.onOpacityChange = (e) => {
-            this._opacity = e.target.value;
-            this.setColor();
-        }
-        
+
 
 
         // attach shadow dom
@@ -160,44 +164,47 @@ export default class PtcColorPicker extends HTMLElement {
         const swatchWrapper = document.createElement('div')
         swatchWrapper.classList.add('swatch-wrapper');
 
+        this.closeOverlay = (e)=>{
+            const path = e.path || (e.composedPath && e.composedPath());
+            if ((this.getAttribute('open') === 'true') && !path.includes(this.colorOverlay)) {
+                this.colorOverlay.classList.remove('visible')
+                this.removeAttribute('open');
+                document.removeEventListener('mousedown', this.closeOverlay);
+                document.removeEventListener('workspaceInputStart', this.closeOverlay);
+            }
+        }
+
         this.swatch = document.createElement('div')
         this.swatch.classList.add('swatch')
+        this.swatch.addEventListener('mousedown', (e) => {
+            this.colorOverlay.classList.add('visible')
+            this.setAttribute('open','true');
+            setTimeout(()=>{
+                document.addEventListener('mousedown', this.closeOverlay)
+                document.addEventListener('workspaceInputStart', this.closeOverlay)
+            },0)
+            
+        })
 
         this._color = this.getAttribute('value')
         this.swatch.style.backgroundColor = this._color;
 
         this._name = this.getAttribute('name')
 
-        this.colorInput = document.createElement('input')
-        this.colorInput.classList.add('color-input')
-        this.colorInput.type = 'color'
-        this.colorInput.value = this._color
-        this.colorInput.addEventListener('input', this.onColorChange)
-
-        this.swatch.appendChild(this.colorInput)
-
         swatchWrapper.appendChild(this.swatch)
-        
+
         this._shadow.appendChild(swatchWrapper);
 
-        this.opacityInput = document.createElement('input')
-        this.opacityInput.type = 'range'
-        this.opacityInput.min = 0
-        this.opacityInput.max = 1
-        this.opacityInput.step = 0.01
-        this.opacityInput.value = this._opacity
-        this.opacityInput.addEventListener('input', this.onOpacityChange)
+        this.colorOverlay = document.createElement('div');
+        this.colorOverlay.classList.add('color-overlay');
 
-        this._shadow.appendChild(this.opacityInput)
+
+        this.colorInput = document.createElement('color-picker')
+        this.colorInput.formats = ['hex', 'rgb', 'hsl']
+        this.colorInput.addEventListener('input', this.onColorChange)
+
+        this.colorOverlay.appendChild(this.colorInput)
+        this._shadow.appendChild(this.colorOverlay)
+
     }
-    connectedCallback() {
-    }
-
-    // static get observedAttributes () { return ['value'] }
-
-    // attributeChangedCallback (name, oldValue, newValue) {
-    //   if (this._attrChangeMethods[name]) {
-    //     this._attrChangeMethods[name](newValue, oldValue)
-    //   }
-    // }
 }

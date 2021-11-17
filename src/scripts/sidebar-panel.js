@@ -55,6 +55,29 @@ h3{
   height: 100%;
   overflow-y: auto;
 }
+.input-wrap{
+    display: inline-flex;
+    background-color: #efefef;
+    border-radius: 3px;
+    height: 23px;
+    align-items: center;
+    width: 100%;
+}
+.input-wrap > * {
+  height: 100%;
+  cursor: text;
+}
+.input-wrap.range-2{
+  background-color: transparent;
+  grid-column: span 2;
+}
+.input-label{
+    display: inline-flex;
+    padding: 0 4px;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
 `
 class SidebarPanel extends HTMLElement {
   constructor() {
@@ -82,23 +105,38 @@ class SidebarPanel extends HTMLElement {
       this.onPickModStart && this.onPickModStart(e)
     }
 
-    this.createInput = (args) => {
+    this.createInput = (args, appendTo = this.grid, unit = 'px') => {
       //name, initial, icon = null, type = 'number'
       const wrap = document.createElement('div')
       wrap.classList.add('input-wrap')
       args.wrap?.class ? wrap.classList.add(args.wrap.class) : null;
       wrap.setAttribute('title', args.input.name)
-      const label = document.createElement('label')
-      label.classList.add('input-label')
-      label.setAttribute('for', args.input.name)
-      label.innerHTML = args.label?.icon ? `<i class="${args.label.icon}"></i>` : args.label?.initial
 
       const input = ci(args.input);
+      if (args.label) {
+        const label = document.createElement('label')
+        label.classList.add('input-label')
+        label.setAttribute('for', args.input.name)
+        label.innerHTML = args.label?.icon ? `<i class="${args.label.icon}"></i>` : args.label?.initial
+        label.addEventListener('click', () => {
+          input.focus()
+        })
+        wrap.appendChild(label)
+      }
 
-      wrap.appendChild(label)
       wrap.appendChild(input)
 
-      this.grid.appendChild(wrap)
+      if (unit) {
+        const unitLabel = document.createElement('label')
+        unitLabel.classList.add('input-label')
+        unitLabel.innerHTML = unit
+        unitLabel.addEventListener('click', () => {
+          input.focus()
+        })
+        wrap.appendChild(unitLabel)
+      }
+
+      appendTo.appendChild(wrap)
 
       return input
     }
@@ -112,17 +150,17 @@ class SidebarPanel extends HTMLElement {
       }
     }
 
-    this.addSeparator = ()=>{
+    this.addSeparator = () => {
       const separator = document.createElement('div');
       separator.classList.add('separator');
       this.grid.appendChild(separator);
     }
 
-    this.addHeading = (text, addbutton = false)=>{
+    this.addHeading = (text, addbutton = false) => {
       const heading = document.createElement('div');
       heading.classList.add('heading');
       heading.innerHTML = text;
-      if(addbutton){
+      if (addbutton) {
         const button = document.createElement('button');
         button.classList.add('add-button');
         button.innerHTML = '<i class="fa-solid fa-plus"></i>';

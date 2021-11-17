@@ -34,6 +34,9 @@ label{
     display: inline-block;
     margin-inline: 4px;
 }
+ptc-color-picker{
+    flex:1 1 auto;
+}
 .iodiv{
     display: grid;
     grid-template-columns: 1fr 1fr;

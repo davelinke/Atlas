@@ -3,32 +3,43 @@ import { fireEvent } from './lib-events.js'
 import { LoadParticles } from "./lib-loader.js";
 
 const Css = `
-input[type=number],
-input[type=color] {
-    width: 50px;
+input[type=number]{
+    width: 24px;
     border: none;
-    background-color: #efefef;
-    border-radius: 3px;
+    background-color: transparent;
     font-family: inherit;
     font-size: 12px;
-    padding: 0.25rem;
+    padding: 0;
+    text-align: end;
+    outline: none;
+    flex:1 1 auto;
 }
 input[type=number][disabled]{
     opacity: 0.5;
 }
-.input-wrap{
-    display: inline-flex;
+input[type="number"] {
+  -webkit-appearance: textfield;
+     -moz-appearance: textfield;
+          appearance: textfield;
 }
-.input-label{
-    display: inline-flex;
-    width: 1.5rem;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none;
+}
+input[type="range"] {
+  flex: 1 1 auto;
 }
 select{
   border: none;
   background-color: #efefef;
+  border-radius: 3px;
+}
+.border-div {
+  display: grid;
+  justify-content: space-between;
+  grid-column: span 2;
+  grid-template-columns: 30px 1.5fr 1.5fr;
+  grid-column-gap: 8px;
 }
 `
 
@@ -220,7 +231,7 @@ class SidebarDocument extends SidebarPanel {
     const opacityInput = this.createInput({
       //'opacity', 'BG', 'fa-regular fa-eye' ,'range'
       wrap: {
-        class: 'span-2'
+        class: 'range-2'
       },
       input: {
         name: 'opacity',
@@ -229,12 +240,8 @@ class SidebarDocument extends SidebarPanel {
         max: 1,
         step: 0.01,
         initial: 1
-      },
-      label: {
-        initial: 'O',
-        icon: 'fa-regular fa-eye'
       }
-    })
+    },this.grid,false)
 
     this.addSeparator();
 
@@ -243,18 +250,19 @@ class SidebarDocument extends SidebarPanel {
     const colorInput = document.createElement('ptc-color-picker');
     colorInput.setAttribute('name', 'backgroundColor');
     colorInput.classList.add('span-2')
-    colorInput.setAttribute('initial', 'C')
     this.grid.appendChild(colorInput)
 
     this.addSeparator();
 
     this.addHeading('Border');
 
+    const borderDiv = document.createElement('div')
+    borderDiv.classList.add('border-div')
+    this.grid.appendChild(borderDiv)
+
     const borderColorInput = document.createElement('ptc-color-picker');
     borderColorInput.setAttribute('name', 'borderColor');
-    borderColorInput.setAttribute('initial', 'C');
-    borderColorInput.classList.add('span-2')
-    this.grid.appendChild(borderColorInput)
+    borderDiv.appendChild(borderColorInput)
 
     const borderWidthInput = this.createInput({
       input: {
@@ -265,7 +273,7 @@ class SidebarDocument extends SidebarPanel {
       label: {
         initial: 'W',
       }
-    });
+    }, borderDiv);
 
     const borderStyleInput = document.createElement('select');
     borderStyleInput.setAttribute('name', 'borderStyle');
@@ -281,7 +289,7 @@ class SidebarDocument extends SidebarPanel {
     });
 
 
-    this.grid.appendChild(borderStyleInput);
+    borderDiv.appendChild(borderStyleInput);
 
     this.addSeparator();
 
