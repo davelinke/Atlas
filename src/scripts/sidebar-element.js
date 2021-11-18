@@ -48,6 +48,7 @@ class SidebarDocument extends SidebarPanel {
     super()
     this.mainHeading = 'Element'
 
+    LoadParticles(['ptc-overlay']);
     LoadParticles(['ptc-color-picker']);
     LoadParticles(['ptc-shadow-picker']);
 

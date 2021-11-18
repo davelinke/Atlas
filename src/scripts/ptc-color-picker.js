@@ -1,4 +1,5 @@
 import * as ColorPicker from './lib-color-picker.js'
+import { LoadParticles } from './lib-loader.js'
 const Css = `
 :host{
     display: inline-flex;
@@ -67,6 +68,8 @@ export default class PtcColorPicker extends HTMLElement {
 
     constructor() {
         super();
+
+        LoadParticles(['ptc-overlay'])
 
         this._value = null;
 
@@ -176,15 +179,6 @@ export default class PtcColorPicker extends HTMLElement {
 
         this.swatch = document.createElement('div')
         this.swatch.classList.add('swatch')
-        this.swatch.addEventListener('mousedown', (e) => {
-            this.colorOverlay.classList.add('visible')
-            this.setAttribute('open','true');
-            setTimeout(()=>{
-                document.addEventListener('mousedown', this.closeOverlay)
-                document.addEventListener('workspaceInputStart', this.closeOverlay)
-            },0)
-            
-        })
 
         this._color = this.getAttribute('value')
         this.swatch.style.backgroundColor = this._color;
@@ -192,19 +186,21 @@ export default class PtcColorPicker extends HTMLElement {
         this._name = this.getAttribute('name')
 
         swatchWrapper.appendChild(this.swatch)
-
-        this._shadow.appendChild(swatchWrapper);
-
-        this.colorOverlay = document.createElement('div');
-        this.colorOverlay.classList.add('color-overlay');
-
+        swatchWrapper.setAttribute('slot','target')
 
         this.colorInput = document.createElement('color-picker')
+        this.colorInput.setAttribute('slot','content');
+        this.colorInput.style.margin = '8px'
         this.colorInput.formats = ['hex', 'rgb', 'hsl']
         this.colorInput.addEventListener('input', this.onColorChange)
 
-        this.colorOverlay.appendChild(this.colorInput)
-        this._shadow.appendChild(this.colorOverlay)
+        const colorPopover = document.createElement('ptc-overlay');
+        colorPopover.variant = 'popover';
+        colorPopover.height = '260px'
+        colorPopover.width = '256px'
+        colorPopover.appendChild(swatchWrapper)
+        colorPopover.appendChild(this.colorInput)
+        this._shadow.appendChild(colorPopover)
 
     }
 }

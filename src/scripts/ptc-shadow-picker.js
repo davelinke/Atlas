@@ -50,6 +50,7 @@ label{
     display: flex;
     height: 100%;
     align-items: center;
+    cursor:text;
 }
 ptc-color-picker{
     flex:1 1 auto;
@@ -234,6 +235,9 @@ export default class PtcShadowPicker extends HTMLElement {
                 if (min!==false) {
                     inputElement.min = min
                 }
+                labelElement.addEventListener('click', () => {
+                    inputElement.focus()
+                })
                 const container = document.createElement('div')
                 container.classList.add('input-container')
                 container.appendChild(labelElement)
