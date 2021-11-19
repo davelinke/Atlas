@@ -200,6 +200,9 @@ export default class PtcColorPicker extends HTMLElement {
         colorPopover.width = '256px'
         colorPopover.appendChild(swatchWrapper)
         colorPopover.appendChild(this.colorInput)
+        colorPopover.addEventListener('ptcShow', (e) => {
+            this.colorInput._valueChanged();
+        })
         this._shadow.appendChild(colorPopover)
 
     }
