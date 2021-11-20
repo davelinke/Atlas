@@ -156,14 +156,6 @@ export default class PtcColorPicker extends HTMLElement {
         styles.innerHTML = Css
         this._shadow.appendChild(styles)
 
-        this.initial = this.getAttribute('initial');
-        if (this.initial) {
-            const initial = document.createElement('div')
-            initial.classList.add('initial')
-            initial.innerHTML = this.initial
-            this._shadow.appendChild(initial)
-        }
-
         const swatchWrapper = document.createElement('div')
         swatchWrapper.classList.add('swatch-wrapper');
 
@@ -205,5 +197,22 @@ export default class PtcColorPicker extends HTMLElement {
         })
         this._shadow.appendChild(colorPopover)
 
+
+        for (const a of this.attributes) {
+            this[a.name] = a.value;
+        }
+
+        // this.initial = this.getAttribute('initial');
+        if (this.initial) {
+            const initial = document.createElement('div')
+            initial.classList.add('initial')
+            initial.innerHTML = this.initial
+            this._shadow.appendChild(initial)
+        }
+    }
+
+    connectedCallback() {
+
+        
     }
 }
