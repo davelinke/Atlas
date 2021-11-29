@@ -33,6 +33,9 @@ select{
   border: none;
   background-color: #efefef;
   border-radius: 3px;
+  padding: 0;
+  line-height: 0;
+  height: 23px;
 }
 .border-div {
   display: grid;

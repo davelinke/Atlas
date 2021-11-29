@@ -108,7 +108,7 @@ var pg = function (regExpLib, input) {
 
             // Position (optional).
             if (!!matchColorStop[2]) {
-                stopResult.position = matchColorStop[2];
+                stopResult.position = parseInt(matchColorStop[2])*1;
             }
             result.colorStopList.push(stopResult);
 

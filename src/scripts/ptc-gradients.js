@@ -1,5 +1,6 @@
 import { parseGradient } from './lib-gradients.js';
 import { fireEvent } from './lib-events.js';
+import angleImg from './img-angle.js';
 
 const Css = `
 .dialog{
@@ -31,6 +32,99 @@ const Css = `
     height:150px;
     border-radius: 2px;
 }
+.options{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-column-gap: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+}
+.options-direction{
+    display: none;
+}
+.linear .options-direction{
+    display: block;
+}
+
+.options-radial-type{
+    display: none;
+}
+.radial .options-radial-type{
+    display: block;
+}
+
+select{
+    border: none;
+    background-color: #efefef;
+    border-radius: 3px;
+    padding: 0;
+    line-height: 0;
+    height: 23px;
+    outline: none;
+    width: 100%;
+}
+.input-wrap {
+    display: inline-flex;
+    background-color: #efefef;
+    border-radius: 3px;
+    height: 23px;
+    align-items: center;
+    width: 100%;
+}
+.input-wrap > * {
+    height: 100%;
+    cursor: text;
+}
+.input-label {
+    display: inline-flex;
+    padding: 0 4px;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+input[type=number],
+input[type=text] {
+    width: 24px;
+    border: none;
+    background-color: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    padding: 0;
+    text-align: end;
+    outline: none;
+    flex: 1 1 auto;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.input-label {
+    display: inline-flex;
+    padding: 0 4px;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 12px;
+}
+.step{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #efefef;
+    margin-bottom: 8px;
+    padding: 4px;
+    align-items: center;
+    border-radius: 4px;
+}
+.step .input-wrap{
+    background-color: #fff;
+}
 `;
 
 export default class PtcGradients extends HTMLElement {
@@ -45,42 +139,118 @@ export default class PtcGradients extends HTMLElement {
             },
             set: (val) => {
                 this._value = val;
-                this.setGradient(val);
+                this.setGradient();
             }
         })
         this._type = 'linear';
+        Object.defineProperty(this, 'type', {
+            get: () => {
+                return this._type;
+            },
+            set: (val) => {
+                this._type = val;
+                const gradientString = this.generateGradientString();
+                this.value = gradientString;
+            }
+        })
+
+        this._angle = '90deg';
+        Object.defineProperty(this, 'angle', {
+            get: () => {
+                return this._angle;
+            },
+            set: (val) => {
+                this._angle = val;
+                this.angleInput.value = parseInt(val.replace('deg', ''));
+                this.setGradient();
+            }
+        })
+
+        this._radialType = 'ellipse';
+        Object.defineProperty(this, 'radialType', {
+            get: () => {
+                return this._radialType;
+            },
+            set: (val) => {
+                this._radialType = val;
+                const gradientString = this.generateGradientString();
+                this.value = gradientString;
+            }
+        })
 
         this.setGradient = () => {
-            this.sample.style.backgroundImage = this.value;
+            const sample = this.sample;
+            sample.style.backgroundImage = this.value;
             this.controls.style.backgroundImage = this.value;
         }
 
-        this.generateGradientString = (go) => {
-            let output = `linear-gradient(${go.angle}`
-            go.colorStopList.forEach((cs, i) => {
-                output += `, ${cs.color} ${cs.position}`
-            })
-            output += `)`
+        this.generateGradientObject = () => {
+            const steps = [];
+            this.steps.querySelectorAll('.step').forEach(step => {
+                const color = step.querySelector('ptc-color-picker').value;
+                const position = step.querySelector('.input-position').value;
+                steps.push({
+                    color,
+                    position
+                })
+            });
+            const go = {
+                angle: this.angle,
+                colorStopList: steps
+            }
+            return go;
+        };
+
+        this.generateGradientString = (go = this.generateGradientObject()) => {
+
+            const type = this.type;
+            let output = ``;
+
+            if (type === 'linear') {
+                output += `linear-gradient(${go.angle}`
+                go.colorStopList.forEach((cs, i) => {
+                    output += `, ${cs.color} ${cs.position}%`
+                })
+                output += `)`
+            }
+            if (type === 'radial') {
+                output += `radial-gradient(${this.radialType}`
+                go.colorStopList.forEach((cs, i) => {
+                    output += `, ${cs.color} ${cs.position}%`
+                })
+                output += `)`
+            }
+            if (type === 'conical') {
+                output += `conic-gradient(at 50% 50%`
+                go.colorStopList.forEach((cs, i) => {
+                    output += `, ${cs.color} ${cs.position*360/100}deg`
+                })
+                output += `)`
+            }
+            console.log(output)
             return output;
         }
 
         this.createSteps = () => {
             const go = parseGradient(this.value);
+            this.angle = go.angle;
             go.colorStopList.forEach((cs, i) => {
                 const step = document.createElement('div');
                 step.classList.add('step');
+                const position = parseInt(cs.position) * 1
+
                 step.innerHTML = `
                 <div><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
-                <div><input type="text" value="${cs.position}"/></div>
+                <div class="input-wrap"><label class="input-label">P</label><input class="input-position" type="number" min="0" max="100" value="${position}"/><label class="input-label">%</label></div>
                 `
                 const stepInput = step.querySelector('input');
 
                 stepInput.addEventListener('focus', (e) => {
-                  fireEvent(this, 'toggleKeyboardShortcuts', false)
+                    fireEvent(this, 'toggleKeyboardShortcuts', false)
                 })
-            
+
                 stepInput.addEventListener('blur', (e) => {
-                  fireEvent(this, 'toggleKeyboardShortcuts', true)
+                    fireEvent(this, 'toggleKeyboardShortcuts', true)
                 })
                 stepInput.addEventListener('change', (e) => {
                     const pos = e.target.value;
@@ -106,24 +276,34 @@ export default class PtcGradients extends HTMLElement {
         this._shadow.appendChild(styles)
 
         this.wrap = document.createElement('div')
-        this.wrap.classList.add('dialog')
+        this.wrap.setAttribute('class', 'dialog linear')
         this.wrap.innerHTML = `
 <div class="sample">
     <div class="sample-gradient"></div>
 </div>
 <div class="options">
-<div class="options-type">
-    <input type="radio" name="type" value="linear" id="linear" checked>
-    <label for="linear">Linear</label>
-    <input type="radio" name="type" value="radial" id="radial">
-    <label for="radial">Radial</label>
-    <input type="radio" name="type" value="conical" id="conical">
-    <label for="conical">Conical</label>
-</div>
-<div class="options-direction">
-    <input type="number" name="direction" value="0" id="direction"> °
-    <label for="direction">Angle</label>
-</div>
+    <div class="options-type">
+        <select id="type" name="type">
+            <option value="linear" selected>Linear</option>
+            <option value="radial">Radial</option>
+            <option value="conical">Conical</option>
+        </select>
+    </div>
+    <div class="options-radial-type">
+        <select id="radial-type" name="radial-type">
+            <option value="ellipse" selected>Ellipse</option>
+            <option value="circle">Circle</option>
+        </select>
+    </div>
+    <div class="options-direction">
+        <div class="input-wrap">
+            <label class="input-label" for="direction">
+                <img src="${angleImg}" width="12" height="12" alt="Angle" />
+            </label>
+            <input type="number" name="direction" value="0" id="direction">
+            <label class="input-label">°</label>
+        </div>
+    </div>
 </div>
 <div class="controls"></div>
 <div class="steps"></div>
@@ -132,6 +312,34 @@ export default class PtcGradients extends HTMLElement {
         this.sample = this.wrap.querySelector('.sample-gradient')
         this.controls = this.wrap.querySelector('.controls')
         this.steps = this.wrap.querySelector('.steps')
+        this.typeSelect = this.wrap.querySelector('#type')
+
+        this.typeSelect.addEventListener('change', (e) => {
+            const type = e.target.value;
+            this.wrap.setAttribute('class', `dialog ${type}`)
+            this.type = e.target.value;
+        })
+
+        this.angleInput = this.wrap.querySelector('#direction');
+        this.angleInput.addEventListener('focus', (e) => {
+            fireEvent(this, 'toggleKeyboardShortcuts', false)
+        })
+
+        this.angleInput.addEventListener('blur', (e) => {
+            fireEvent(this, 'toggleKeyboardShortcuts', true)
+        })
+        this.angleInput.addEventListener('change', (e) => {
+            const angle = e.target.value;
+            this.angle = angle + 'deg';
+            const val = this.generateGradientString();
+            console.log(val)
+            this.value = val
+        })
+
+        this.radialTypeSelect = this.wrap.querySelector('#radial-type')
+        this.radialTypeSelect.addEventListener('change', (e) => {
+            this.radialType = e.target.value;
+        })
 
         this.setGradient();
         this.createSteps();
