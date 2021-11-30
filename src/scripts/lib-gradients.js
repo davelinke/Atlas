@@ -108,7 +108,9 @@ var pg = function (regExpLib, input) {
 
             // Position (optional).
             if (!!matchColorStop[2]) {
-                stopResult.position = parseInt(matchColorStop[2])*1;
+                const posArray = matchColorStop[2].match(/(\d+)|\D+$/g)
+                stopResult.position = parseInt(posArray[0]);
+                stopResult.unit = posArray[1];
             }
             result.colorStopList.push(stopResult);
 
@@ -166,7 +168,69 @@ var test_this_thing = function () {
 };
 
 export const parseGradient = (gradient) => {
+    let gr = gradient;
     const regExpLib = generateRegExp();
-    return test_this_one(regExpLib, gradient);
+    let go = {};
+    go.repeat = new RegExp(/repeat/).test(gradient);
+    if (go.repeat) {
+        gr.replace('repeat-', '');
+    }
+    if (new RegExp(/conic-gradient/).test(gr)) {
+        go.type = 'conic';
+    } else if (new RegExp(/radial-gradient/).test(gr)) {
+        go.type = 'radial';
+        go.shape = new RegExp(/circle/).test(gr) ? 'circle' : null;
+        if (!go.shape) {
+            go.shape = new RegExp(/ellipse/).test(gr) ? 'ellipse' : null;
+        }
+        const hasPositioning = new RegExp(/at\s*/).test(gr);
+
+        if (!hasPositioning) {
+            go.position = {
+                x: {
+                    unit: '%',
+                    value: 50
+                },
+                y: {
+                    unit: '%',
+                    value: 50
+                }
+            }
+        }
+
+        if (go.shape || hasPositioning) {
+            const grMeat = gr.split('(');
+            const grPieces = grMeat[1].split(',');
+
+            if (hasPositioning) {
+                go.position = {}
+                const positionArray = grPieces[0].trim().split('at ')[1].split(' ');
+                if (positionArray.length === 1) {
+                    positionArray.push('50%');
+                }
+                positionArray.forEach((p, i) => {
+                    const posObj = i === 0 ? 'x' : 'y';
+                    go.position[posObj] = {};
+                    go.position[posObj].unit = p.match(/px/) ? 'px' : '%';
+                    go.position[posObj].value = parseFloat(p.replace(/px|%/g, ''));
+                });
+            }
+
+            grPieces.shift();
+            grMeat[1] = grPieces.join(',');
+            gr = grMeat.join('(');
+        }
+
+        if (!go.shape) {
+            go.shape = 'ellipse'
+        }
+        
+    } else {
+        go.type = 'linear';
+    }
+
+    go = { ...go, ...test_this_one(regExpLib, gr) };
+
+    return go
 }
-test_this_thing();
+// test_this_thing();

@@ -35,9 +35,10 @@ const Css = `
     height:150px;
     border-radius: 2px;
 }
-.options{
+.options,
+.settings{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-column-gap: 8px;
     margin-bottom: 8px;
     border-bottom: 1px solid #ccc;
@@ -46,7 +47,8 @@ const Css = `
 .options-direction{
     display: none;
 }
-.linear .options-direction{
+.linear .options-direction,
+.conical .options-direction{
     display: block;
 }
 
@@ -86,16 +88,9 @@ select{
     height: 100%;
     cursor: text;
 }
-.input-label {
-    display: inline-flex;
-    padding: 0 4px;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-}
 input[type=number],
 input[type=text] {
-    width: 24px;
+    width: 100%;
     border: none;
     background-color: transparent;
     font-family: inherit;
@@ -121,7 +116,7 @@ input[type="number"] {
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    line-height: 12px;
+    line-height: 13px;
 }
 .step{
     display: grid;
@@ -132,6 +127,9 @@ input[type="number"] {
     align-items: center;
     border-radius: 4px;
 }
+.step:last-child{
+    margin-bottom: 0;
+}
 .step .input-wrap{
     background-color: #fff;
 }
@@ -139,7 +137,7 @@ input[type="number"] {
     font-weight: 500;
     font-size: 0.75rem;
     text-transform: uppercase;
-    grid-column: span 2;
+    grid-column: span 4;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -150,14 +148,24 @@ input[type="number"] {
     border: none;
     cursor: pointer;
 }
+.unit{
+    cursor: pointer;
+    width: 12px;
+}
 `;
+
+const unitSymbols = {
+    'px': 'px',
+    '%': '%',
+    'deg': '°',
+}
 
 export default class PtcGradients extends HTMLElement {
 
     constructor() {
         super()
 
-        this._value = 'linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)'
+        this._value = 'radial-gradient(at 100%, rgba(255,0,0,1), rgba(0,255,0,1) 50%, rgba(0,0,255,1) 75%, rgba(255,0,0,1) 75%)'
         Object.defineProperty(this, 'value', {
             get: () => {
                 return this._value;
@@ -172,19 +180,39 @@ export default class PtcGradients extends HTMLElement {
             get: () => {
                 return this._type;
             },
-            set: (val) => {
-                this._type = val;
-                const gradientString = this.generateGradientString();
-                this.value = gradientString;
+            set: (val = 'linear') => {
+                // convert px values to percentages in conical only
+                const pxSteps = this.gradientObject.colorStopList.filter(cs => cs.unit === 'px')
+
+                if (val === 'conical' && pxSteps.length) {
+                    const confirm = window.confirm('Conical gradients cannot have px values. Convert to percentage?')
+                    if (confirm) {
+                        pxSteps.forEach(cs => {
+                            cs.unit = '%'
+                        })
+                        this._type = val;
+                        const gradientString = this.generateGradientString();
+                        this.value = gradientString;
+                        this.createSteps();
+                    } else {
+                        return
+                    }
+                } else {
+                    this._type = val;
+                    const gradientString = this.generateGradientString();
+                    this.value = gradientString;
+                }
+                this.wrap.setAttribute('class', `dialog ${this._type}`)
+                this.typeSelect.value = this._type;
             }
         })
 
-        this._angle = '90deg';
+        this._angle = '0deg';
         Object.defineProperty(this, 'angle', {
             get: () => {
                 return this._angle;
             },
-            set: (val) => {
+            set: (val = '0deg') => {
                 this._angle = val;
                 this.angleInput.value = parseInt(val.replace('deg', ''));
                 this.setGradient();
@@ -196,10 +224,12 @@ export default class PtcGradients extends HTMLElement {
             get: () => {
                 return this._radialType;
             },
-            set: (val) => {
+            set: (val = 'ellipse') => {
                 this._radialType = val;
                 const gradientString = this.generateGradientString();
                 this.value = gradientString;
+                console.log(val)
+                this.radialTypeSelect.value = this._radialType;
             }
         })
 
@@ -208,16 +238,69 @@ export default class PtcGradients extends HTMLElement {
             get: () => {
                 return this._repeat;
             },
-            set: (val) => {
+            set: (val = false) => {
                 this._repeat = val;
+                const gradientString = this.generateGradientString();
+                this.value = gradientString;
+                this.repeatCheckbox.checked = this._repeat;
+            }
+        })
+
+        this._positionX = 50;
+        Object.defineProperty(this, 'positionX', {
+            get: () => {
+                return this._positionX;
+            },
+            set: (val = 50) => {
+                this._positionX = val;
+                this.positionXInput.value = val;
+                const gradientString = this.generateGradientString();
+                this.value = gradientString;
+            }
+        })
+
+        this._positionXUnit = '%';
+        Object.defineProperty(this, 'positionXUnit', {
+            get: () => {
+                return this._positionXUnit;
+            },
+            set: (val = '%') => {
+                this._positionXUnit = val;
+                this.positionXUnitSelect.value = val;
+                const gradientString = this.generateGradientString();
+                this.value = gradientString;
+            }
+        })
+
+        this._positionY = 50;
+        Object.defineProperty(this, 'positionY', {
+            get: () => {
+                return this._positionY;
+            },
+            set: (val = 50) => {
+                this._positionY = val;
+                this.positionYInput.value = val;
+                const gradientString = this.generateGradientString();
+                this.value = gradientString;
+            }
+        })
+
+        this._positionYUnit = '%';
+        Object.defineProperty(this, 'positionYUnit', {
+            get: () => {
+                return this._positionYUnit;
+            },
+            set: (val = '%') => {
+                this._positionYUnit = val;
+                this.positionYUnitSelect.value = val;
                 const gradientString = this.generateGradientString();
                 this.value = gradientString;
             }
         })
 
         this.setGradient = () => {
-            const sample = this.sample;
-            sample.style.backgroundImage = this.value;
+            console.log(this.value)
+            this.sample.style.backgroundImage = this.value;
             this.controls.style.backgroundImage = this.value;
             fireEvent(this, 'change', this.value)
         }
@@ -227,59 +310,73 @@ export default class PtcGradients extends HTMLElement {
             this.steps.querySelectorAll('.step').forEach(step => {
                 const color = step.querySelector('ptc-color-picker').value;
                 const position = step.querySelector('.input-position').value;
+                const unit = step.querySelector('.unit').innerText;
                 steps.push({
                     color,
-                    position
+                    position,
+                    unit
                 })
             });
+
             const go = {
+                type: this.type,
                 angle: this.angle,
+                shape: this.radialType,
+                repeat: this.repeat,
+                positionX: this.positionX,
+                positionXUnit: this.positionXUnit,
+                positionY: this.positionY,
+                positionYUnit: this.positionYUnit,
                 colorStopList: steps
             }
+
             return go;
         };
 
         this.generateGradientString = (go = this.generateGradientObject()) => {
-
             const type = this.type;
             let output = ``;
 
             if (type === 'linear') {
                 output += `linear-gradient(${go.angle}`
                 go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position}%`
+                    output += `, ${cs.color} ${cs.position}${cs.unit}`
                 })
                 output += `)`
             }
             if (type === 'radial') {
                 output += this.repeat ? `repeating-` : ``
-                output += `radial-gradient(${this.radialType}`
+                output += `radial-gradient(`
+                output += this.radialType ? this.radialType : 'ellipse'
+                output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
+                output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
                 go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position}%`
+                    output += `, ${cs.color} ${cs.position}${cs.unit}`
                 })
                 output += `)`
             }
             if (type === 'conical') {
                 output += this.repeat ? `repeating-` : ``
-                output += `conic-gradient(at 50% 50%`
+                output += `conic-gradient(`
+                output += this.angle ? 'from ' + this.angle : 'from 0deg'
+                output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
+                output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
                 go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position*360/100}deg`
+                    output += `, ${cs.color} ${cs.position * 360 / 100}deg`
                 })
                 output += `)`
             }
-            console.log(output)
             return output;
         }
 
-        this.createStep = (cs, i)=>{
+        this.createStep = (cs, i) => {
             const go = this.gradientObject;
             const step = document.createElement('div');
             step.classList.add('step');
-            const position = parseInt(cs.position) * 1
 
             step.innerHTML = `
             <div><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
-            <div class="input-wrap"><label class="input-label">P</label><input class="input-position" type="number" min="0" max="100" value="${position}"/><label class="input-label">%</label></div>
+            <div class="input-wrap"><label class="input-label">P</label><input class="input-position" type="number" min="0" value="${cs.position ? cs.position : 0}"/><label class="input-label unit">${cs.unit ? cs.unit : '%'}</label></div>
             `
             const stepInput = step.querySelector('input');
 
@@ -296,6 +393,18 @@ export default class PtcGradients extends HTMLElement {
                 this.value = this.generateGradientString();
             });
 
+            const unitLabel = step.querySelector('.unit');
+            unitLabel.addEventListener('click', (e) => {
+                if (cs.unit === '%') {
+                    cs.unit = 'px';
+                    unitLabel.innerText = 'px';
+                } else {
+                    cs.unit = '%';
+                    unitLabel.innerText = '%';
+                }
+                this.value = this.generateGradientString();
+            })
+
             const colorInput = step.querySelector('ptc-color-picker');
             colorInput.addEventListener('change', (e) => {
                 const color = e.detail.value;
@@ -306,11 +415,12 @@ export default class PtcGradients extends HTMLElement {
             return step;
         }
 
-        this.addStep = ()=> {
+        this.addStep = () => {
             const go = this.gradientObject;
             const stepData = {
                 color: 'rgba(0,0,0,1)',
-                position: '100'
+                position: 100,
+                unit: '%'
             }
             go.colorStopList.push(stepData)
             const step = this.createStep(stepData, go.colorStopList.length - 1);
@@ -320,9 +430,21 @@ export default class PtcGradients extends HTMLElement {
 
         this.createSteps = () => {
             this.gradientObject = parseGradient(this.value);
+            console.log(this.gradientObject)
+
+            this.type = this.gradientObject.type;
+            this.shape = this.gradientObject.shape;
             this.angle = this.gradientObject.angle;
+            this.radialType = this.gradientObject.shape;
+            if (this.gradientObject.position) {
+                this.positionX = this.gradientObject.position.x.value;
+                this.positionXUnit = this.gradientObject.position.x.unit;
+                this.positionY = this.gradientObject.position.y?.value;
+                this.positionYUnit = this.gradientObject.position.y?.unit;
+            }
+            this.steps.innerHTML = '';
             this.gradientObject.colorStopList.forEach((cs, i) => {
-                const step = this.createStep(cs,i);
+                const step = this.createStep(cs, i);
                 this.steps.appendChild(step);
             });
         }
@@ -346,6 +468,7 @@ export default class PtcGradients extends HTMLElement {
     <div class="sample-gradient"></div>
 </div>
 <div class="options">
+<div class="heading">Type</div>
     <div class="options-type">
         <select id="type" name="type">
             <option value="linear" selected>Linear</option>
@@ -353,14 +476,14 @@ export default class PtcGradients extends HTMLElement {
             <option value="conical">Conical</option>
         </select>
     </div>
+</div>
+<div class="settings">
+    <div class="heading">Settings</div>
     <div class="options-radial-type">
         <select id="radial-type" name="radial-type">
             <option value="ellipse" selected>Ellipse</option>
             <option value="circle">Circle</option>
         </select>
-    </div>
-    <div class="options-repeat">
-        <input type="checkbox" id="repeat" name="repeat" /> <label for="repeat">Repeat</label>
     </div>
     <div class="options-direction">
         <div class="input-wrap">
@@ -370,6 +493,27 @@ export default class PtcGradients extends HTMLElement {
             <input type="number" name="direction" value="0" id="direction">
             <label class="input-label">°</label>
         </div>
+    </div>
+    <div class="options-position-x">
+        <div class="input-wrap">
+            <label class="input-label" for="position-x">
+                X
+            </label>
+            <input type="number" name="position-x" value="50" id="position-x">
+            <label class="input-label" id="position-x-unit">%</label>
+        </div>
+    </div>
+    <div class="options-position-y">
+        <div class="input-wrap">
+            <label class="input-label" for="position-y">
+                Y
+            </label>
+            <input type="number" name="position-y" value="50" id="position-y">
+            <label class="input-label" id="position-y-unit">%</label>
+        </div>
+    </div>
+    <div class="options-repeat">
+        <input type="checkbox" id="repeat" name="repeat" /> <label for="repeat">Repeat</label>
     </div>
 </div>
 <div class="controls"></div>
@@ -387,10 +531,7 @@ export default class PtcGradients extends HTMLElement {
             this.addStep()
         })
 
-
         this.typeSelect.addEventListener('change', (e) => {
-            const type = e.target.value;
-            this.wrap.setAttribute('class', `dialog ${type}`)
             this.type = e.target.value;
         })
 
@@ -406,7 +547,6 @@ export default class PtcGradients extends HTMLElement {
             const angle = e.target.value;
             this.angle = angle + 'deg';
             const val = this.generateGradientString();
-            console.log(val)
             this.value = val
         })
 
@@ -422,6 +562,42 @@ export default class PtcGradients extends HTMLElement {
         this.repeatCheckbox.nextSibling.addEventListener('click', (e) => {
             this.repeatCheckbox.checked = !this.repeatCheckbox.checked;
         });
+
+        this.positionXInput = this.wrap.querySelector('#position-x')
+        this.positionXInput.addEventListener('focus', (e) => {
+            fireEvent(this, 'toggleKeyboardShortcuts', false)
+        })
+        this.positionXInput.addEventListener('blur', (e) => {
+            fireEvent(this, 'toggleKeyboardShortcuts', true)
+        })
+        this.positionXInput.addEventListener('change', (e) => {
+            this.positionX = e.target.value;
+        })
+
+        this.positionXUnitSelect = this.wrap.querySelector('#position-x-unit')
+        this.positionXUnitSelect.addEventListener('click', (e) => {
+            const newUnit = e.target.innerText === '%' ? 'px' : '%';
+            this.positionXUnit = newUnit;
+            this.positionXUnitSelect.innerText = newUnit;
+        })
+
+        this.positionYInput = this.wrap.querySelector('#position-y')
+        this.positionYInput.addEventListener('focus', (e) => {
+            fireEvent(this, 'toggleKeyboardShortcuts', false)
+        })
+        this.positionYInput.addEventListener('blur', (e) => {
+            fireEvent(this, 'toggleKeyboardShortcuts', true)
+        })
+        this.positionYInput.addEventListener('change', (e) => {
+            this.positionY = e.target.value;
+        })
+
+        this.positionYUnitSelect = this.wrap.querySelector('#position-y-unit')
+        this.positionYUnitSelect.addEventListener('click', (e) => {
+            const newUnit = e.target.innerText === '%' ? 'px' : '%';
+            this.positionYUnit = newUnit;
+            this.positionYUnitSelect.innerText = newUnit;
+        })
 
         this.setGradient();
         this.createSteps();
