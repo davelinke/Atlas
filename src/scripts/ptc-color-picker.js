@@ -183,7 +183,7 @@ export default class PtcColorPicker extends HTMLElement {
         this.colorInput = document.createElement('color-picker')
         this.colorInput.setAttribute('slot','content');
         this.colorInput.style.margin = '8px'
-        this.colorInput.formats = ['hex', 'rgb', 'hsl']
+        this.colorInput.formats = ['rgb', 'hsl','hex']
         this.colorInput.addEventListener('input', this.onColorChange)
 
         const colorPopover = document.createElement('ptc-overlay');
