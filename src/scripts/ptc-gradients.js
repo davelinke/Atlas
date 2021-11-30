@@ -48,7 +48,7 @@ const Css = `
     display: none;
 }
 .linear .options-direction,
-.conical .options-direction{
+.conic .options-direction{
     display: block;
 }
 
@@ -61,7 +61,7 @@ const Css = `
 }
 
 .radial .options-repeat,
-.conical .options-repeat{
+.conic .options-repeat{
     display: inline-flex;
     align-items: center;
 }
@@ -154,18 +154,13 @@ input[type="number"] {
 }
 `;
 
-const unitSymbols = {
-    'px': 'px',
-    '%': '%',
-    'deg': '°',
-}
 
 export default class PtcGradients extends HTMLElement {
 
     constructor() {
         super()
 
-        this._value = 'radial-gradient(at 100%, rgba(255,0,0,1), rgba(0,255,0,1) 50%, rgba(0,0,255,1) 75%, rgba(255,0,0,1) 75%)'
+        this._value = 'conic-gradient(from 45deg at 100px 30%, rgba(255,0,0,1), rgba(0,255,0,1) 50%, rgba(0,0,255,1) 75%, rgba(255,0,0,1) 75%)'
         Object.defineProperty(this, 'value', {
             get: () => {
                 return this._value;
@@ -181,11 +176,11 @@ export default class PtcGradients extends HTMLElement {
                 return this._type;
             },
             set: (val = 'linear') => {
-                // convert px values to percentages in conical only
+                // convert px values to percentages in conic only
                 const pxSteps = this.gradientObject.colorStopList.filter(cs => cs.unit === 'px')
 
-                if (val === 'conical' && pxSteps.length) {
-                    const confirm = window.confirm('Conical gradients cannot have px values. Convert to percentage?')
+                if (val === 'conic' && pxSteps.length) {
+                    const confirm = window.confirm('Conic gradients cannot have px values. Convert to percentage?')
                     if (confirm) {
                         pxSteps.forEach(cs => {
                             cs.unit = '%'
@@ -355,7 +350,7 @@ export default class PtcGradients extends HTMLElement {
                 })
                 output += `)`
             }
-            if (type === 'conical') {
+            if (type === 'conic') {
                 output += this.repeat ? `repeating-` : ``
                 output += `conic-gradient(`
                 output += this.angle ? 'from ' + this.angle : 'from 0deg'
@@ -473,7 +468,7 @@ export default class PtcGradients extends HTMLElement {
         <select id="type" name="type">
             <option value="linear" selected>Linear</option>
             <option value="radial">Radial</option>
-            <option value="conical">Conical</option>
+            <option value="conic">Conic</option>
         </select>
     </div>
 </div>
