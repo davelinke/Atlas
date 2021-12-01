@@ -1,6 +1,7 @@
 import { parseGradient } from './lib-gradients.js';
 import { fireEvent } from './lib-events.js';
 import angleImg from './img-angle.js';
+import { arrayMove } from './lib-utils.js';
 
 const Css = `
 :host {
@@ -57,6 +58,17 @@ const Css = `
     display: none;
 }
 .radial .options-radial-type{
+    display: block;
+}
+
+.options-position-x,
+.options-position-y{
+    display: none;
+}
+.radial .options-position-x,
+.radial .options-position-y,
+.conic .options-position-x,
+.conic .options-position-y{
     display: block;
 }
 
@@ -119,13 +131,17 @@ input[type="number"] {
     line-height: 13px;
 }
 .step{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
     background-color: #efefef;
-    margin-bottom: 8px;
     padding: 4px;
     align-items: center;
     border-radius: 4px;
+}
+.step > div{
+    margin-inline-end: 8px;
+}
+.step > div:last-child{
+    margin-inline-end: 0;
 }
 .step:last-child{
     margin-bottom: 0;
@@ -150,24 +166,72 @@ input[type="number"] {
 }
 .unit{
     cursor: pointer;
-    width: 12px;
+    min-width: 12px;
+}
+.step-remove{
+    display:flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.step-remove-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    height: 24px;
+    width: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.step-color{
+    display: flex;
+    align-items: center;
+}
+.steps.no-remove .step-remove-button{
+    opacity:.1;
+    pointer-events: none;
+}
+.step-handle{
+    width: 32px;
+    display: flex;
+    align-items:center;
+    justify-content: center;
+}
+.step-drop-zone{
+    height: 8px;
+    background-color: #ffeeee;
+}
+.step-drop-zone.drag-over{
+    height: 32px;
 }
 `;
 
+const units = {
+    'px': 'px',
+    '%': '%',
+    'deg': '°'
+}
 
 export default class PtcGradients extends HTMLElement {
 
     constructor() {
         super()
 
-        this._value = 'conic-gradient(from 45deg at 100px 30%, rgba(255,0,0,1), rgba(0,255,0,1) 50%, rgba(0,0,255,1) 75%, rgba(255,0,0,1) 75%)'
+        this._value = 'conic-gradient(from 45deg at 100px 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
         Object.defineProperty(this, 'value', {
             get: () => {
                 return this._value;
             },
             set: (val) => {
+                console.log(val)
                 this._value = val;
-                this.setGradient();
+                this.sample.style.backgroundImage = val;
+                this.controls.style.backgroundImage = val;
+                fireEvent(this, 'change', val)
             }
         })
         this._type = 'linear';
@@ -176,29 +240,53 @@ export default class PtcGradients extends HTMLElement {
                 return this._type;
             },
             set: (val = 'linear') => {
+                console.log(this._type, val)
+                let reRenderSteps = false;
                 // convert px values to percentages in conic only
                 const pxSteps = this.gradientObject.colorStopList.filter(cs => cs.unit === 'px')
 
-                if (val === 'conic' && pxSteps.length) {
-                    const confirm = window.confirm('Conic gradients cannot have px values. Convert to percentage?')
-                    if (confirm) {
-                        pxSteps.forEach(cs => {
-                            cs.unit = '%'
-                        })
-                        this._type = val;
-                        const gradientString = this.generateGradientString();
-                        this.value = gradientString;
-                        this.createSteps();
-                    } else {
-                        return
-                    }
-                } else {
+                const stepsPctToDeg = (create = false) => {
+                    this.gradientObject.colorStopList.forEach(cs => {
+                        if (cs.unit!=='deg'){
+                            cs.unit = 'deg'
+                            cs.value = cs.value * 360 / 100
+                        }
+                    })
                     this._type = val;
-                    const gradientString = this.generateGradientString();
-                    this.value = gradientString;
+                    this.value = this.generateGradientString();
+                }
+
+                const stepsDegToPct = () => {
+                    this.gradientObject.colorStopList.forEach(cs => {
+                        cs.unit = '%'
+                        cs.value = cs.value * 100 / 360
+                    })
+                    this._type = val;
+                    this.value = this.generateGradientString();
+                }
+
+                if (this._type === 'conic' && val !== 'conic') {
+                    reRenderSteps = true;
+                    stepsDegToPct();
+                }
+                if (val=== 'conic' && this._type !== 'conic') {
+                    if (pxSteps.length) {
+                        reRenderSteps = true;const confirm = window.confirm('Conic gradients cannot have px values. Convert to degrees?')
+                        if (confirm) {
+                            stepsPctToDeg(true);
+                        } else {
+                            return
+                        }
+                    }
+                    stepsPctToDeg();
+                }
+                if (val!=='conic' && this._type !== 'conic') {
+                    this._type = val;
+                    this.value = this.generateGradientString();
                 }
                 this.wrap.setAttribute('class', `dialog ${this._type}`)
                 this.typeSelect.value = this._type;
+                reRenderSteps && this.createSteps();
             }
         })
 
@@ -210,7 +298,7 @@ export default class PtcGradients extends HTMLElement {
             set: (val = '0deg') => {
                 this._angle = val;
                 this.angleInput.value = parseInt(val.replace('deg', ''));
-                this.setGradient();
+                this.value = this.generateGradientString();
             }
         })
 
@@ -223,7 +311,6 @@ export default class PtcGradients extends HTMLElement {
                 this._radialType = val;
                 const gradientString = this.generateGradientString();
                 this.value = gradientString;
-                console.log(val)
                 this.radialTypeSelect.value = this._radialType;
             }
         })
@@ -261,7 +348,7 @@ export default class PtcGradients extends HTMLElement {
             },
             set: (val = '%') => {
                 this._positionXUnit = val;
-                this.positionXUnitSelect.value = val;
+                this.positionXUnitSelect.innerText = val;
                 const gradientString = this.generateGradientString();
                 this.value = gradientString;
             }
@@ -287,48 +374,14 @@ export default class PtcGradients extends HTMLElement {
             },
             set: (val = '%') => {
                 this._positionYUnit = val;
-                this.positionYUnitSelect.value = val;
+                this.positionYUnitSelect.innerText = val;
                 const gradientString = this.generateGradientString();
                 this.value = gradientString;
             }
         })
 
-        this.setGradient = () => {
-            console.log(this.value)
-            this.sample.style.backgroundImage = this.value;
-            this.controls.style.backgroundImage = this.value;
-            fireEvent(this, 'change', this.value)
-        }
-
-        this.generateGradientObject = () => {
-            const steps = [];
-            this.steps.querySelectorAll('.step').forEach(step => {
-                const color = step.querySelector('ptc-color-picker').value;
-                const position = step.querySelector('.input-position').value;
-                const unit = step.querySelector('.unit').innerText;
-                steps.push({
-                    color,
-                    position,
-                    unit
-                })
-            });
-
-            const go = {
-                type: this.type,
-                angle: this.angle,
-                shape: this.radialType,
-                repeat: this.repeat,
-                positionX: this.positionX,
-                positionXUnit: this.positionXUnit,
-                positionY: this.positionY,
-                positionYUnit: this.positionYUnit,
-                colorStopList: steps
-            }
-
-            return go;
-        };
-
-        this.generateGradientString = (go = this.generateGradientObject()) => {
+        this.generateGradientString = () => {
+            const go = this.gradientObject;
             const type = this.type;
             let output = ``;
 
@@ -357,21 +410,33 @@ export default class PtcGradients extends HTMLElement {
                 output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
                 output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
                 go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position * 360 / 100}deg`
+                    output += `, ${cs.color} ${cs.position}deg`
                 })
                 output += `)`
             }
             return output;
         }
 
+        this.checkMinSteps = () => {
+            if (this.gradientObject.colorStopList.length < 3) {
+                this.steps.classList.add('no-remove')
+            } else {
+                this.steps.classList.remove('no-remove')
+            }
+        }
+
         this.createStep = (cs, i) => {
             const go = this.gradientObject;
             const step = document.createElement('div');
-            step.classList.add('step');
 
             step.innerHTML = `
-            <div><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
-            <div class="input-wrap"><label class="input-label">P</label><input class="input-position" type="number" min="0" value="${cs.position ? cs.position : 0}"/><label class="input-label unit">${cs.unit ? cs.unit : '%'}</label></div>
+            <div class="step-drop-zone" data-index="${i}"></div>
+            <div class="step" draggable="true" id="step-${i}" data-index="${i}">
+                <div class="step-handle"><i class="fa-solid fa-grip-vertical"></i></div>
+                <div class="step-color"><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
+                <div class="input-wrap"><label class="input-label">Position</label><input class="input-position" type="number" min="0" value="${cs.position ? cs.position : 0}"/><label class="input-label unit">${units[cs.unit]}</label></div>
+                <div class="step-remove"><button class="step-remove-button"><i class="fa-solid fa-xmark"></i></button></div>
+            </div>
             `
             const stepInput = step.querySelector('input');
 
@@ -390,14 +455,16 @@ export default class PtcGradients extends HTMLElement {
 
             const unitLabel = step.querySelector('.unit');
             unitLabel.addEventListener('click', (e) => {
-                if (cs.unit === '%') {
-                    cs.unit = 'px';
-                    unitLabel.innerText = 'px';
-                } else {
-                    cs.unit = '%';
-                    unitLabel.innerText = '%';
+                if (this.type !== 'conic') {
+                    if (cs.unit === '%') {
+                        cs.unit = 'px';
+                        unitLabel.innerText = 'px';
+                    } else {
+                        cs.unit = '%';
+                        unitLabel.innerText = '%';
+                    }
+                    this.value = this.generateGradientString();
                 }
-                this.value = this.generateGradientString();
             })
 
             const colorInput = step.querySelector('ptc-color-picker');
@@ -405,6 +472,46 @@ export default class PtcGradients extends HTMLElement {
                 const color = e.detail.value;
                 cs.color = color;
                 this.value = this.generateGradientString();
+            });
+
+            const removeButton = step.querySelector('.step-remove-button');
+            removeButton.addEventListener('click', (e) => {
+                this.steps.removeChild(step);
+                go.colorStopList.splice(i, 1);
+                this.value = this.generateGradientString();
+
+                this.checkMinSteps();
+            });
+
+            const dragItem = step.querySelector('.step');
+
+            dragItem.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.dataset.index);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            const dropZone = step.querySelector('.step-drop-zone');
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.dataTransfer.dropEffect = 'move';
+                dropZone.classList.add('drag-over');
+            });
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+                const draggedStepIndex = e.dataTransfer.getData('text/plain');
+                const draggedStepCS = go.colorStopList[draggedStepIndex];
+                arrayMove(go.colorStopList, draggedStepIndex, i);
+                this.value = this.generateGradientString();
+
+                this.createSteps(false);
             });
 
             return step;
@@ -421,22 +528,10 @@ export default class PtcGradients extends HTMLElement {
             const step = this.createStep(stepData, go.colorStopList.length - 1);
             this.steps.appendChild(step);
             this.value = this.generateGradientString();
+            this.checkMinSteps();
         }
 
         this.createSteps = () => {
-            this.gradientObject = parseGradient(this.value);
-            console.log(this.gradientObject)
-
-            this.type = this.gradientObject.type;
-            this.shape = this.gradientObject.shape;
-            this.angle = this.gradientObject.angle;
-            this.radialType = this.gradientObject.shape;
-            if (this.gradientObject.position) {
-                this.positionX = this.gradientObject.position.x.value;
-                this.positionXUnit = this.gradientObject.position.x.unit;
-                this.positionY = this.gradientObject.position.y?.value;
-                this.positionYUnit = this.gradientObject.position.y?.unit;
-            }
             this.steps.innerHTML = '';
             this.gradientObject.colorStopList.forEach((cs, i) => {
                 const step = this.createStep(cs, i);
@@ -495,7 +590,7 @@ export default class PtcGradients extends HTMLElement {
                 X
             </label>
             <input type="number" name="position-x" value="50" id="position-x">
-            <label class="input-label" id="position-x-unit">%</label>
+            <label class="input-label unit" id="position-x-unit">%</label>
         </div>
     </div>
     <div class="options-position-y">
@@ -504,7 +599,7 @@ export default class PtcGradients extends HTMLElement {
                 Y
             </label>
             <input type="number" name="position-y" value="50" id="position-y">
-            <label class="input-label" id="position-y-unit">%</label>
+            <label class="input-label unit" id="position-y-unit">%</label>
         </div>
     </div>
     <div class="options-repeat">
@@ -594,8 +689,20 @@ export default class PtcGradients extends HTMLElement {
             this.positionYUnitSelect.innerText = newUnit;
         })
 
-        this.setGradient();
-        this.createSteps();
+        if (this.value) {
+            this.gradientObject = parseGradient(this.value);
+            this.type = this.gradientObject.type;
+            this.angle = this.gradientObject.angle;
+            this.radialType = this.gradientObject.shape;
+            if (this.gradientObject.position) {
+                this.positionX = this.gradientObject.position.x.value;
+                this.positionXUnit = this.gradientObject.position.x.unit;
+                this.positionY = this.gradientObject.position.y?.value;
+                this.positionYUnit = this.gradientObject.position.y?.unit;
+            }
+            this.createSteps();
+        }
+        
 
         this._shadow.appendChild(this.wrap)
     }

@@ -3,6 +3,7 @@ import { fireEvent } from './lib-events.js'
 const Css = `
 :host {
     display: inline-block;
+    line-height: 0;
 }
 :host(.block) {
     display: block;
@@ -17,6 +18,7 @@ const Css = `
 }
 .ptc-overlay__target {
     display: inline-block;
+    linke-height: 0;
 }
 .ptc-overlay__target.disabled {
     cursor: not-allowed;

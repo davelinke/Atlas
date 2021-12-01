@@ -175,7 +175,8 @@ export const parseGradient = (gradient) => {
     if (go.repeat) {
         gr.replace('repeat-', '');
     }
-    if (new RegExp(/conic-gradient/).test(gr)) {
+    const isConic = new RegExp(/conic-gradient/).test(gr);
+    if (isConic) {
         go.type = 'conic';
         const hasAngle = new RegExp(/from/).test(gr);
         const hasPositioning = new RegExp(/at\s*/).test(gr);
