@@ -15,7 +15,7 @@ const Css = `
     z-index: 9999;
     top: 100px;
     left: calc(50% - 150px);
-    padding:8px;
+    padding:8px 8px 0;
     border-radius: 4px;
     box-shadow: 0 0 10px rgba(0,0,0,.2);
 }
@@ -159,6 +159,9 @@ input[type="number"] {
     justify-content: space-between;
     margin-block-end: 12px;
 }
+.heading.heading-steps{
+    margin-block-end: 0;
+}
 .heading button {
     background: none;
     border: none;
@@ -200,13 +203,13 @@ input[type="number"] {
     display: flex;
     align-items:center;
     justify-content: center;
+    opacity: 0.3;
 }
 .step-drop-zone{
     height: 8px;
-    background-color: #ffeeee;
 }
 .step-drop-zone.drag-over{
-    height: 32px;
+    height: 44px;
 }
 `;
 
@@ -247,9 +250,9 @@ export default class PtcGradients extends HTMLElement {
 
                 const stepsPctToDeg = (create = false) => {
                     this.gradientObject.colorStopList.forEach(cs => {
-                        if (cs.unit!=='deg'){
+                        if (cs.unit !== 'deg') {
                             cs.unit = 'deg'
-                            cs.value = cs.value * 360 / 100
+                            cs.position = cs.position * 360 / 100
                         }
                     })
                     this._type = val;
@@ -257,21 +260,23 @@ export default class PtcGradients extends HTMLElement {
                 }
 
                 const stepsDegToPct = () => {
+                    reRenderSteps = true;
                     this.gradientObject.colorStopList.forEach(cs => {
                         cs.unit = '%'
-                        cs.value = cs.value * 100 / 360
+                        cs.position = cs.position * 100 / 360
                     })
                     this._type = val;
                     this.value = this.generateGradientString();
                 }
 
-                if (this._type === 'conic' && val !== 'conic') {
+                if (val !== 'conic' && this._type === 'conic') {
                     reRenderSteps = true;
                     stepsDegToPct();
                 }
-                if (val=== 'conic' && this._type !== 'conic') {
+                if (val === 'conic' && this._type !== 'conic') {
+                    reRenderSteps = true;
                     if (pxSteps.length) {
-                        reRenderSteps = true;const confirm = window.confirm('Conic gradients cannot have px values. Convert to degrees?')
+                        reRenderSteps = true; const confirm = window.confirm('Conic gradients cannot have px values. Convert to degrees?')
                         if (confirm) {
                             stepsPctToDeg(true);
                         } else {
@@ -280,12 +285,13 @@ export default class PtcGradients extends HTMLElement {
                     }
                     stepsPctToDeg();
                 }
-                if (val!=='conic' && this._type !== 'conic') {
+                if (val !== 'conic' && this._type !== 'conic') {
                     this._type = val;
                     this.value = this.generateGradientString();
                 }
                 this.wrap.setAttribute('class', `dialog ${this._type}`)
                 this.typeSelect.value = this._type;
+                console.log(reRenderSteps)
                 reRenderSteps && this.createSteps();
             }
         })
@@ -425,12 +431,48 @@ export default class PtcGradients extends HTMLElement {
             }
         }
 
+        this.createDropZone = (i) => {
+            const go = this.gradientObject;
+            const dropZone = document.createElement('div');
+            dropZone.classList.add('step-drop-zone');
+            dropZone.dataset.index = i;
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const theIndex = e.dataTransfer.getData('text/plain');
+                if (theIndex !== i) {
+                    e.dataTransfer.dropEffect = 'move';
+                    dropZone.classList.add('drag-over');
+                }
+            });
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('drag-over');
+                const draggedStepIndex = e.dataTransfer.getData('text/plain');
+                console.log('dragging element', draggedStepIndex);
+                console.log('throwing into', i);
+                const newIndex = (draggedStepIndex > i) ? i + 1 : i;
+                arrayMove(go.colorStopList, draggedStepIndex, newIndex);
+                this.value = this.generateGradientString();
+
+                this.createSteps(false);
+            });
+
+            return dropZone;
+        }
+
         this.createStep = (cs, i) => {
             const go = this.gradientObject;
             const step = document.createElement('div');
 
             step.innerHTML = `
-            <div class="step-drop-zone" data-index="${i}"></div>
             <div class="step" draggable="true" id="step-${i}" data-index="${i}">
                 <div class="step-handle"><i class="fa-solid fa-grip-vertical"></i></div>
                 <div class="step-color"><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
@@ -490,30 +532,6 @@ export default class PtcGradients extends HTMLElement {
                 e.dataTransfer.effectAllowed = 'move';
             });
 
-            const dropZone = step.querySelector('.step-drop-zone');
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                e.dataTransfer.dropEffect = 'move';
-                dropZone.classList.add('drag-over');
-            });
-            dropZone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('drag-over');
-            });
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('drag-over');
-                const draggedStepIndex = e.dataTransfer.getData('text/plain');
-                const draggedStepCS = go.colorStopList[draggedStepIndex];
-                arrayMove(go.colorStopList, draggedStepIndex, i);
-                this.value = this.generateGradientString();
-
-                this.createSteps(false);
-            });
-
             return step;
         }
 
@@ -535,8 +553,15 @@ export default class PtcGradients extends HTMLElement {
             this.steps.innerHTML = '';
             this.gradientObject.colorStopList.forEach((cs, i) => {
                 const step = this.createStep(cs, i);
+                const dropZone = this.createDropZone(i);
+                if (i === 0) {
+                    this.steps.appendChild(this.createDropZone(-1));
+                }
                 this.steps.appendChild(step);
+                this.steps.appendChild(dropZone);
             });
+
+            this.gradientObject.colorStopList.appendChild
         }
 
         // attach shadow dom
@@ -607,7 +632,7 @@ export default class PtcGradients extends HTMLElement {
     </div>
 </div>
 <div class="controls"></div>
-<div class="heading">Steps<button class="add-button"><i class="fa-solid fa-plus"></i></button></div>
+<div class="heading heading-steps">Steps<button class="add-button"><i class="fa-solid fa-plus"></i></button></div>
 <div class="steps"></div>
 <div class="swatches"></div>
       `
@@ -702,7 +727,7 @@ export default class PtcGradients extends HTMLElement {
             }
             this.createSteps();
         }
-        
+
 
         this._shadow.appendChild(this.wrap)
     }
