@@ -5,39 +5,60 @@ import { arrayMove } from './lib-utils.js';
 
 const Css = `
 :host {
-    font-size:12px;
+    font-size: 12px;
+    display: inline-block;
 }
-.dialog{
+.dialog {
     background-color: #fff;
     position: fixed;
     width: 300px;
     min-height: 300px;
-    z-index: 9999;
-    top: 100px;
+    top: 50px;
     left: calc(50% - 150px);
-    padding:8px 8px 0;
+    padding: 8px 8px 0;
     border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    max-height: calc(100vh - 100px);
+    overflow: auto;
 }
-
-.sample{
-    background-image:
-        linear-gradient(45deg, #aaaaaa 25%, transparent 25%),
-        linear-gradient(-45deg, #aaaaaa 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #aaaaaa 75%),
-        linear-gradient(-45deg, transparent 75%, #aaaaaa 75%);
-    background-size:16px 16px;
-    background-position:0 0,0 8px,8px -8px,8px 0px;
-    margin-bottom:8px
-}
-
-.sample-gradient{
+.backdrop {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    height:150px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+}
+
+:host(.open) .dialog,
+:host(.open) .backdrop {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sample {
+    background-image: linear-gradient(45deg, #aaaaaa 25%, transparent 25%),
+        linear-gradient(-45deg, #aaaaaa 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #aaaaaa 75%),
+        linear-gradient(-45deg, transparent 75%, #aaaaaa 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, 8px 0px;
+    margin-bottom: 8px;
+}
+
+.sample-gradient {
+    width: 100%;
+    height: 150px;
     border-radius: 2px;
 }
 .options,
-.settings{
+.settings {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-column-gap: 8px;
@@ -45,40 +66,40 @@ const Css = `
     border-bottom: 1px solid #ccc;
     padding-bottom: 8px;
 }
-.options-direction{
+.options-direction {
     display: none;
 }
 .linear .options-direction,
-.conic .options-direction{
+.conic .options-direction {
     display: block;
 }
 
 .options-radial-type,
-.options-repeat{
+.options-repeat {
     display: none;
 }
-.radial .options-radial-type{
+.radial .options-radial-type {
     display: block;
 }
 
 .options-position-x,
-.options-position-y{
+.options-position-y {
     display: none;
 }
 .radial .options-position-x,
 .radial .options-position-y,
 .conic .options-position-x,
-.conic .options-position-y{
+.conic .options-position-y {
     display: block;
 }
 
 .radial .options-repeat,
-.conic .options-repeat{
+.conic .options-repeat {
     display: inline-flex;
     align-items: center;
 }
 
-select{
+select {
     border: none;
     background-color: #efefef;
     border-radius: 3px;
@@ -100,8 +121,8 @@ select{
     height: 100%;
     cursor: text;
 }
-input[type=number],
-input[type=text] {
+input[type="number"],
+input[type="text"] {
     width: 100%;
     border: none;
     background-color: transparent;
@@ -114,8 +135,8 @@ input[type=text] {
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 input[type="number"] {
     -webkit-appearance: textfield;
@@ -130,23 +151,23 @@ input[type="number"] {
     font-size: 12px;
     line-height: 13px;
 }
-.step{
+.step {
     display: flex;
     background-color: #efefef;
     padding: 4px;
     align-items: center;
     border-radius: 4px;
 }
-.step > div{
+.step > div {
     margin-inline-end: 8px;
 }
-.step > div:last-child{
+.step > div:last-child {
     margin-inline-end: 0;
 }
-.step:last-child{
+.step:last-child {
     margin-bottom: 0;
 }
-.step .input-wrap{
+.step .input-wrap {
     background-color: #fff;
 }
 .heading {
@@ -159,7 +180,7 @@ input[type="number"] {
     justify-content: space-between;
     margin-block-end: 12px;
 }
-.heading.heading-steps{
+.heading.heading-steps {
     margin-block-end: 0;
 }
 .heading button {
@@ -167,12 +188,12 @@ input[type="number"] {
     border: none;
     cursor: pointer;
 }
-.unit{
+.unit {
     cursor: pointer;
     min-width: 12px;
 }
-.step-remove{
-    display:flex;
+.step-remove {
+    display: flex;
     align-items: center;
     justify-content: flex-end;
 }
@@ -190,26 +211,67 @@ input[type="number"] {
     justify-content: center;
     padding: 0;
 }
-.step-color{
+.step-color {
     display: flex;
     align-items: center;
 }
-.steps.no-remove .step-remove-button{
-    opacity:.1;
+.steps {
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+}
+.steps.no-remove .step-remove-button {
+    opacity: 0.1;
     pointer-events: none;
 }
-.step-handle{
+.step-handle {
     width: 32px;
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: center;
     opacity: 0.3;
 }
-.step-drop-zone{
+.step-drop-zone {
     height: 8px;
 }
-.step-drop-zone.drag-over{
+.step-drop-zone.drag-over {
     height: 44px;
+}
+.swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.footer {
+    padding-bottom: 8px;
+    text-align: end;
+}
+.button{
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+.save-button {
+    background-color: #0075FF;
+    color: #fff;
+}
+.cancel-button {
+    background-color: transparent;
+    color: #0075FF;
+}
+@media (hover: hover) {
+    .save-button:hover {
+        background-color: #0095FF;
+    }
+    .cancel-button:hover {
+        color: #0095FF;
+    }
 }
 `;
 
@@ -224,17 +286,28 @@ export default class PtcGradients extends HTMLElement {
     constructor() {
         super()
 
-        this._value = 'conic-gradient(from 45deg at 100px 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
+        this._value = 'conic-gradient(from 45deg at 100% 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
         Object.defineProperty(this, 'value', {
+            get: () => this._value,
+            set: (val) => {
+                this._value = val
+                this.swatch.style.backgroundImage = val
+                this.tempValue = val
+                fireEvent(this, 'change', val)
+            }
+        })
+
+        this._tempValue = this.value;
+        Object.defineProperty(this, 'tempValue', {
             get: () => {
-                return this._value;
+                return this._tempValue;
             },
             set: (val) => {
                 console.log(val)
-                this._value = val;
+                this._tempValue = val;
                 this.sample.style.backgroundImage = val;
                 this.controls.style.backgroundImage = val;
-                fireEvent(this, 'change', val)
+                //
             }
         })
         this._type = 'linear';
@@ -256,7 +329,7 @@ export default class PtcGradients extends HTMLElement {
                         }
                     })
                     this._type = val;
-                    this.value = this.generateGradientString();
+                    this.tempValue = this.generateGradientString();
                 }
 
                 const stepsDegToPct = () => {
@@ -266,7 +339,7 @@ export default class PtcGradients extends HTMLElement {
                         cs.position = cs.position * 100 / 360
                     })
                     this._type = val;
-                    this.value = this.generateGradientString();
+                    this.tempValue = this.generateGradientString();
                 }
 
                 if (val !== 'conic' && this._type === 'conic') {
@@ -287,7 +360,7 @@ export default class PtcGradients extends HTMLElement {
                 }
                 if (val !== 'conic' && this._type !== 'conic') {
                     this._type = val;
-                    this.value = this.generateGradientString();
+                    this.tempValue = this.generateGradientString();
                 }
                 this.wrap.setAttribute('class', `dialog ${this._type}`)
                 this.typeSelect.value = this._type;
@@ -304,7 +377,7 @@ export default class PtcGradients extends HTMLElement {
             set: (val = '0deg') => {
                 this._angle = val;
                 this.angleInput.value = parseInt(val.replace('deg', ''));
-                this.value = this.generateGradientString();
+                this.tempValue = this.generateGradientString();
             }
         })
 
@@ -316,7 +389,7 @@ export default class PtcGradients extends HTMLElement {
             set: (val = 'ellipse') => {
                 this._radialType = val;
                 const gradientString = this.generateGradientString();
-                this.value = gradientString;
+                this.tempValue = gradientString;
                 this.radialTypeSelect.value = this._radialType;
             }
         })
@@ -329,7 +402,7 @@ export default class PtcGradients extends HTMLElement {
             set: (val = false) => {
                 this._repeat = val;
                 const gradientString = this.generateGradientString();
-                this.value = gradientString;
+                this.tempValue = gradientString;
                 this.repeatCheckbox.checked = this._repeat;
             }
         })
@@ -343,7 +416,7 @@ export default class PtcGradients extends HTMLElement {
                 this._positionX = val;
                 this.positionXInput.value = val;
                 const gradientString = this.generateGradientString();
-                this.value = gradientString;
+                this.tempValue = gradientString;
             }
         })
 
@@ -356,7 +429,7 @@ export default class PtcGradients extends HTMLElement {
                 this._positionXUnit = val;
                 this.positionXUnitSelect.innerText = val;
                 const gradientString = this.generateGradientString();
-                this.value = gradientString;
+                this.tempValue = gradientString;
             }
         })
 
@@ -369,7 +442,7 @@ export default class PtcGradients extends HTMLElement {
                 this._positionY = val;
                 this.positionYInput.value = val;
                 const gradientString = this.generateGradientString();
-                this.value = gradientString;
+                this.tempValue = gradientString;
             }
         })
 
@@ -382,7 +455,18 @@ export default class PtcGradients extends HTMLElement {
                 this._positionYUnit = val;
                 this.positionYUnitSelect.innerText = val;
                 const gradientString = this.generateGradientString();
-                this.value = gradientString;
+                this.tempValue = gradientString;
+            }
+        })
+
+        this._open = false;
+        Object.defineProperty(this, 'open', {
+            get: () => {
+                return this._open;
+            },
+            set: (val = false) => {
+                this._open = val;
+                this.classList[val ? 'add' : 'remove']('open');
             }
         })
 
@@ -460,7 +544,7 @@ export default class PtcGradients extends HTMLElement {
                 console.log('throwing into', i);
                 const newIndex = (draggedStepIndex > i) ? i + 1 : i;
                 arrayMove(go.colorStopList, draggedStepIndex, newIndex);
-                this.value = this.generateGradientString();
+                this.tempValue = this.generateGradientString();
 
                 this.createSteps(false);
             });
@@ -492,7 +576,7 @@ export default class PtcGradients extends HTMLElement {
             stepInput.addEventListener('change', (e) => {
                 const pos = e.target.value;
                 cs.position = pos;
-                this.value = this.generateGradientString();
+                this.tempValue = this.generateGradientString();
             });
 
             const unitLabel = step.querySelector('.unit');
@@ -505,7 +589,7 @@ export default class PtcGradients extends HTMLElement {
                         cs.unit = '%';
                         unitLabel.innerText = '%';
                     }
-                    this.value = this.generateGradientString();
+                    this.tempValue = this.generateGradientString();
                 }
             })
 
@@ -513,14 +597,14 @@ export default class PtcGradients extends HTMLElement {
             colorInput.addEventListener('change', (e) => {
                 const color = e.detail.value;
                 cs.color = color;
-                this.value = this.generateGradientString();
+                this.tempValue = this.generateGradientString();
             });
 
             const removeButton = step.querySelector('.step-remove-button');
             removeButton.addEventListener('click', (e) => {
                 this.steps.removeChild(step);
                 go.colorStopList.splice(i, 1);
-                this.value = this.generateGradientString();
+                this.tempValue = this.generateGradientString();
 
                 this.checkMinSteps();
             });
@@ -545,7 +629,7 @@ export default class PtcGradients extends HTMLElement {
             go.colorStopList.push(stepData)
             const step = this.createStep(stepData, go.colorStopList.length - 1);
             this.steps.appendChild(step);
-            this.value = this.generateGradientString();
+            this.tempValue = this.generateGradientString();
             this.checkMinSteps();
         }
 
@@ -635,6 +719,10 @@ export default class PtcGradients extends HTMLElement {
 <div class="heading heading-steps">Steps<button class="add-button"><i class="fa-solid fa-plus"></i></button></div>
 <div class="steps"></div>
 <div class="swatches"></div>
+<div class="footer">
+    <button class="button cancel-button">Cancel</button>
+    <button class="button save-button">Apply</button>
+</div>
       `
         this.sample = this.wrap.querySelector('.sample-gradient')
         this.controls = this.wrap.querySelector('.controls')
@@ -662,7 +750,7 @@ export default class PtcGradients extends HTMLElement {
             const angle = e.target.value;
             this.angle = angle + 'deg';
             const val = this.generateGradientString();
-            this.value = val
+            this.tempValue = val
         })
 
         this.radialTypeSelect = this.wrap.querySelector('#radial-type')
@@ -714,8 +802,8 @@ export default class PtcGradients extends HTMLElement {
             this.positionYUnitSelect.innerText = newUnit;
         })
 
-        if (this.value) {
-            this.gradientObject = parseGradient(this.value);
+        if (this.tempValue) {
+            this.gradientObject = parseGradient(this.tempValue);
             this.type = this.gradientObject.type;
             this.angle = this.gradientObject.angle;
             this.radialType = this.gradientObject.shape;
@@ -728,7 +816,38 @@ export default class PtcGradients extends HTMLElement {
             this.createSteps();
         }
 
+        this.close = () => {
+            this.open = false
+            this.tempValue = this.value;
+        }
 
+        const backdrop = document.createElement('div');
+        backdrop.classList.add('backdrop');
+        backdrop.addEventListener('click', (e) => {
+            this.close();
+        });
+
+        this.acceptButton = this.wrap.querySelector('.save-button')
+        this.acceptButton.addEventListener('click', (e) => {
+            this.value = this.tempValue;
+            this.close();
+        });
+
+        this.cancelButton = this.wrap.querySelector('.cancel-button')
+        this.cancelButton.addEventListener('click', (e) => {
+            this.close();
+        });
+
+        this.swatch = document.createElement('div');
+        this.swatch.classList.add('swatch');
+        this.swatch.style.backgroundImage = this.tempValue;
+        this.swatch.addEventListener('click', (e) => {
+            this.open = true
+        });
+
+        this._shadow.appendChild(this.swatch);
+
+        this._shadow.appendChild(backdrop);
         this._shadow.appendChild(this.wrap)
     }
 
