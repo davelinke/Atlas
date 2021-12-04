@@ -193,7 +193,7 @@ class EditorWorkspace extends HTMLElement {
           top: 15000,
           right: 14900,
           bottom: 14900,
-          backgroundColor: '#ffffff',
+          background: '#ffffff',
           borderColor: '#000000',
           borderWidth: 1,
           borderRadius: 0,

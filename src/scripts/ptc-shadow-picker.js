@@ -122,10 +122,7 @@ export default class PtcShadowPicker extends HTMLElement {
         this._spread = 0
         this._color = '#000000'
 
-        this._value = 'none';
-
         this._name = null;
-
         Object.defineProperty(this, 'name', {
             get: () => {
                 return this._name;
@@ -140,7 +137,7 @@ export default class PtcShadowPicker extends HTMLElement {
             }
         })
 
-
+        this._value = 'none';
         Object.defineProperty(this, 'value', {
             get: () => {
                 let output = ``;

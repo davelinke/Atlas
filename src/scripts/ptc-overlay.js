@@ -90,9 +90,9 @@ const Css = `
     display: block;
     width: 0;
     height: 0;
-    border-inline-start: 8px solid transparent;
-    border-inline-end: 8px solid transparent;
-    border-block-end: 8px solid var(--ptc-color-grayscale-white, #fff);
+    border-inline-start: 6px solid transparent;
+    border-inline-end: 6px solid transparent;
+    border-block-end: 6px solid var(--ptc-color-grayscale-white, #fff);
     margin-inline-start: 1rem;
 }
 .popover::after {
@@ -101,6 +101,7 @@ const Css = `
     background-color: var(--ptc-color-grayscale-white, #fff);
     width: 100%;
     height: calc(100% - 8px);
+    border-radius:4px;
 }
 .popover.hidden {
     opacity: 0;
@@ -108,7 +109,7 @@ const Css = `
 }
 .popover.pn::before, .popover.pp::before {
     margin-inline-start: auto;
-    margin-inline-end: 1rem;
+    margin-inline-end: 6px;
 }
 .popover.pp, .popover.np {
     align-self: flex-end;
@@ -340,7 +341,7 @@ export default class PtcOverlay extends HTMLElement {
 
         this.hideOverlay = e => {
             // determine if the click is within the content slot that's within the overlay
-            const path = e.composedPath();
+            const path = e.path || (e.composedPath && e.composedPath());
 
             // sometimes we send a fake event without composed path when we hide the overlay by prop
             // therefore we force the "clickoutside" by just saying it was outside

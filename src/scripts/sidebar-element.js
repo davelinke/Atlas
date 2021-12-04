@@ -1,6 +1,7 @@
 import SidebarPanel from './sidebar-panel.js'
 import { fireEvent } from './lib-events.js'
 import { LoadParticles } from "./lib-loader.js";
+import pic from './img-beach.js';
 
 const Css = `
 input[type=number]{
@@ -44,6 +45,47 @@ select{
   grid-template-columns: 30px 1.5fr 1.5fr;
   grid-column-gap: 8px;
 }
+.bg-types{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+  grid-column-gap: 8px;
+  padding: 12px;
+}
+.heading button.bg-type {
+  width: 75px;
+  height: 75px;
+  background-color: #efefef;
+  border-radius: 3px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0 0 4px 0;
+  flex-direction: column;
+}
+@media(hover: hover){
+  .heading button.bg-type:hover {
+    background-color: #d5f7ff;
+  }
+}
+.bg-type::before{
+  content: "";
+  display: block;
+  width: 100%;
+  height: 51px;
+  border-radius: 3px 3px 0 0;
+  box-sizing: border-box;
+}
+.bg-type.bg-color::before{
+  background: #ff0076;
+}
+.bg-type.bg-gradient::before{
+  background-image: conic-gradient(from 45deg at 100% 30%, rgb(255, 0, 0) 0deg, rgb(0, 255, 0) 90deg, rgb(0, 0, 255) 180deg, rgb(255, 0, 0) 270deg);
+}
+.bg-type.bg-image::before{
+  background-image: url(${pic});
+  background-size: cover;
+}
 `
 
 class SidebarDocument extends SidebarPanel {
@@ -51,9 +93,7 @@ class SidebarDocument extends SidebarPanel {
     super()
     this.mainHeading = 'Element'
 
-    LoadParticles(['ptc-overlay']);
-    LoadParticles(['ptc-color-picker']);
-    LoadParticles(['ptc-shadow-picker']);
+    LoadParticles(['ptc-overlay','ptc-color-picker','ptc-shadow-picker','ptc-background-picker']);
 
     this.pickLengthShow = function (pick) {
       return pick.length === 1
@@ -90,7 +130,7 @@ class SidebarDocument extends SidebarPanel {
       leftInput.value = realLeft - (wsDim / 2)
       widthInput.value = (wsDim - elementDims.right) - realLeft
       heightInput.value = (wsDim - elementDims.bottom) - realTop
-      colorInput.value = elementDims.backgroundColor
+      backgroundPicker.value = elementDims.background
       borderWidthInput.value = elementDims.borderWidth
       borderStyleInput.value = elementDims.borderStyle
 
@@ -173,7 +213,6 @@ class SidebarDocument extends SidebarPanel {
         }
         default: {
           const value = input.value ? input.value : (e.detail ? e.detail.value : null);
-          console.log(dimension, value)
           element.setProp(dimension, value)
           fireEvent(this, 'storeDocument', null)
         }
@@ -249,14 +288,67 @@ class SidebarDocument extends SidebarPanel {
 
     this.addSeparator();
 
-    this.addHeading('Fill');
+    /*
+    * BACKGROUNDS
+    */
 
-    const colorInput = document.createElement('ptc-color-picker');
-    colorInput.setAttribute('name', 'backgroundColor');
-    colorInput.classList.add('span-2')
-    this.grid.appendChild(colorInput)
+    this.addBackground = () => {}
+
+
+    const fillHeading = document.createElement('div');
+    fillHeading.classList.add('heading');
+    fillHeading.innerHTML = 'Fill';
+    
+    
+    const bpo = document.createElement('ptc-overlay');
+    bpo.setAttribute('width', '265px');
+    bpo.setAttribute('height', '110px');
+    const bpoButton = document.createElement('button');
+    bpoButton.setAttribute('slot','target')
+    bpoButton.classList.add('add-button');
+    bpoButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
+    bpo.appendChild(bpoButton);
+
+    const bpoOptions = document.createElement('div');
+    bpoOptions.classList.add('bg-types');
+    bpoOptions.setAttribute('slot','content');
+    bpoOptions.innerHTML = `
+<button data-bg-type="color" class="bg-type bg-color">Color</button>
+<button data-bg-type="gradient" class="bg-type bg-gradient">Gradient</button>
+<button data-bg-type="image" class="bg-type bg-image">Image</button>
+    `
+    bpoOptions.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const path = e.path || (e.composedPath && e.composedPath());
+      const clicktElement = path[0];
+      const bgType = clicktElement.dataset.bgType;
+      if (bgType) {
+        bpo.hideOverlay({path:[]});
+        this.addBackground(bgType);
+      }
+
+    });
+    bpo.appendChild(bpoOptions);
+
+    fillHeading.appendChild(bpo);
+
+
+    this.grid.appendChild(fillHeading);
+
+    const backgroundPicker = document.createElement('ptc-background-picker');
+    backgroundPicker.setAttribute('name','background');
+    backgroundPicker.classList.add('span-2')
+    this.grid.appendChild(backgroundPicker)
+    // const colorInput = document.createElement('ptc-color-picker');
+    // colorInput.setAttribute('name', 'background');
+    // colorInput.classList.add('span-2')
+    // this.grid.appendChild(colorInput)
 
     this.addSeparator();
+
+    /*
+    * BORDER
+    */
 
     this.addHeading('Border');
 
@@ -313,7 +405,7 @@ class SidebarDocument extends SidebarPanel {
     shadowInput.classList.add('span-2')
     this.grid.appendChild(shadowInput)
 
-    this.inputs = [topInput, leftInput, heightInput, widthInput, colorInput, borderColorInput, opacityInput, borderWidthInput, shadowInput]
+    this.inputs = [topInput, leftInput, heightInput, widthInput, backgroundPicker, borderColorInput, opacityInput, borderWidthInput, shadowInput]
 
     this.inputs.forEach(input => {
       input.addEventListener('focus', (e) => {

@@ -686,7 +686,6 @@ class ToolSelect extends Tool {
 
         } else { // no shift means i have to clear the pick and start a drag
           this.deselectAll() // clear the pick
-          console.log(  'inputStart')
           this.firePickChangeEvent() // fire the change event
         }
       }

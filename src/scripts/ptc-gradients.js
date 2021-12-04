@@ -303,7 +303,6 @@ export default class PtcGradients extends HTMLElement {
                 return this._tempValue;
             },
             set: (val) => {
-                console.log(val)
                 this._tempValue = val;
                 this.sample.style.backgroundImage = val;
                 this.controls.style.backgroundImage = val;
@@ -316,7 +315,6 @@ export default class PtcGradients extends HTMLElement {
                 return this._type;
             },
             set: (val = 'linear') => {
-                console.log(this._type, val)
                 let reRenderSteps = false;
                 // convert px values to percentages in conic only
                 const pxSteps = this.gradientObject.colorStopList.filter(cs => cs.unit === 'px')
@@ -364,7 +362,6 @@ export default class PtcGradients extends HTMLElement {
                 }
                 this.wrap.setAttribute('class', `dialog ${this._type}`)
                 this.typeSelect.value = this._type;
-                console.log(reRenderSteps)
                 reRenderSteps && this.createSteps();
             }
         })
@@ -540,8 +537,6 @@ export default class PtcGradients extends HTMLElement {
                 e.stopPropagation();
                 dropZone.classList.remove('drag-over');
                 const draggedStepIndex = e.dataTransfer.getData('text/plain');
-                console.log('dragging element', draggedStepIndex);
-                console.log('throwing into', i);
                 const newIndex = (draggedStepIndex > i) ? i + 1 : i;
                 arrayMove(go.colorStopList, draggedStepIndex, newIndex);
                 this.tempValue = this.generateGradientString();
