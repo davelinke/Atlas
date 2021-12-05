@@ -3,6 +3,7 @@ import { fireEvent } from './lib-events.js'
 
 const Css = `
 .instance-container{
+    width: 100%;
     display: inline-grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     grid-row-gap:6px;
