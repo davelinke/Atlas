@@ -286,7 +286,8 @@ export default class PtcGradients extends HTMLElement {
     constructor() {
         super()
 
-        this._value = 'conic-gradient(from 45deg at 100% 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
+        // this._value = 'conic-gradient(from 45deg at 100% 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
+        this._value = null
         Object.defineProperty(this, 'value', {
             get: () => this._value,
             set: (val) => {
@@ -306,7 +307,7 @@ export default class PtcGradients extends HTMLElement {
                 this._tempValue = val;
                 this.sample.style.backgroundImage = val;
                 this.controls.style.backgroundImage = val;
-                //
+                this.initializeGradient(val);
             }
         })
         this._type = 'linear';
@@ -551,11 +552,14 @@ export default class PtcGradients extends HTMLElement {
             const go = this.gradientObject;
             const step = document.createElement('div');
 
+            const position = cs.position ? cs.position : null;
+            const unit = cs.unit ? units[cs.unit] : '';
+
             step.innerHTML = `
             <div class="step" draggable="true" id="step-${i}" data-index="${i}">
                 <div class="step-handle"><i class="fa-solid fa-grip-vertical"></i></div>
                 <div class="step-color"><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
-                <div class="input-wrap"><label class="input-label">Position</label><input class="input-position" type="number" min="0" value="${cs.position ? cs.position : 0}"/><label class="input-label unit">${units[cs.unit]}</label></div>
+                <div class="input-wrap"><label class="input-label">Position</label><input class="input-position" type="number" min="0" value="${position}"/><label class="input-label unit">${unit}</label></div>
                 <div class="step-remove"><button class="step-remove-button"><i class="fa-solid fa-xmark"></i></button></div>
             </div>
             `
@@ -570,7 +574,11 @@ export default class PtcGradients extends HTMLElement {
             })
             stepInput.addEventListener('change', (e) => {
                 const pos = e.target.value;
+                if (!cs.unit){
+                    cs.unit = '%';
+                }
                 cs.position = pos;
+                
                 this.tempValue = this.generateGradientString();
             });
 
@@ -797,18 +805,21 @@ export default class PtcGradients extends HTMLElement {
             this.positionYUnitSelect.innerText = newUnit;
         })
 
-        if (this.tempValue) {
-            this.gradientObject = parseGradient(this.tempValue);
-            this.type = this.gradientObject.type;
-            this.angle = this.gradientObject.angle;
-            this.radialType = this.gradientObject.shape;
-            if (this.gradientObject.position) {
-                this.positionX = this.gradientObject.position.x.value;
-                this.positionXUnit = this.gradientObject.position.x.unit;
-                this.positionY = this.gradientObject.position.y?.value;
-                this.positionYUnit = this.gradientObject.position.y?.unit;
+        this.initializeGradient = (gradientString)=>{
+            if (gradientString) {
+                this.gradientObject = parseGradient(gradientString);
+                console.log(this.gradientObject)
+                this._type = this.gradientObject.type;
+                this._angle = this.gradientObject.angle;
+                this._radialType = this.gradientObject.shape;
+                if (this.gradientObject.position) {
+                    this._positionX = this.gradientObject.position.x.value;
+                    this._positionXUnit = this.gradientObject.position.x.unit;
+                    this._positionY = this.gradientObject.position.y?.value;
+                    this._positionYUnit = this.gradientObject.position.y?.unit;
+                }
+                this.createSteps();
             }
-            this.createSteps();
         }
 
         this.close = () => {
@@ -844,6 +855,8 @@ export default class PtcGradients extends HTMLElement {
 
         this._shadow.appendChild(backdrop);
         this._shadow.appendChild(this.wrap)
+
+        this.initializeGradient(this.tempValue);
     }
 
     connectedCallback() {

@@ -1,5 +1,6 @@
 import { LoadParticles } from "./lib-loader.js";
 import { fireEvent } from './lib-events.js'
+import pic from './img-beach.js';
 
 const Css = `
 .instance-container {
@@ -11,21 +12,21 @@ const Css = `
     padding: 4px 6px 6px;
     margin-inline: -6px;
 }
-.instance-container:first-child{
+.instance-container:first-child {
     margin-block-start: 0;
 }
-.bg-header{
+.bg-header {
     grid-column: span 4;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
-.bg-header h4{
-    margin:0;
+.bg-header h4 {
+    margin: 0;
     font-weight: normal;
     text-transform: uppercase;
 }
-.bg-header button{
+.bg-header button {
     border: none;
     background: none;
     cursor: pointer;
@@ -41,21 +42,87 @@ const Css = `
     justify-content: center;
     padding: 0;
 }
-.bg-pic-preview{
+.bg-pic-preview {
     width: 100%;
     height: 100px;
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
 }
-.bg-pic-preview-wrap{
-    background-image:
-        linear-gradient(45deg, #aaaaaa 25%, transparent 25%),
-        linear-gradient(-45deg, #aaaaaa 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #aaaaaa 75%),
+.bg-pic-preview-wrap {
+    background-image: linear-gradient(45deg, #aaaaaa 25%, transparent 25%),
+        linear-gradient(-45deg, #aaaaaa 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #aaaaaa 75%),
         linear-gradient(-45deg, transparent 75%, #aaaaaa 75%);
-    background-size:16px 16px;
-    background-position:0 0,0 8px,8px -8px,8px 0px;
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, 8px 0px;
+}
+
+.bg-types {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+    grid-column-gap: 8px;
+    padding: 12px;
+}
+.heading button.bg-type {
+    width: 75px;
+    height: 75px;
+    background-color: #efefef;
+    border-radius: 3px;
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0 0 4px 0;
+    flex-direction: column;
+}
+.heading button.bg-type[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+@media (hover: hover) {
+    .heading button.bg-type:not([disabled]):hover {
+        background-color: #d5f7ff;
+    }
+}
+
+.heading {
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: 8px;
+}
+.heading button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.bg-type::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 51px;
+    border-radius: 3px 3px 0 0;
+    box-sizing: border-box;
+}
+.bg-type.bg-color::before {
+    background: #ff0076;
+}
+.bg-type.bg-gradient::before {
+    background-image: conic-gradient(
+        from 45deg at 100% 30%,
+        rgb(255, 0, 0) 0deg,
+        rgb(0, 255, 0) 90deg,
+        rgb(0, 0, 255) 180deg,
+        rgb(255, 0, 0) 270deg
+    );
+}
+.bg-type.bg-image::before {
+    background-image: url(${pic});
+    background-size: cover;
 }
 `
 
@@ -188,9 +255,11 @@ export default class PtcBackgroundPicker extends HTMLElement {
                 previewWrap.appendChild(preview);
                 instanceContainer.appendChild(previewWrap);
             } else if (bgType === 'gradient') {
+                console.log('woot', bgValue)
                 const picker = document.createElement('ptc-gradients');
                 picker.setAttribute('name', `${this.name}-bg-${i}`);
                 picker.setAttribute('value', bgValue);
+                picker.value = bgValue;
                 picker.addEventListener('change', (e) => {
                     bg.value = e.detail.value;
                     const bgString = this.createBgString()
@@ -218,7 +287,6 @@ export default class PtcBackgroundPicker extends HTMLElement {
 
         this.createBgString = () => {
             let output = ``;
-            console.log(this.bgData)
             this.bgData.forEach((bg, i) => {
                 console.log(bg.value)
                 output += bg.value;
@@ -226,6 +294,40 @@ export default class PtcBackgroundPicker extends HTMLElement {
             })
             console.log(output)
             return output;
+        }
+
+        this.addBackground = (type) => {
+            if (type === 'image') {
+                const bg = {
+                    type: 'image',
+                    value: `url(/assets/icon.png)`
+                }
+                this.bgData.unshift(bg);
+                this.renderBgInstances();
+                const bgString = this.createBgString()
+                this._value = bgString
+                fireEvent(this, 'change', { value: bgString })
+            } else if (type === 'gradient') {
+                const bg = {
+                    type: 'gradient',
+                    value: `linear-gradient(rgb(0, 0, 0) 1%, rgb(255, 255, 255) 99%)`
+                }
+                this.bgData.unshift(bg);
+                this.renderBgInstances();
+                const bgString = this.createBgString()
+                this._value = bgString
+                fireEvent(this, 'change', { value: bgString })
+            } else if (type === 'color') {
+                const bg = {
+                    type: 'color',
+                    value: `#ffffff`
+                }
+                this.bgData.push(bg);
+                this.renderBgInstances();
+                const bgString = this.createBgString()
+                this._value = bgString
+                fireEvent(this, 'change', { value: bgString })
+            }
         }
 
         /**
@@ -242,6 +344,65 @@ export default class PtcBackgroundPicker extends HTMLElement {
         fontawesome.setAttribute('rel', 'stylesheet')
         fontawesome.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css')
         this._shadow.appendChild(fontawesome)
+
+        const fillHeading = document.createElement('div');
+        fillHeading.classList.add('heading');
+        fillHeading.innerHTML = 'Fill';
+
+
+        const bpo = document.createElement('ptc-overlay');
+        bpo.setAttribute('width', '265px');
+        bpo.setAttribute('height', '110px');
+        const bpoButton = document.createElement('button');
+        bpoButton.setAttribute('slot', 'target')
+        bpoButton.classList.add('add-button');
+        bpoButton.innerHTML = '<i class="fa-solid fa-plus"></i>';
+        bpo.appendChild(bpoButton);
+
+        const bpoOptions = document.createElement('div');
+        bpoOptions.classList.add('bg-types');
+        bpoOptions.setAttribute('slot', 'content');
+        bpoOptions.innerHTML = `
+    <button data-bg-type="image" class="bg-type bg-image">Image</button>
+    <button data-bg-type="gradient" class="bg-type bg-gradient">Gradient</button>
+    <button data-bg-type="color" class="bg-type bg-color">Color</button>
+        `
+        bpoOptions.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const path = e.path || (e.composedPath && e.composedPath());
+            const clicktElement = path[0];
+            const bgType = clicktElement.dataset.bgType;
+            if (bgType) {
+                bpo.hideOverlay({ path: [] });
+                this.addBackground(bgType);
+            }
+
+        });
+
+        const bpoOptionColor = bpoOptions.querySelector('.bg-color');
+
+        const checkColor = (e) => {
+            const length = this.bgData.length;
+            if (length > 0) {
+                console.log(this.bgData);
+                const hasColor = this.bgData[length - 1].type === 'color';
+                if (hasColor) {
+                    bpoOptionColor.classList.remove('active');
+                    bpoOptionColor.setAttribute('disabled', 'true');
+                } else {
+                    bpoOptionColor.classList.add('active');
+                    bpoOptionColor.removeAttribute('disabled');
+                }
+            }
+        }
+
+        bpo.addEventListener('ptcShow', checkColor)
+        bpo.appendChild(bpoOptions);
+
+        fillHeading.appendChild(bpo);
+
+
+        this._shadow.appendChild(fillHeading);
 
         this.bgsContainer = document.createElement('div');
         this._shadow.appendChild(this.bgsContainer);
