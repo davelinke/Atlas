@@ -184,20 +184,32 @@ export default class PtcBackgroundPicker extends HTMLElement {
 
         this.setBgData = (val) => {
             const splitBg = (string) => {
-                var token = /((?:[^"']|".*?"|'.*?')*?)([(,)]|$)/g;
-                return (function recurse() {
-                    for (var array = []; ;) {
-                        var result = token.exec(string);
-                        if (result[2] == '(') {
-                            array.push(result[1].trim() + '(' + recurse().join(',') + ')');
-                            result = token.exec(string);
-                        } else array.push(result[1].trim());
-                        if (result[2] != ',') return array
+                const bgs = [];
+                const parts = string.split(',');
+                let parNum = 0;
+                let piece = ''
+                parts.forEach((part) => {
+                    if (part.includes('(')) {
+                        const openers = part.split('(');
+                        parNum += openers.length-1;
+                        piece += openers.join('(') + ','
+                    } else if (part.includes(')')) {
+                        const closers = part.split(')');
+                        parNum -= closers.length-1;
+                        piece += closers.join(')') + ','
+                    } else {
+                        piece += part + ','
                     }
-                })()
+                    if (parNum === 0) {
+                        bgs.push(piece.slice(0,-1))
+                        piece = ''
+                    }
+                });
+                return bgs;
             }
             // first split the many possible backgrounds
             let backgrounds = splitBg(val);
+
             // then split each bg into its own array
             this.bgData = backgrounds.map(bg => {
                 const output = {
@@ -215,6 +227,7 @@ export default class PtcBackgroundPicker extends HTMLElement {
                 output.value = bg
                 return output
             });
+
         }
 
         this.renderBgInstances = () => {
@@ -255,13 +268,12 @@ export default class PtcBackgroundPicker extends HTMLElement {
                 previewWrap.appendChild(preview);
                 instanceContainer.appendChild(previewWrap);
             } else if (bgType === 'gradient') {
-                console.log('woot', bgValue)
                 const picker = document.createElement('ptc-gradients');
                 picker.setAttribute('name', `${this.name}-bg-${i}`);
                 picker.setAttribute('value', bgValue);
                 picker.value = bgValue;
                 picker.addEventListener('change', (e) => {
-                    bg.value = e.detail.value;
+                    bg.value = e.detail;
                     const bgString = this.createBgString()
                     this._value = bgString
                     fireEvent(this, 'change', { value: bgString })
@@ -288,11 +300,9 @@ export default class PtcBackgroundPicker extends HTMLElement {
         this.createBgString = () => {
             let output = ``;
             this.bgData.forEach((bg, i) => {
-                console.log(bg.value)
                 output += bg.value;
                 output += i < this.bgData.length - 1 ? ', ' : '';
             })
-            console.log(output)
             return output;
         }
 
@@ -310,7 +320,7 @@ export default class PtcBackgroundPicker extends HTMLElement {
             } else if (type === 'gradient') {
                 const bg = {
                     type: 'gradient',
-                    value: `linear-gradient(rgb(0, 0, 0) 1%, rgb(255, 255, 255) 99%)`
+                    value: `linear-gradient(0deg, rgb(0, 0, 0) 0%, rgb(255, 255, 255) 100%)`
                 }
                 this.bgData.unshift(bg);
                 this.renderBgInstances();
@@ -384,7 +394,6 @@ export default class PtcBackgroundPicker extends HTMLElement {
         const checkColor = (e) => {
             const length = this.bgData.length;
             if (length > 0) {
-                console.log(this.bgData);
                 const hasColor = this.bgData[length - 1].type === 'color';
                 if (hasColor) {
                     bpoOptionColor.classList.remove('active');

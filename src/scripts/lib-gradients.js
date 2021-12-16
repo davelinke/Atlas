@@ -163,8 +163,6 @@ var test_this_thing = function () {
     for (var i = 0; i < testSubjects.length; i++) {
         result.push(test_this_one(regExpLib, testSubjects[i]));
     }
-
-    console.log(result);
 };
 
 export const parseGradient = (gradient) => {
@@ -273,12 +271,11 @@ export const parseGradient = (gradient) => {
             go.shape = 'ellipse'
         }
 
-    } else {
+    } else { //linear
         go.type = 'linear';
     }
 
     go = { ...go, ...test_this_one(regExpLib, gr) };
-
     return go
 }
 // test_this_thing();

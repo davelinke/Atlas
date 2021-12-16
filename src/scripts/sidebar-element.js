@@ -171,7 +171,6 @@ class SidebarDocument extends SidebarPanel {
         }
         default: {
           const value = input.value ? input.value : (e.detail ? e.detail.value : null);
-          console.log(input, input.value)
           element.setProp(dimension, value)
           fireEvent(this, 'storeDocument', null)
         }
