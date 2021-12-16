@@ -656,13 +656,13 @@ export default class PtcGradients extends HTMLElement {
                 this._repeat = go.repeat;
                 this.repeatCheckbox.checked = go.repeat;
             }
-            if (go.angle!== undefined || go.angle!== null) {
+            if (go.angle !== undefined && go.angle!== null) {
                 this._angle = go.angle;
                 this.angleInput.value = go.angle.replace('deg', '');
             }
             if(go.position) {
                 if (go.position.x) {
-                    if (go.position.x.value !== undefined || go.position.x.value !== null) {
+                    if (go.position.x.value !== undefined && go.position.x.value !== null) {
                         this._positionX = go.position.x.value;
                         this.positionXInput.value = go.position.x.value;
                     }
@@ -672,7 +672,7 @@ export default class PtcGradients extends HTMLElement {
                     }
                 }
                 if (go.position.y) {
-                    if (go.position.y.value!==undefined || go.position.y.value!==null) {
+                    if (go.position.y.value!==undefined && go.position.y.value!==null) {
                         this._positionY = go.position.y.value;
                         this.positionYInput.value = go.position.y.value;
                     }
