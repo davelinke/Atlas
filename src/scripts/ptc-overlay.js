@@ -308,6 +308,8 @@ export default class PtcOverlay extends HTMLElement {
 
         // this function toggles the overlay state
         this.toggleOverlay = e => {
+            e.preventDefault();
+            e.stopPropagation();
             if (!this.disabled && !this.noToggle) {
                 if (this._hidden) {
                     return this.showOverlay();

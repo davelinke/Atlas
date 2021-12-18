@@ -172,7 +172,6 @@ class ToolSelect extends Tool {
     }
 
     this.addToPick = (element) => {
-      //console.log('addToPick')
       element.picked = true
       this.pick.push(element)
       this.resizePickArea()
@@ -180,7 +179,6 @@ class ToolSelect extends Tool {
     }
 
     this.removeFormPick = (element) => {
-      console.log('removeFormPick')
       element.picked = false
       this.pick.splice(this.pick.indexOf(element), 1)
       this.resizePickArea()
@@ -837,7 +835,6 @@ class ToolSelect extends Tool {
           newPick.splice(this.pick.indexOf(e.detail), 1)
           this.pick = newPick
           this.resizePickArea()
-          console.log('removed from pick')
           this.firePickChangeEvent()
         }
       })

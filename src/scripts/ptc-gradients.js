@@ -53,8 +53,8 @@ const Css = `
 }
 
 .sample-gradient {
-    width: 100%;
-    height: 150px;
+    width: 300px;
+    height: 300px;
     border-radius: 2px;
 }
 .options,
@@ -214,6 +214,10 @@ input[type="number"] {
 .step-color {
     display: flex;
     align-items: center;
+    pointer-events: none;
+}
+ptc-color-picker{
+    pointer-events: auto;
 }
 .steps {
     margin-bottom: 8px;
@@ -563,25 +567,60 @@ export default class PtcGradients extends HTMLElement {
 
         this.createStep = (cs, i) => {
             const go = this.gradientObject;
+
             const step = document.createElement('div');
+            step.classList.add('step');
+            step.setAttribute('draggable', true);
 
             const position = cs.position ? cs.position : cs.position===0? 0 : '';
             const unit = cs.unit ? units[cs.unit] : (cs.unit = '%' && '%');
 
-            step.innerHTML = `
-            <div class="step" draggable="true" id="step-${i}" data-index="${i}">
-                <div class="step-handle"><i class="fa-solid fa-grip-vertical"></i></div>
-                <div class="step-color"><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
-                <div class="input-wrap"><label class="input-label">Position</label><input class="input-position" type="number" min="0" value="${position}" placeholder="-"/><label class="input-label unit">${unit}</label></div>
-                <div class="step-remove"><button class="step-remove-button"><i class="fa-solid fa-xmark"></i></button></div>
-            </div>
-            `
-            const stepInput = step.querySelector('input');
+            // STEP HANDLE
+            const stepHandle  = document.createElement('div');
+            stepHandle.classList.add('step-handle');
+            stepHandle.innerHTML = `<i class="fa-solid fa-grip-vertical"></i>`;
+            stepHandle.addEventListener('dragstart', (e) => {
+                const theIndex = i;
+                e.dataTransfer.setData('text/plain', theIndex);
+                e.dataTransfer.effectAllowed = 'move';
+            });
 
+            step.appendChild(stepHandle);
+
+            // STEP COLOR
+            const stepColor = document.createElement('div');
+            stepColor.classList.add('step-color');
+            step.appendChild(stepColor);
+
+            const colorInput = document.createElement('ptc-color-picker');
+            console.log(cs.color)
+            colorInput.setAttribute('value', cs.color);
+            colorInput.addEventListener('change', (e) => {
+                const color = e.detail.value;
+                cs.color = color;
+                this.tempValue = this.generateGradientString();
+            });
+
+            stepColor.appendChild(colorInput);
+
+            // POSITION INPUT
+            const inputWrap = document.createElement('div');
+            inputWrap.classList.add('input-wrap');
+
+            const inputLabel = document.createElement('label');
+            inputLabel.classList.add('input-label');
+            inputLabel.innerText = 'Position';
+            inputWrap.appendChild(inputLabel);
+
+            const stepInput = document.createElement('input');
+            stepInput.classList.add('input-position');
+            stepInput.setAttribute('type', 'number');
+            stepInput.setAttribute('min', '0');
+            stepInput.setAttribute('value', position);
+            stepInput.setAttribute('placeholder', '-');
             stepInput.addEventListener('focus', (e) => {
                 fireEvent(this, 'toggleKeyboardShortcuts', false)
             })
-
             stepInput.addEventListener('blur', (e) => {
                 fireEvent(this, 'toggleKeyboardShortcuts', true)
             })
@@ -593,7 +632,12 @@ export default class PtcGradients extends HTMLElement {
                 }
             });
 
-            const unitLabel = step.querySelector('.unit');
+            inputWrap.appendChild(stepInput);
+
+            // UNIT LABEL
+            const unitLabel = document.createElement('label');
+            unitLabel.classList.add('input-label');
+            unitLabel.innerText = unit;
             unitLabel.addEventListener('click', (e) => {
                 if (this.type !== 'conic') {
                     if (cs.unit === '%') {
@@ -606,28 +650,23 @@ export default class PtcGradients extends HTMLElement {
                     this.tempValue = this.generateGradientString();
                 }
             })
+            inputWrap.appendChild(unitLabel);
 
-            const colorInput = step.querySelector('ptc-color-picker');
-            colorInput.addEventListener('change', (e) => {
-                const color = e.detail.value;
-                cs.color = color;
-                this.tempValue = this.generateGradientString();
-            });
+            step.appendChild(inputWrap);
 
-            const removeButton = step.querySelector('.step-remove-button');
+            // REMOVE STEP
+            const stepRemove = document.createElement('div');
+            stepRemove.classList.add('step-remove');
+
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('step-remove-button');
+            removeButton.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
             removeButton.addEventListener('click', (e) => {
                 this.steps.removeChild(step);
                 go.colorStopList.splice(i, 1);
                 this.tempValue = this.generateGradientString();
 
                 this.checkMinSteps();
-            });
-
-            const dragItem = step.querySelector('.step');
-
-            dragItem.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', e.target.dataset.index);
-                e.dataTransfer.effectAllowed = 'move';
             });
 
             return step;
@@ -875,9 +914,6 @@ export default class PtcGradients extends HTMLElement {
 
         const backdrop = document.createElement('div');
         backdrop.classList.add('backdrop');
-        backdrop.addEventListener('click', (e) => {
-            this.close();
-        });
 
         this.acceptButton = this.wrap.querySelector('.save-button')
         this.acceptButton.addEventListener('click', (e) => {
@@ -902,6 +938,10 @@ export default class PtcGradients extends HTMLElement {
         this._shadow.appendChild(backdrop);
         this._shadow.appendChild(this.wrap)
 
+        const attrValue = this.getAttribute('value');
+        if (attrValue) {
+            this.value = attrValue;
+        }
         this.initializeGradient(this.tempValue);
     }
 
