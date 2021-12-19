@@ -1,13 +1,9 @@
-import { GenerateId } from './lib-strings.js'
-import { LoadParticles } from './lib-loader.js'
-import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
-import { propUnitsJs } from './lib-units.js'
 
 const viewportDim = 30000
 
 const Css = `
-:host{
+editor-workspace {
     display:block;
     position:absolute;
     top:0;
@@ -16,7 +12,7 @@ const Css = `
     bottom:0;
     overflow:hidden;
 }
-
+/*
 .wrapper{
     width: 100%; 
     height: 100%; 
@@ -61,316 +57,50 @@ const Css = `
     background-color: rgba(0,0,255,0.1);
     border-color: rgba(0,0,255,1);
 }
+*/
 `
 
 class EditorWorkspace extends HTMLElement {
   /**
        * the button constructor
        */
-  constructor () {
+  constructor() {
     super()
 
-    // LOAD DEPENDENCIES
-
-    LoadParticles(['editor-element'])
-
-    // STATE
-
-    this.canvasOffsetLeft = 0
-    this.canvasOffsetTop = 0
-
-    this.viewportDim = viewportDim
-
-    // METHODS
-
-    this.mouseCoords = (e, scale) => {
-      const rect = this._workspace.getBoundingClientRect()
-
-      const left = e.clientX - rect.left // x position within the element.
-      const top = e.clientY - rect.top // y position within the element.
-      const right = viewportDim - (e.clientX - rect.left)
-      const bottom = viewportDim - (e.clientY - rect.top)
-
-      const coords = {
-        left,
-        top,
-        right,
-        bottom
-      }
-
-      const filteredCoords = coordsFilterFn(coords, this.app.gridActive, this.app.gridSize, this.app.zoomScale, false)
-
-      const returnValue = {
-        left: (filteredCoords.left / scale),
-        top: (filteredCoords.top / scale),
-        right: (filteredCoords.right) / scale,
-        bottom: (filteredCoords.bottom) / scale
-      }
-
-      return returnValue
-    }
-
-    this.startInput = (e) => {
-      e.stopPropagation()
-      e.preventDefault()
-
-      // so any input focused blurs
-      this._canvas.focus()
-
-      if (e.button === 0) {
-        const downEvent = e
-        const scale = this.app.zoomScale
-        const downEventDetail = this.mouseCoords(downEvent, scale)
-
-        // fire start event listener
-
-        fireEvent(this, 'workspaceInputStart', {
-          mouseEvent: e,
-          coords: downEventDetail
-        })
-
-        const stopInput = () => {
-          // fire end event listener
-          const scale = this.app.zoomScale
-          const coords = this.mouseCoords(e, scale)
-
-          const upEventDetail = {
-            mouseEvent: e,
-            coords: coords
-          }
-
-          fireEvent(this, 'workspaceInputEnd', upEventDetail)
-
-          document.removeEventListener('mouseup', stopInput)
-          document.removeEventListener('touchend', stopInput)
-          document.removeEventListener('mousemove', move)
-          document.removeEventListener('touchmove', move)
-        }
-
-        const move = (e) => {
-          const coords = this.mouseCoords(e, scale)
-
-          const moveEventDetail = {
-            mouseEvent: e,
-            coords: coords
-          }
-
-          // fire move event listener
-          fireEvent(this, 'workspaceInputMove', moveEventDetail)
-        }
-
-        document.addEventListener('mouseup', stopInput)
-        document.addEventListener('touchend', stopInput)
-        document.addEventListener('mousemove', move)
-        document.addEventListener('touchmove', move)
-      }
-    }
-
-    this.inputAreaStart = (args) => {
-      const ia = this._inputArea
-      ia.classList.add(args.variant)
-      ia.style.top = `${args.top}px`
-      ia.style.left = `${args.left}px`
-      ia.style.right = `${args.right}px`
-      ia.style.bottom = `${args.bottom}px`
-    }
-    this.inputAreaResize = (args) => {
-      const ia = this._inputArea
-      ia.style.top = `${args.top}px`
-      ia.style.left = `${args.left}px`
-      ia.style.right = `${args.right}px`
-      ia.style.bottom = `${args.bottom}px`
-    }
-    this.inputAreaClear = () => {
-      const ia = this._inputArea
-      ia.setAttribute('class', 'input-area')
-    }
-
-    this.addElement = (props = {}, state = 'default') => {
-      const args = {
-        ...{
-          left: 15000,
-          top: 15000,
-          right: 14900,
-          bottom: 14900,
-          backgroundColor: '#ffffff',
-          borderColor: '#000000',
-          borderWidth: 1,
-          borderRadius: 0,
-          borderStyle: 'solid',
-          zIndex: 1,
-          position: 'absolute'
-        },
-        ...props
-      }
-      const element = document.createElement('editor-element')
-
-      const elementId = GenerateId()
-
-      element.setAttribute('id', elementId)
-
-      element.currentState = 'default'
-      element.setState('default', args)
-
-      for (const prop in args) {
-        const unit = propUnitsJs[prop] ? propUnitsJs[prop] : ''
-        element.style[prop] = args[prop] + unit
-      }
-      this._canvas.appendChild(element)
-
-      fireEvent(this, 'editorElementAdded', element)
-
-      return element
-    }
-
-    this.insertElement = (element, popEvent = true) => {
-      this._canvas.appendChild(element)
-
-      if (popEvent) {
-        fireEvent(this, 'editorElementAdded', element)
-      }
-    }
-
-    this.removeElement = (element) => {
-      fireEvent(this, 'editorElementRemoved', element)
-      this._canvas.removeChild(element)
-    }
-
-    this.canvasOffset = (newLeft, newTop) => {
-      const c = this._canvas
-
-      this.canvasOffsetLeft = newLeft
-      this.canvasOffsetTop = newTop
-
-      c.style.left = `${newLeft}px`
-      c.style.top = `${newTop}px`
-
-      fireEvent(this, 'editorCanvasOffset', { left: newLeft, top: newTop })
-    }
-
-    this.activateSelection = () => {
-      this._canvas.classList.add('selection-active')
-    }
-    this.deactivateSelection = () => {
-      this._canvas.classList.remove('selection-active')
-    }
-
-    this.getDocumentHTML = () => {
-      // tools to register
-      const doc = this._canvas.cloneNode(true)
-      doc.querySelectorAll(':not(editor-element').forEach(el => el.remove())
-      doc.querySelectorAll('editor-element[class]').forEach(e => {
-        e.removeAttribute('class')
-      })
-      return doc.innerHTML
-    }
-
-    this.clearCanvas = () => {
-      this._canvas.querySelectorAll('editor-element').forEach(el => {
-        this.removeElement(el)
-      })
-    }
-
-    this.setSavedWorkspace = () => {
-      // set the initial offset
-      const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'))
-      storedCanvasOffset && this.canvasOffset(storedCanvasOffset.left, storedCanvasOffset.top)
-
-      // set the initial zoom
-      const storedZoom = JSON.parse(window.localStorage.getItem('zoomScale'))
-      storedZoom && fireEvent(this, 'setZoom', storedZoom)
-    }
-
-    this.loadDocumentHTML = (html, isAutoSave = false) => {
-      const canvasHelpers = []
-      this._canvas.childNodes.forEach(el => {
-        if (el.tagName === 'DIV') {
-          canvasHelpers.push(el)
-        }
-      })
-
-      this._canvas.innerHTML = html
-
-      canvasHelpers.forEach(el => {
-        this._canvas.appendChild(el)
-      })
-
-      if (!isAutoSave) {
-        this.canvasOffset(0, 0)
-      } else {
-        this.setSavedWorkspace()
-      }
-
-      fireEvent(this, 'editorDocumentLoaded', null)
-
-      this.app.storeDocument()
-    }
-
-    this.initWorkspace = () => {
-      this.app.addEventListener('zoomChange', (e) => {
-        // set the transform origin at the center of the viewport
-        this._workspace.style.transform = `scale(${this.app.zoomScale})`
-      })
-
-      const storedDocument = window.localStorage.getItem('currentDocument')
-      storedDocument && this.loadDocumentHTML(storedDocument, true)
-    }
-
-    this.onHandShake = (app) => {
-      this.app = app
-      app.workspace = this
-      this.initWorkspace()
-    }
-
-    this.getElements = () => {
-      const elements = Array.from(this._canvas.childNodes)
-      return elements.filter(el => {
-        return (el.tagName === 'EDITOR-ELEMENT')
-      })
-    }
 
     // STRUCTURE
 
-    this._shadow = this.attachShadow({ mode: 'open' })
-
     const styles = document.createElement('style')
     styles.innerHTML = Css
-    this._shadow.appendChild(styles)
+    this.appendChild(styles)
 
-    this._wrapper = document.createElement('div')
-    this._wrapper.classList.add('wrapper')
-    this._shadow.append(this._wrapper)
+    this.createCanvas = () => {
+      const dims = this.getBoundingClientRect()
+      this._canvasElement = document.createElement('canvas');
+      this._canvasElement.setAttribute('width', dims.width + 'px');
+      this._canvasElement.setAttribute('height', dims.height + 'px');
+      this.appendChild(this._canvasElement)
+      this.initCanvas()
+    }
 
-    this._workspace = document.createElement('div')
-    this._workspace.classList.add('workspace')
+    this.initCanvas = () => {
+      this.canvas = new fabric.Canvas(this._canvasElement)
 
-    this._workspace.addEventListener('mousedown', this.startInput)
-    this._workspace.addEventListener('touchstart', this.startInput)
+      // fire up an event to make myself available to the app
+      fireEvent(this, 'handShake', this)
+    }
 
-    this._canvas = document.createElement('div')
-    this._canvas.classList.add('canvas')
-    this._canvas.setAttribute('tabindex', '0')
+    this.onHandShake = (app) => {
+      app.canvas = this.canvas
+    }
 
-    // get the store document
-    this._workspace.appendChild(this._canvas)
-
-    this._inputArea = document.createElement('div')
-    this._inputArea.classList.add('input-area')
-
-    this._canvas.appendChild(this._inputArea)
-
-    this._wrapper.append(this._workspace)
+    this.createCanvas()
   }
 
   // LIFE CYCLE
 
-  connectedCallback () {
-    // scroll to middle if it's not defined
-    this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
-    this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
+  connectedCallback() {
 
-    // fire up an event to make myself available to the app
-    fireEvent(this, 'handShake', this)
   }
 }
 

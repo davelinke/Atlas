@@ -17,6 +17,7 @@
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
     <link rel="manifest" href="/manifest.json">
 
+    <script src="scripts/lib-fabric.js"></script>
     <script type="module" src="/scripts/scripts.js"></script>
 </head>
 
@@ -35,17 +36,22 @@
                 <editor-menu-section label="Object">
                     <editor-menu-item-object-remove></editor-menu-item-object-remove>
                 </editor-menu-section>
+                <editor-menu-section label="Preferences">
+                    <editor-menu-item-smart-guides></editor-menu-item-smart-guides>
+                </editor-menu-section>
             </editor-menu>
         </div>
         <div class="layout__toolbar">
             <div class="layout__toolbar-tools">
                 <tool-select></tool-select>
-                <tool-pan></tool-pan>
-                <tool-rectangle></tool-rectangle>
+                <!--
+                    <tool-pan></tool-pan>
+                 -->
+                 <tool-rectangle></tool-rectangle>
                 <!-- <tool-text></tool-text> -->
             </div>
             <div class="layout__toolbar-settings">
-                <ptc-gradients></ptc-gradients>
+                <!-- <ptc-gradients></ptc-gradients> -->
                 <setting-zoom></setting-zoom>
             </div>
         </div>

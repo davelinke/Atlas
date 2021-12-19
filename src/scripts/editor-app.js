@@ -86,26 +86,28 @@ class EditorApp extends HTMLElement {
       this.toolActive.activateTool(this)
     })
 
+    /*
     // what to do when workspace starts input
-    this.addEventListener('workspaceInputStart', (e) => {
+    this.addEventListener('mouse:down', (e) => {
       if (this.toolActive !== null) {
         this.toolActive.inputStart(e)
       }
     })
 
     // what to do when workspace ends input
-    this.addEventListener('workspaceInputEnd', (e) => {
+    this.addEventListener('mouse:up', (e) => {
       if (this.toolActive !== null) {
         this.toolActive.inputEnd(e)
       }
     })
 
     // what to do when workspace moves input
-    this.addEventListener('workspaceInputMove', (e) => {
+    this.addEventListener('mouse:move', (e) => {
       if (this.toolActive !== null) {
         this.toolActive.inputMove(e)
       }
     })
+    */
 
     // what to do when workspace moves input
     this.addEventListener('setZoom', (e) => {
