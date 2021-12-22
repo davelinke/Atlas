@@ -84,6 +84,7 @@ class EditorWorkspace extends HTMLElement {
     }
 
     this.initCanvas = () => {
+      fabric.Object.prototype.noScaleCache = false;
       this.canvas = new fabric.Canvas(this._canvasElement)
 
       // fire up an event to make myself available to the app

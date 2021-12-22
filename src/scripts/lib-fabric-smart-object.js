@@ -10,22 +10,21 @@ const SnappyRect = fabric.util.createClass(fabric.Rect, {
   },
   _render: function(ctx) {
     this.callSuper("_render", ctx);
-    this._drawObjectGuides();
   },
 
-  _drawObjectGuides: function() {
+  _drawObjectGuides: function(opacity = 1) {
     const w = this.getScaledWidth();
     const h = this.getScaledHeight();
-    this._drawGuide("top", this.top);
-    this._drawGuide("left", this.left);
-    this._drawGuide("centerX", this.left + w / 2);
-    this._drawGuide("centerY", this.top + h / 2);
-    this._drawGuide("right", this.left + w);
-    this._drawGuide("bottom", this.top + h);
+    this._drawGuide("top", this.top, opacity);
+    this._drawGuide("left", this.left, opacity);
+    this._drawGuide("centerX", this.left + w / 2, opacity);
+    this._drawGuide("centerY", this.top + h / 2, opacity);
+    this._drawGuide("right", this.left + w, opacity);
+    this._drawGuide("bottom", this.top + h, opacity);
     this.setCoords();
   },
 
-  _drawGuide: function(side, pos) {
+  _drawGuide: function(side, pos, opacity = 1) {
     let ln;
     const color = "rgb(178, 207, 255)";
     const lineProps = {
@@ -34,7 +33,7 @@ const SnappyRect = fabric.util.createClass(fabric.Rect, {
       evented: true,
       stroke: color,
       selectable: false,
-      opacity: 1
+      opacity: opacity
     };
 
     switch (side) {
@@ -108,6 +107,7 @@ const SnappyRect = fabric.util.createClass(fabric.Rect, {
     }
     this.guides[side] = ln;
     this.canvas.add(ln);
+    this.canvas.moveTo(ln, 0);
   }
 });
 

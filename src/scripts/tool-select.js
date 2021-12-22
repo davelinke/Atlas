@@ -507,7 +507,6 @@ class ToolSelect extends Tool {
 
     this.toolInit = (app) => {
       // do stuff on initialization
-      console.log(app.canvas)
       const canvas = app.canvas
 
       canvas.off('mouse:down');

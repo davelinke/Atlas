@@ -23,6 +23,10 @@ class ToolRectangle extends Tool {
 
     this.app = null
 
+    this.isAdding = true
+    
+    this.addedObject = null;
+
     // METHODS
 
     this.toolInit = (app) => {
@@ -31,9 +35,8 @@ class ToolRectangle extends Tool {
       this.app = app
       this.canvas = app.canvas;
 
-      console.log('woot', this.canvas)
-
       this.canvas.on('mouse:down', (e) => {
+        console.log('mousedown')
         this._inputDown = true;
         const pointer = this.canvas.getPointer(e.e);
         /*
@@ -60,10 +63,15 @@ class ToolRectangle extends Tool {
           width: pointer.x - this.origX,
           height: pointer.y - this.origY,
           angle: 0,
-          fill: 'rgba(255,0,0,0.5)',
+          fill: 'rgba(255,255,255,1)',
+          stroke: 'rgba(0,0,0,1)',
+          strokeWidth: 1,
+          strokeUniform: true,
           transparentCorners: false
         });
         this.canvas.add(this.rect);
+        this.isAdding = true;
+        this.addedObject = this.rect;
       })
 
       this.canvas.on('mouse:move', (e) => {
@@ -96,6 +104,9 @@ class ToolRectangle extends Tool {
 
       this.canvas.on('mouse:up', () => {
         this._inputDown = false;
+        this.isAdding = false;
+        this.addedObject._drawObjectGuides(0)
+        this.addedObject = null;
 
         fireEvent(this, 'toolChange', this.app.toolDefaultInstance)
       });

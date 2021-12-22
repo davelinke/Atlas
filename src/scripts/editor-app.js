@@ -10,29 +10,31 @@ class EditorApp extends HTMLElement {
 
     // PROPS
 
-    this.doc = null
-
     this._zoomScale = 1
 
-    this.gridSize = 10
+    this.doc = null
 
     this.gridActive = false
 
-    this.workspace = null
+    this.gridSize = 10
+
+    this.keyDownLast = null
+
+    this.keyDownShortcuts = {}
+
+    this.keyboardShortcutsActive = true
+
+    this.keyUpShortcuts = {}
+
+    this.snapThreshold = 4
+
+    this.toolActive = null
 
     this.toolDefault = 'select'
 
     this.toolDefaultInstance = null
 
-    this.toolActive = null
-
-    this.keyDownShortcuts = {}
-
-    this.keyDownLast = null
-
-    this.keyUpShortcuts = {}
-
-    this.keyboardShortcutsActive = true
+    this.workspace = null
 
     Object.defineProperty(this, 'zoomScale', {
       get: () => {
