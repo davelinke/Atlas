@@ -19,6 +19,12 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
     this.adding = false
     this.addedObject = null
 
+    this.reDrawGuides = (e) => {
+      const obj = e.target;
+      if (!(obj instanceof fabric.Rect)) return false;
+      this.drawObjectGuides(obj);
+    }
+
     this.handlers = {
       // object: ["added", "moving", "moved", "scaled", "selected", "over"],
       // mouse: ["down", "up", "moving", "over", "out"]
@@ -28,23 +34,19 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
         },
         moved: (e) => {
           // Add the smart guides around the object
-          const obj = e.target;
-          if (!(obj instanceof fabric.Rect)) return false;
-          this.drawObjectGuides(obj);
+          console.log('moved', e)
+          this.reDrawGuides(e)
         },
         scaling: (e) => {
           this.scaleSnap(e)
         },
         scaled: (e) => {
-          const obj = e.target;
-          if (!(obj instanceof fabric.Rect)) return false;
-          this.drawObjectGuides(obj);
+          console.log('scaled', e)
+          this.reDrawGuides(e)
         },
         modified: (e) => {
-          console.log('modified',e)
-          const obj = e.target;
-          if (!(obj instanceof fabric.Rect)) return false;
-          this.drawObjectGuides(obj);
+          console.log('modified', e)
+          this.reDrawGuides(e)
         },
         added: (e) => {
           this.adding = true;
@@ -53,7 +55,7 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
       },
       mouse: {
         up: (e) => {
-          console.log('mouseup',e, this.addedObject===e.target)
+          console.log('mouseup', e, this.addedObject === e.target)
           this.drawObjectGuides(this.addedObject);
           this.adding = false;
           this.addedObject = null;
@@ -74,7 +76,7 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
       }
     }
 
-    this.scaleSnap = (e)=>{
+    this.scaleSnap = (e) => {
       const drag = e.target;
       const transDir = e.transform.corner;
       console.log(transDir)
@@ -95,10 +97,10 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
       // var {bl,br,tl,tr} = drag.oCoords
       const matches = new Set();
 
-      for (let canvasObject of canvasObjects){
+      for (let canvasObject of canvasObjects) {
         var axis, newPos;
 
-        if (transDir==='mt'){
+        if (transDir === 'mt') {
           const side = 'top';
           axis = side;
           newPos = canvasObject.guides[side][axis];
@@ -115,7 +117,7 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
 
         }
 
-        if (transDir==='mb'){
+        if (transDir === 'mb') {
           const side = 'bottom';
           axis = 'top';
           newPos = canvasObject.guides[side][axis];
@@ -140,7 +142,7 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
       drag.setCoords();
     }
 
-    this.moveSnap = (e)=>{
+    this.moveSnap = (e) => {
       const drag = e.target;
 
       if (!(drag instanceof fabric.SnappyRect)) return false;
@@ -353,9 +355,9 @@ export default class EditorMenuItemSmartGuides extends EditorMenuItem {
     this.drawSideGuides = (obj, transDir) => {
       const w = obj.getScaledWidth();
       const h = obj.getScaledHeight();
-      if (transDir==="mt"){
+      if (transDir === "mt") {
         this.drawGuide("top", obj.top, obj);
-      }
+      }r
       obj.setCoords();
     }
 

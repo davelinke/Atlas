@@ -1,4 +1,5 @@
 import { fireEvent } from './lib-events.js'
+import { debounce } from './lib-tools.js'
 
 const viewportDim = 30000
 
@@ -96,12 +97,19 @@ class EditorWorkspace extends HTMLElement {
     }
 
     this.createCanvas()
+
+    this.resizeCanvas = debounce(()=>{
+      const dims = this.getBoundingClientRect()
+      this.canvas.setWidth(dims.width);
+      this.canvas.setHeight(dims.height);
+      this.canvas.calcOffset();
+    })
   }
 
   // LIFE CYCLE
 
   connectedCallback() {
-
+    window.addEventListener('resize',this.resizeCanvas);
   }
 }
 

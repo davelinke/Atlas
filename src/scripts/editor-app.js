@@ -5,7 +5,7 @@ class EditorApp extends HTMLElement {
   /**
      * the button constructor
      */
-  constructor () {
+  constructor() {
     super()
 
     // PROPS
