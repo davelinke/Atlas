@@ -572,16 +572,15 @@ class ToolSelect extends Tool {
       ws._canvas.appendChild(this.pickAreaElement)
       ws._shadow.appendChild(this.selectAreaElement)
 
-      
+
       this.appReference.addEventListener('zoomChange', this.resizeHandles);
       ws && ws.activateSelection()
+      this.resizeHandles();
     }
     this.resizeHandles = (e) => {
-      console.log(e);
-      console.log(this.handles)
+      const scale = e ? 1 / e.detail : 1 / this.appReference.zoomScale;
       for (let handleId in this.handles) {
         const handle = this.handles[handleId];
-        const scale = 1/e.detail;
         handle.style.transform = `scale(${scale})`;
       }
     };
