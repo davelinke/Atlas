@@ -173,7 +173,6 @@ class SidebarDocument extends SidebarPanel {
         }
         default: {
           const value = input.value ? input.value : (e.detail ? e.detail.value : null);
-          console.log(dimension, value)
           element.setProp(dimension, value)
           fireEvent(this, 'storeDocument', null)
         }
@@ -227,6 +226,10 @@ class SidebarDocument extends SidebarPanel {
         initial: 'H',
       }
     })
+
+    // angle input
+
+
 
     this.addSeparator();
 

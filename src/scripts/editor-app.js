@@ -121,7 +121,6 @@ class EditorApp extends HTMLElement {
     this.onKeyDown = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      // console.log('keydown', e.key)
       this.keyDownLast = e.key
       this.keyDownShortcuts[e.key] && this.keyDownShortcuts[e.key](e)
     }

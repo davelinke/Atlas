@@ -186,7 +186,6 @@ class ToolSelect extends Tool {
     }
 
     this.addToPick = (element) => {
-      //console.log('addToPick')
       element.picked = true
       this.pick.push(element)
       this.resizePickArea()
@@ -194,7 +193,6 @@ class ToolSelect extends Tool {
     }
 
     this.removeFormPick = (element) => {
-      console.log('removeFormPick')
       element.picked = false
       this.pick.splice(this.pick.indexOf(element), 1)
       this.resizePickArea()
@@ -656,6 +654,7 @@ class ToolSelect extends Tool {
 
         if (shiftKey) { // i am definitely adding or removing
           this.pickRegister(element)
+          this.firePickChangeEvent() // fire the change event
         } else { // no shift means i am clearing the selection and starting with an element
           if (this.pick.includes(element)) {
             // just move
@@ -702,7 +701,6 @@ class ToolSelect extends Tool {
 
         } else { // no shift means i have to clear the pick and start a drag
           this.deselectAll() // clear the pick
-          console.log('inputStart')
           this.firePickChangeEvent() // fire the change event
         }
       }
@@ -854,7 +852,6 @@ class ToolSelect extends Tool {
           newPick.splice(this.pick.indexOf(e.detail), 1)
           this.pick = newPick
           this.resizePickArea()
-          console.log('removed from pick')
           this.firePickChangeEvent()
         }
       })
