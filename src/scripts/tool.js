@@ -27,6 +27,7 @@ button:focus,
 }
 ::slotted(i){
     color: var(--tool-button-icon-color, var(--cta-icon-color, #444));
+    font-size: var(--tool-button-icon-size, var(--cta-icon-size, 20px));
 }
 ::slotted(.reflect){
     transform: scaleX(-1);
@@ -103,7 +104,7 @@ class Tool extends HTMLElement {
     // fire up an event to make myself available to the app
     fireEvent(this, 'handShake', this)
 
-    this.innerHTML = `<i class="material-icons ${this.iconClass ? this.iconClass : ''}">${this.icon}</i>`
+    this.innerHTML = `<i class="${this.iconClass ? this.iconClass : ''}"></i>`
   }
 
   // ATTRIBUTE CHANGES

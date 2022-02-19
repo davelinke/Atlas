@@ -67,7 +67,7 @@ class EditorWorkspace extends HTMLElement {
   /**
        * the button constructor
        */
-  constructor () {
+  constructor() {
     super()
 
     // LOAD DEPENDENCIES
@@ -186,15 +186,15 @@ class EditorWorkspace extends HTMLElement {
       ia.setAttribute('class', 'input-area')
     }
 
-    this.addElement = (props = {}, state = 'default') => {
+    this.addElement = (type = 'element', props = {}, state = 'default') => {
       const args = {
         ...{
           left: 15000,
           top: 15000,
           right: 14900,
           bottom: 14900,
-          backgroundColor: '#fff',
-          borderColor: '#000',
+          backgroundColor: '#ffffff',
+          borderColor: '#000000',
           borderWidth: 1,
           borderRadius: 0,
           borderStyle: 'solid',
@@ -210,6 +210,8 @@ class EditorWorkspace extends HTMLElement {
       element.setAttribute('id', elementId)
 
       element.currentState = 'default'
+      element.setType(type)
+      element.setName(type)
       element.setState('default', args)
 
       for (const prop in args) {
@@ -364,7 +366,7 @@ class EditorWorkspace extends HTMLElement {
 
   // LIFE CYCLE
 
-  connectedCallback () {
+  connectedCallback() {
     // scroll to middle if it's not defined
     this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))

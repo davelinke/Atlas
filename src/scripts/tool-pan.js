@@ -7,7 +7,7 @@ class ToolPan extends Tool {
 
     this.name = 'pan'
 
-    this.icon = 'pan_tool'
+    this.iconClass = 'fa-regular fa-hand'
 
     this.cursor = 'grab'
 

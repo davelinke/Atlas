@@ -77,6 +77,10 @@ class EditorApp extends HTMLElement {
       element.onHandShake && element.onHandShake(this)
     })
 
+    this.addEventListener('storeDocument', (e) => {
+      this.storeDocument();
+    })
+
     this.addEventListener('toolChange', (e) => {
       this.toolActive = e.detail
       this.toolActive.activateTool(this)
@@ -117,7 +121,6 @@ class EditorApp extends HTMLElement {
     this.onKeyDown = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      // console.log('keydown', e.key)
       this.keyDownLast = e.key
       this.keyDownShortcuts[e.key] && this.keyDownShortcuts[e.key](e)
     }

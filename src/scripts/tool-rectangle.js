@@ -12,7 +12,7 @@ class ToolRectangle extends Tool {
     // PROPS
     this.name = 'rectangle'
 
-    this.icon = 'crop_din'
+    this.iconClass = 'fa-regular fa-square'
 
     // STATE
 
@@ -131,7 +131,7 @@ class ToolRectangle extends Tool {
       let addedElement = null
 
       if (this._tentativeRectangle) {
-        addedElement = ws.addElement(this._tentativeRectangle)
+        addedElement = ws.addElement('rectangle',this._tentativeRectangle)
 
         // store the doc
         this.app.storeDocument()

@@ -35,7 +35,7 @@ class EditorElement extends HTMLElement {
   /**
      * the button constructor
      */
-  constructor () {
+  constructor() {
     super()
 
     // STATE
@@ -61,8 +61,16 @@ class EditorElement extends HTMLElement {
     // METHODS
 
     this.setState = (state, props) => {
+      console.log(state, props)
       this.states[state] = props
       this.setAttribute(`data-states-${state}`, JSON.stringify(props))
+    }
+
+    this.setName = (name) => {
+      this.setAttribute('data-name', name);
+    }
+    this.setType = (type) => {
+      this.setAttribute('data-type', type);
     }
 
     this.getDimensions = () => {
@@ -72,7 +80,8 @@ class EditorElement extends HTMLElement {
     this.setProp = (prop, value) => {
       this.states[this.currentState][prop] = value
       this.setAttribute(`data-states-${this.currentState}`, JSON.stringify(this.states[this.currentState]))
-      this.style[prop] = value + propUnitsJs[prop]
+      const units = propUnitsJs[prop] ? propUnitsJs[prop] : '';
+      this.style[prop] = value + units
     }
 
     // attach shadow dom
@@ -92,11 +101,15 @@ class EditorElement extends HTMLElement {
     this._shadow.append(this.modGrid)
   }
 
-  connectedCallback () {
+  connectedCallback() {
+    // populate states
     for (const [key, value] of Object.entries(this.dataset)) {
-      const statename = key.replace('states', '').toLowerCase()
-      const props = JSON.parse(value)
-      this.setState(statename, props)
+      const regex = new RegExp('states*');
+      if (regex.test(key)) {
+        const statename = key.replace('states', '').toLowerCase()
+        const props = JSON.parse(value)
+        this.setState(statename, props)
+      }
     }
   }
 }

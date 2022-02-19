@@ -53,12 +53,10 @@ class SettingZoom extends HTMLElement {
     zoomInput.setAttribute('value', '100')
 
     zoomInput.addEventListener('focus', (e) => {
-      console.log('focus')
       fireEvent(this, 'toggleKeyboardShortcuts', false)
     })
 
     zoomInput.addEventListener('blur', (e) => {
-      console.log('blur')
       fireEvent(this, 'toggleKeyboardShortcuts', true)
     })
 
