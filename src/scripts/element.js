@@ -1,7 +1,5 @@
 class CustomElement extends HTMLElement {
-  /**
-     * the button constructor
-     */
+
   constructor () {
     super()
 

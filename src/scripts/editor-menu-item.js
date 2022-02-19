@@ -26,9 +26,7 @@ button{
 `
 
 class EditorMenuItem extends CustomElement {
-  /**
-     * the button constructor
-     */
+
   constructor () {
     super()
 

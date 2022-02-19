@@ -3,9 +3,6 @@ import { filterCoord } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
 
 class ToolRectangle extends Tool {
-  /**
-       * the button constructor
-       */
   constructor () {
     super()
 

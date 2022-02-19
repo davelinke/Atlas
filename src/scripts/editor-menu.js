@@ -1,7 +1,5 @@
 class EditorMenu extends HTMLElement {
-  /**
-     * the button constructor
-     */
+
   constructor () {
     super()
 

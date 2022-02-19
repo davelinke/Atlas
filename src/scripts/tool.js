@@ -35,9 +35,7 @@ button:focus,
 `
 
 class Tool extends HTMLElement {
-  /**
-     * the button constructor
-     */
+
   constructor () {
     super()
 

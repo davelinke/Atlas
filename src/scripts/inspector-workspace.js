@@ -60,7 +60,7 @@ class InspectorWorkspace extends HTMLElement {
         }
       });
       nextElements.forEach(element => {
-        element.classList.add('picked');
+        element && element.classList && element.classList.add('picked');
       });
     }
 
