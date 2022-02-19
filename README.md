@@ -12,6 +12,12 @@ This latest iteration makes use of contemporary ESM modules to fulfill the goal 
 
 Although you end up creating a bit of a framework yourself while doing this, it provides many advantages, being the most important one independence and slim codebase.
 
-The architecture of this project relies on modularized web components, simple native event bubbling and handshake patterns that allow new modules to have visibility of the whole and shared state. This means it's fully decoupled. you remove a feature and everything else keeps on working fine and dandy.
+The architecture of this project relies on modularized web components, simple native event bubbling and handshake patterns that allow new modules to have visibility of the whole app and the shared state, This means it's fully decoupled; you remove a feature and everything else keeps on working fine and dandy.
 
 There's a long road ahead in terms of completing this project, as well as documenting it properly. Should you want to collaborate jut let me know!
+
+## Run it locally
+Download/clone the repo
+
+    - npm install
+    - npm start

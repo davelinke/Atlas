@@ -4,8 +4,15 @@ import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
 import { propUnitsJs } from './lib-units.js'
 
+
+/**
+ * THE VIEWPORT DIMENSION BOTH IN HEIGHT AND WIDTH
+ */
 const viewportDim = 30000
 
+/**
+ * THE CSS FOR THE WORKSPACE
+ */
 const Css = `
 :host{
     display:block;
@@ -64,25 +71,31 @@ const Css = `
 `
 
 class EditorWorkspace extends HTMLElement {
-  /**
-       * the button constructor
-       */
   constructor() {
     super()
 
-    // LOAD DEPENDENCIES
 
+    /**
+     * LOAD DEPENDENCIES
+     */
     LoadParticles(['editor-element'])
 
-    // STATE
+    /**
+     * THE WORKPSACE STATE
+     */
 
     this.canvasOffsetLeft = 0
     this.canvasOffsetTop = 0
 
     this.viewportDim = viewportDim
 
-    // METHODS
+    /**
+     * METHODS
+     */
 
+    /**
+     * a method to get the current mouse position
+     */
     this.mouseCoords = (e, scale) => {
       const rect = this._workspace.getBoundingClientRect()
 
@@ -110,6 +123,9 @@ class EditorWorkspace extends HTMLElement {
       return returnValue
     }
 
+    /**
+     * a method to register the mouse/touch input start event
+     */
     this.startInput = (e) => {
       e.stopPropagation()
       e.preventDefault()
@@ -117,18 +133,18 @@ class EditorWorkspace extends HTMLElement {
       // so any input focused blurs
       this._canvas.focus()
 
-      if (e.button === 0) {
+      if (e.button === 0) { // the principal mouse button (we have to add touch at some point)
         const downEvent = e
         const scale = this.app.zoomScale
         const downEventDetail = this.mouseCoords(downEvent, scale)
 
         // fire start event listener
-
         fireEvent(this, 'workspaceInputStart', {
           mouseEvent: e,
           coords: downEventDetail
         })
 
+        // a method that defines what to do when the input stops
         const stopInput = () => {
           // fire end event listener
           const scale = this.app.zoomScale
@@ -147,6 +163,7 @@ class EditorWorkspace extends HTMLElement {
           document.removeEventListener('touchmove', move)
         }
 
+        // a method that defines what to do when the input moves
         const move = (e) => {
           const coords = this.mouseCoords(e, scale)
 
@@ -159,6 +176,7 @@ class EditorWorkspace extends HTMLElement {
           fireEvent(this, 'workspaceInputMove', moveEventDetail)
         }
 
+        // register the listeners for the stop and move events
         document.addEventListener('mouseup', stopInput)
         document.addEventListener('touchend', stopInput)
         document.addEventListener('mousemove', move)
@@ -166,6 +184,9 @@ class EditorWorkspace extends HTMLElement {
       }
     }
 
+    /**
+     * A method to set the initial style of the input area
+     */
     this.inputAreaStart = (args) => {
       const ia = this._inputArea
       ia.classList.add(args.variant)
@@ -174,6 +195,10 @@ class EditorWorkspace extends HTMLElement {
       ia.style.right = `${args.right}px`
       ia.style.bottom = `${args.bottom}px`
     }
+
+    /**
+     * A method to resize the style of the input area
+     */
     this.inputAreaResize = (args) => {
       const ia = this._inputArea
       ia.style.top = `${args.top}px`
@@ -181,11 +206,18 @@ class EditorWorkspace extends HTMLElement {
       ia.style.right = `${args.right}px`
       ia.style.bottom = `${args.bottom}px`
     }
+
+    /**
+     * A methood to clear the style of the input area
+     */
     this.inputAreaClear = () => {
       const ia = this._inputArea
       ia.setAttribute('class', 'input-area')
     }
 
+    /**
+     * A method to add an element to the workspace
+     */
     this.addElement = (type = 'element', props = {}, state = 'default') => {
       const args = {
         ...{
@@ -225,6 +257,8 @@ class EditorWorkspace extends HTMLElement {
       return element
     }
 
+    /*
+    // this method is not used
     this.insertElement = (element, popEvent = true) => {
       this._canvas.appendChild(element)
 
@@ -232,12 +266,19 @@ class EditorWorkspace extends HTMLElement {
         fireEvent(this, 'editorElementAdded', element)
       }
     }
+    */
 
+    /**
+     * A method to remove an element to the workspace
+     */
     this.removeElement = (element) => {
       fireEvent(this, 'editorElementRemoved', element)
       this._canvas.removeChild(element)
     }
 
+    /**
+     * A method to set the canvas offset
+     */
     this.canvasOffset = (newLeft, newTop) => {
       const c = this._canvas
 
@@ -250,13 +291,23 @@ class EditorWorkspace extends HTMLElement {
       fireEvent(this, 'editorCanvasOffset', { left: newLeft, top: newTop })
     }
 
+    /**
+     * A method to instantiate that something has been selected
+     */
     this.activateSelection = () => {
       this._canvas.classList.add('selection-active')
     }
+
+    /**
+     * A method to instatniate that something has been deselected
+     */
     this.deactivateSelection = () => {
       this._canvas.classList.remove('selection-active')
     }
 
+    /**
+     * A method that returns the HTML of the entire document
+     */
     this.getDocumentHTML = () => {
       // tools to register
       const doc = this._canvas.cloneNode(true)
@@ -267,12 +318,18 @@ class EditorWorkspace extends HTMLElement {
       return doc.innerHTML
     }
 
+    /**
+     * A method to clear the canvas
+     */
     this.clearCanvas = () => {
       this._canvas.querySelectorAll('editor-element').forEach(el => {
         this.removeElement(el)
       })
     }
 
+    /**
+     * A method to set the state of the workspace as it was saved
+     */
     this.setSavedWorkspace = () => {
       // set the initial offset
       const storedCanvasOffset = JSON.parse(window.localStorage.getItem('canvasOffset'))
@@ -283,6 +340,9 @@ class EditorWorkspace extends HTMLElement {
       storedZoom && fireEvent(this, 'setZoom', storedZoom)
     }
 
+    /**
+     * A method to load previously saved HTML into the workspace
+     */
     this.loadDocumentHTML = (html, isAutoSave = false) => {
       const canvasHelpers = []
       this._canvas.childNodes.forEach(el => {
@@ -308,6 +368,9 @@ class EditorWorkspace extends HTMLElement {
       this.app.storeDocument()
     }
 
+    /**
+     * A method to initialize the workspace
+     */
     this.initWorkspace = () => {
       this.app.addEventListener('zoomChange', (e) => {
         // set the transform origin at the center of the viewport
@@ -318,12 +381,18 @@ class EditorWorkspace extends HTMLElement {
       storedDocument && this.loadDocumentHTML(storedDocument, true)
     }
 
+    /**
+     * A method defining what to do on the handshake with the app
+     */
     this.onHandShake = (app) => {
       this.app = app
       app.workspace = this
       this.initWorkspace()
     }
 
+    /**
+     * A method to return all the elements in the workspace
+     */
     this.getElements = () => {
       const elements = Array.from(this._canvas.childNodes)
       return elements.filter(el => {
@@ -331,7 +400,10 @@ class EditorWorkspace extends HTMLElement {
       })
     }
 
-    // STRUCTURE
+    /**
+     * LET'S CREATE THE WORKSPACE STRUCTURE
+     */
+
 
     this._shadow = this.attachShadow({ mode: 'open' })
 
@@ -364,14 +436,17 @@ class EditorWorkspace extends HTMLElement {
     this._wrapper.append(this._workspace)
   }
 
-  // LIFE CYCLE
 
+
+  /**
+   * A METHOD TO EXECUTE WHEN THE WORKSPACE IS INSTANTIATED IN THE DOM
+   */
   connectedCallback() {
-    // scroll to middle if it's not defined
+    // scroll to middle point of the workspace if it's not defined
     this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
 
-    // fire up an event to make myself available to the app
+    // fire up the handshake event to make myself available to the app
     fireEvent(this, 'handShake', this)
   }
 }

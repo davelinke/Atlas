@@ -21,38 +21,50 @@
 </head>
 
 <body>
+    <!-- 
+        Here's where we add features to the app
+        by just inserting the web component designated tag
+        into the HTML structure od this file and voilla!
+    -->
     <editor-app class="layout">
         <div class="layout__workspace">
+            <!-- the workspace-->
             <editor-workspace></editor-workspace>
         </div>
         <div class="layout__menu">
+            <!-- the menu-->
             <editor-menu>
+                <!-- the file menu contents -->
                 <editor-menu-section label="File">
                     <editor-menu-item-file-new></editor-menu-item-file-new>
                     <editor-menu-item-file-open></editor-menu-item-file-open>
                     <editor-menu-item-file-save-as></editor-menu-item-file-save-as>
                 </editor-menu-section>
+                <!-- the object menu contents -->
                 <editor-menu-section label="Object">
                     <editor-menu-item-object-remove></editor-menu-item-object-remove>
                 </editor-menu-section>
             </editor-menu>
         </div>
         <div class="layout__toolbar">
+            <!-- the top toolbar-->
             <div class="layout__toolbar-tools">
                 <tool-select></tool-select>
                 <tool-pan></tool-pan>
                 <tool-rectangle></tool-rectangle>
                 <!-- <tool-text></tool-text> -->
             </div>
+            <!--- the settings area at the end of the top toolbar -->
             <div class="layout__toolbar-settings">
-                <ptc-gradients></ptc-gradients>
                 <setting-zoom></setting-zoom>
             </div>
         </div>
         <div class="layout__docbar">
+            <!-- the document bar with the map of available elements -->
             <inspector-workspace></inspector-workspace>
         </div>
         <div class="layout__sidebar">
+            <!-- the sidebar with the tools to operate on the workspace elemennts -->
             <sidebar-document></sidebar-document>
             <sidebar-element></sidebar-element>
             <sidebar-multiple></sidebar-multiple>
