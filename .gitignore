@@ -16,3 +16,14 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+functions/
+firebase.json
+firestore.indexes.json
+firestore.rules
+functions/.eslintrc.js
+functions/index.js
+functions/package-lock.json
+functions/package.json
+storage.rules
+.firebaserc
+.firebase/hosting.c3Jj.cache
