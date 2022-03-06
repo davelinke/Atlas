@@ -804,6 +804,8 @@ class ToolSelect extends Tool {
           this.isAdding = false
         })
 
+        this.firePickChangeEvent();
+
         this.pickBeforeDrag = []
         this.dragCoveredElements = []
 
@@ -836,7 +838,7 @@ class ToolSelect extends Tool {
         }
       })
 
-      this.app.addEventListener('selectPickAdd', (e) => {
+      this.app.addEventListener('toolsSelectPickAdd', (e) => {
         const elementsToPick = e.detail
         elementsToPick.forEach((element) => {
           this.pickRegister(element)
@@ -844,6 +846,8 @@ class ToolSelect extends Tool {
 
         this.pickAreaElement.setDimension('opacity', 1)
         this.pickAreaHidden = false
+        this.resizePickArea()
+        this.firePickChangeEvent()
       })
 
       this.app.addEventListener('editorElementRemoved', (e) => {

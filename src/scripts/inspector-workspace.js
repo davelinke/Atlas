@@ -5,6 +5,9 @@ const Css = `
 .element-tree-item{
   padding: 0.5rem 0.75rem;
   font-size: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+
 }
 .picked{
   background-color: var(--inspector-picked-background-color, var(--cta-color-active, #f5f5f5));
@@ -14,72 +17,88 @@ class InspectorWorkspace extends HTMLElement {
   constructor() {
     super()
 
-    // STATE
-    this.app = null
+    /**
+     * METHODS
+     */
 
-    this.pickLengthShow = 0
+    /**
+     * A method to handle when an entanglement is clicked
+     */
+    this.handleSelection = (e) => {
+      const theElement = e.target.actualElement;
 
-    this.mainHeading = null
+      // we send the selection to the selection tool via event.
+      fireEvent(this, 'toolsSelectPickAdd', [theElement])
+    }
 
-    // METHODS
+    /**
+     * A method to create the entangled inspector element
+     */
+    this.createEntanglement = (element) => {
+      const div = document.createElement('div');
+      div.classList.add('element-tree-item');
+      div.innerHTML = element.dataset.name
+      div.actualElement = element;
+      div.addEventListener('click', this.handleSelection)
+      div.setAttribute('data-id', element.getAttribute('id'));
+      div.setAttribute('data-type', element.getAttribute('type'));
+      return div;
+    }
 
+    /**
+     * A method to build the tree of elements
+     */
     this.buildTree = (element, target) => {
-        const children = element.querySelectorAll('editor-element');
-        const createDiv = (element) => {
-            const div = document.createElement('div');
-            div.classList.add('element-tree-item');
-            div.innerHTML = element.dataset.name
-            div.setAttribute('data-id', element.getAttribute('id'));
-            div.setAttribute('data-type', element.getAttribute('type'));
-            return div;
-        }
-        for (let i = 0; i < children.length; i++) {
-            const div = createDiv(children[i]);
-            target.appendChild(div);
-            this.buildTree(children[i], div);
-        }
+      const children = element.querySelectorAll('editor-element');
+      for (let i = 0; i < children.length; i++) {
+        const div = this.createEntanglement(children[i]);
+        target.appendChild(div);
+        this.buildTree(children[i], div);
+      }
     }
 
-    this.pickChange = (e) =>{
-      const pickElements = e.detail;
-      const nextElements = []
-      console.log(pickElements)
-      pickElements.forEach(element => {
-        const id = element.getAttribute('id');
-        const nextElement = this.shadowRoot.querySelector(`[data-id="${id}"]`)
-        console.log(nextElements)
-        nextElements.push(nextElement);
-      });
-      console.log(nextElements)
-      const currentPickedElements = this.shadowRoot.querySelectorAll('.picked');
-      currentPickedElements.forEach(element => {
-        if (!nextElements.includes(element)) {
-          element.classList.remove('picked');
-        } else {
-          nextElements.splice(nextElements.indexOf(element), 1);
+    /**
+     * A method to handle the changes in the pick (from outside of the inspector)
+     */
+    this.pickChange = (e) => {
+      const pickElements = [...e.detail];
+      const inspectorElements = Array.from(this.scroller.children);
+      for (let child of inspectorElements) {
+        const isInPick = pickElements.includes(child.actualElement);
+        child.classList[isInPick ? 'add' : 'remove']('picked')
+        if (isInPick) {
+          pickElements.splice(pickElements.indexOf(child.actualElement), 1)
+          if (pickElements.length === 0) {
+            break;
+          }
         }
-      });
-      nextElements.forEach(element => {
-        element && element.classList && element.classList.add('picked');
-      });
+      }
     }
 
-    this.elementAdded = (e) =>{
-      console.log(e);
+    /**
+     * A method to handle when an element is added to the document
+     */
+    this.elementAdded = (e) => {
+      const actualElement = e.detail;
+      const div = this.createEntanglement(actualElement);
+      this.scroller.appendChild(div)
     }
 
+    /**
+     * A method to handle the handshake with the app
+     */
     this.onHandShake = (app) => {
-      this.app = app
+      
       const canvas = app.workspace._canvas
       this.buildTree(canvas, this.scroller)
 
-      this.app.addEventListener('pickChange', this.pickChange)
-      
-      this.app.addEventListener('editorElementAdded', this.elementAdded)
+      app.addEventListener('pickChange', this.pickChange)
 
-    //   this.app.addEventListener('canvasModEnd', this.pickModEnd)
+      app.addEventListener('editorElementAdded', this.elementAdded)
 
-    //   this.app.addEventListener('canvasModStart', this.pickModStart)
+      //   this.app.addEventListener('canvasModEnd', this.pickModEnd)
+
+      //   this.app.addEventListener('canvasModStart', this.pickModStart)
     }
 
     // STRUCTURE
