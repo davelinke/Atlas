@@ -838,16 +838,23 @@ class ToolSelect extends Tool {
         }
       })
 
-      this.app.addEventListener('toolsSelectPickAdd', (e) => {
+      this.app.addEventListener('toolsSelectPickSet', (e) => {
         const elementsToPick = e.detail
+        this.deselectAll()
         elementsToPick.forEach((element) => {
-          this.pickRegister(element)
+          this.addToPick(element)
+          this.pickStartUpdate()
         })
 
         this.pickAreaElement.setDimension('opacity', 1)
         this.pickAreaHidden = false
         this.resizePickArea()
         this.firePickChangeEvent()
+      })
+
+      this.app.addEventListener('toolsSelectIsAdding', (e) => {
+        this.isAdding = e.detail;
+        console.log(this.isAdding)
       })
 
       this.app.addEventListener('editorElementRemoved', (e) => {

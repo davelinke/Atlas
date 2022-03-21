@@ -16,6 +16,13 @@ const Css = `
 class InspectorWorkspace extends HTMLElement {
   constructor() {
     super()
+    /**
+     * STATE
+     */
+
+    this.pick = [];
+
+    this.lastClickedElement = null;
 
     /**
      * METHODS
@@ -25,10 +32,41 @@ class InspectorWorkspace extends HTMLElement {
      * A method to handle when an entanglement is clicked
      */
     this.handleSelection = (e) => {
+      const ctrlKey = e.ctrlKey || e.metaKey;
       const theElement = e.target.actualElement;
+      let elementArray;
 
+      if (ctrlKey) {
+        // ctrl-click
+        if (this.pick.includes(theElement)) {
+          // remove from pick
+          elementArray = [...this.pick].filter(element => element !== theElement);
+        } else {
+          // add to pick
+          elementArray = [...this.pick, ...[theElement]];
+        }
+        this.lastClickedElement = e.target;
+      } else if (e.shiftKey) {
+        // shift-click
+        if (this.lastClickedElement) {
+          // lets find the range of elements
+          const allElements = Array.from(e.target.parentNode.childNodes)
+          const start = allElements.indexOf(this.lastClickedElement);
+          const end = allElements.indexOf(e.target);
+
+          const minElement = Math.min(start, end);
+          const maxElement = Math.max(start, end) + 1;
+          const range = allElements.slice(minElement, maxElement);
+          
+          elementArray = range.map(element => element.actualElement);
+        }
+      } else {
+        // click
+        elementArray = [theElement];
+        this.lastClickedElement = e.target;
+      }
       // we send the selection to the selection tool via event.
-      fireEvent(this, 'toolsSelectPickAdd', [theElement])
+      fireEvent(this, 'toolsSelectPickSet', elementArray)
     }
 
     /**
@@ -61,16 +99,14 @@ class InspectorWorkspace extends HTMLElement {
      * A method to handle the changes in the pick (from outside of the inspector)
      */
     this.pickChange = (e) => {
+      this.pick = e.detail;
       const pickElements = [...e.detail];
       const inspectorElements = Array.from(this.scroller.children);
       for (let child of inspectorElements) {
-        const isInPick = pickElements.includes(child.actualElement);
+        const isInPick = (pickElements.length > 0) && pickElements.includes(child.actualElement);
         child.classList[isInPick ? 'add' : 'remove']('picked')
         if (isInPick) {
           pickElements.splice(pickElements.indexOf(child.actualElement), 1)
-          if (pickElements.length === 0) {
-            break;
-          }
         }
       }
     }
@@ -88,7 +124,7 @@ class InspectorWorkspace extends HTMLElement {
      * A method to handle the handshake with the app
      */
     this.onHandShake = (app) => {
-      
+
       const canvas = app.workspace._canvas
       this.buildTree(canvas, this.scroller)
 
