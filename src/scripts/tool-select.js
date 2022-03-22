@@ -854,7 +854,6 @@ class ToolSelect extends Tool {
 
       this.app.addEventListener('toolsSelectIsAdding', (e) => {
         this.isAdding = e.detail;
-        console.log(this.isAdding)
       })
 
       this.app.addEventListener('editorElementRemoved', (e) => {

@@ -69,6 +69,9 @@ class InspectorWorkspace extends HTMLElement {
       fireEvent(this, 'toolsSelectPickSet', elementArray)
     }
 
+    /**
+     * A method to rename elements
+     */
     this.renameElement = (e) => {
       const theElement = e.target.actualElement;
       const name = prompt('Rename Element', theElement.dataset.name);

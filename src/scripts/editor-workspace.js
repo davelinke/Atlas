@@ -240,9 +240,6 @@ class EditorWorkspace extends HTMLElement {
 
       const elementId = GenerateId()
 
-      console.log(this.app)
-
-
       const elementName = FixDuplicateName(GenerateName(type), this.getElements().map(e => e.dataset.name));
 
       element.setAttribute('id', elementId)
@@ -262,17 +259,6 @@ class EditorWorkspace extends HTMLElement {
 
       return element
     }
-
-    /*
-    // this method is not used
-    this.insertElement = (element, popEvent = true) => {
-      this._canvas.appendChild(element)
-
-      if (popEvent) {
-        fireEvent(this, 'editorElementAdded', element)
-      }
-    }
-    */
 
     /**
      * A method to remove an element to the workspace
