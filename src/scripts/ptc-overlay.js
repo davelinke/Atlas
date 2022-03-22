@@ -173,446 +173,438 @@ const Css = `
 `
 
 export default class PtcOverlay extends HTMLElement {
-    constructor() {
-        super()
+  constructor () {
+    super()
 
-        this.layer = null
-        this.targetElement = null
-        this.selectMaxHeight = 500
+    this.layer = null
+    this.targetElement = null
+    this.selectMaxHeight = 500
 
-        this._hidden = true;
-        this.layerStyle = {};
-        this._orientation = 'nn'
-        Object.defineProperty(this, 'orientation', {
-            get: () => {
-                return this._show;
-            },
-            set: (val) => {
-                if (val !== this._orientation) {
-                    this._orientation = val;
-                    this.layer.classList.remove(`pp`, `np`, `pn`, `nn`);
-                    this.layer.classList.add(this._orientation);
-                }
-            }
-        })
+    this._hidden = true
+    this.layerStyle = {}
+    this._orientation = 'nn'
+    Object.defineProperty(this, 'orientation', {
+      get: () => {
+        return this._show
+      },
+      set: (val) => {
+        if (val !== this._orientation) {
+          this._orientation = val
+          this.layer.classList.remove('pp', 'np', 'pn', 'nn')
+          this.layer.classList.add(this._orientation)
+        }
+      }
+    })
 
-        this._show = false
-        Object.defineProperty(this, 'show', {
-            get: () => {
-                return this._show;
-            },
-            set: (val) => {
-                if (val !== this._show) {
-                    this._show = val;
-                    if (this._show) {
-                        this.showOverlay();
-                    } else {
-                        this.hideOverlay({
-                            target: this.targetElement,
-                            composedPath() {
-                                return false;
-                            },
-                        });
-                    }
-                }
-            }
-        })
+    this._show = false
+    Object.defineProperty(this, 'show', {
+      get: () => {
+        return this._show
+      },
+      set: (val) => {
+        if (val !== this._show) {
+          this._show = val
+          if (this._show) {
+            this.showOverlay()
+          } else {
+            this.hideOverlay({
+              target: this.targetElement,
+              composedPath () {
+                return false
+              }
+            })
+          }
+        }
+      }
+    })
 
-        this._width = '300px'
-        Object.defineProperty(this, 'width', {
-            get: () => {
-                return this._width;
-            },
-            set: (val) => {
-                if (val !== this._width) {
-                    this._width = val;
-                    // this.setLayerStyle({ pointerEvents: 'none' });
-                }
-            }
-        })
+    this._width = '300px'
+    Object.defineProperty(this, 'width', {
+      get: () => {
+        return this._width
+      },
+      set: (val) => {
+        if (val !== this._width) {
+          this._width = val
+          // this.setLayerStyle({ pointerEvents: 'none' });
+        }
+      }
+    })
 
-        this._height = '220px'
-        Object.defineProperty(this, 'height', {
-            get: () => {
-                return this._height;
-            },
-            set: (val) => {
-                if (val !== this._height) {
-                    this._height = val;
-                    // this.setLayerStyle({ pointerEvents: 'none' });
-                }
-            }
-        })
+    this._height = '220px'
+    Object.defineProperty(this, 'height', {
+      get: () => {
+        return this._height
+      },
+      set: (val) => {
+        if (val !== this._height) {
+          this._height = val
+          // this.setLayerStyle({ pointerEvents: 'none' });
+        }
+      }
+    })
 
-
-        /**
+    /**
          * disables overlay toggling on target element click
          */
-        this.noToggle = false;
+    this.noToggle = false
 
-        /**
+    /**
          * disables the overlay funcitonality
          */
-        this._disabled = false;
-        Object.defineProperty(this, 'disabled', {
-            get: () => {
-                return this._show;
-            },
-            set: (val) => {
-                if (val !== this._disabled) {
-                    this._disabled = val;
-                    this.targetElement.classList[this._disabled ? 'add' : 'remove']('disabled');
-                }
-            }
-        })
+    this._disabled = false
+    Object.defineProperty(this, 'disabled', {
+      get: () => {
+        return this._show
+      },
+      set: (val) => {
+        if (val !== this._disabled) {
+          this._disabled = val
+          this.targetElement.classList[this._disabled ? 'add' : 'remove']('disabled')
+        }
+      }
+    })
 
-        /**
+    /**
          * Specify whether component should render from right to left
          */
-        this.variant = 'popover';
+    this.variant = 'popover'
 
-        /**
+    /**
          * Specify the minWidth of the layer in CSS units
          */
-        this.minWidth = '100px';
+    this.minWidth = '100px'
 
-        /**
+    /**
          * Specify whether component should render as block or inline element
          */
-        this.block = false;
+    this.block = false
 
-        /**
+    /**
          * Provides an accessible name for the slot content
          */
-        this.ariaLabel = null;
+    this.ariaLabel = null
 
-        /**
+    /**
          * Forces the overlay to open in a certain direction. Possible values are "ne", "se", "sw" and "nw"
          */
-        this.direction = null;
+    this.direction = null
 
-        /**
+    /**
          * Method to toggle the overlay state programatically.
          */
-        this.toggle = (e) => {
-            this.toggleOverlay(e);
-        }
+    this.toggle = (e) => {
+      this.toggleOverlay(e)
+    }
 
-        /**
+    /**
          * Method to determine if the overlay is shown at a specific moment.
          */
-        this.isShown = () => {
-            return !this._hidden;
+    this.isShown = () => {
+      return !this._hidden
+    }
+
+    // this function toggles the overlay state
+    this.toggleOverlay = e => {
+      if (!this.disabled && !this.noToggle) {
+        if (this._hidden) {
+          return this.showOverlay()
         }
+        return this.hideOverlay(e)
+      }
+    }
 
-        // this function toggles the overlay state
-        this.toggleOverlay = e => {
-            if (!this.disabled && !this.noToggle) {
-                if (this._hidden) {
-                    return this.showOverlay();
-                }
-                return this.hideOverlay(e);
-            }
-        };
+    // this funciton shows the overlay
+    this.showOverlay = () => {
+      setTimeout(() => {
+        document.addEventListener('scroll', this.hideOverlay, true)
+        window.addEventListener('resize', this.hideOverlay)
+        document.addEventListener('click', this.hideOverlay)
+      })
+      this.positionOverlay()
+      const pointerEvents = { pointerEvents: 'all' }
+      this.layerStyle = { ...this.layerStyle, ...pointerEvents }
+      this._hidden = false
+      // set layer style
+      for (const [key, value] of Object.entries(this.layerStyle)) {
+        this.layer.style[key] = value
+      }
+      this.setAttribute('aria-hidden', 'false')
+      this.setAttribute('aria-expanded', 'true')
+      this.layer.classList.remove('hidden')
+      fireEvent(this, 'ptcShow', true)
+    }
 
-        // this funciton shows the overlay
-        this.showOverlay = () => {
-            setTimeout(() => {
-                document.addEventListener('scroll', this.hideOverlay, true);
-                window.addEventListener('resize', this.hideOverlay);
-                document.addEventListener('click', this.hideOverlay);
-            });
-            this.positionOverlay();
-            const pointerEvents = { pointerEvents: 'all' };
-            this.layerStyle = { ...this.layerStyle, ...pointerEvents };
-            this._hidden = false;
-            // set layer style
-            for (const [key, value] of Object.entries(this.layerStyle)) {
-                this.layer.style[key] = value;
-            }
-            this.setAttribute('aria-hidden', 'false');
-            this.setAttribute('aria-expanded', 'true');
-            this.layer.classList.remove('hidden');
-            fireEvent(this, 'ptcShow', true);
-        };
+    // this function hides the overlay
 
-        // this function hides the overlay
+    this.hideOverlay = e => {
+      // determine if the click is within the content slot that's within the overlay
+      const path = e.composedPath()
 
-        this.hideOverlay = e => {
-            // determine if the click is within the content slot that's within the overlay
-            const path = e.composedPath();
+      // sometimes we send a fake event without composed path when we hide the overlay by prop
+      // therefore we force the "clickoutside" by just saying it was outside
+      const isWithin = path.includes(this.layer)
 
-            // sometimes we send a fake event without composed path when we hide the overlay by prop
-            // therefore we force the "clickoutside" by just saying it was outside
-            const isWithin = path.includes(this.layer)
-
-            if (!isWithin) {
-                document.removeEventListener('scroll', this.hideOverlay, true);
-                window.removeEventListener('resize', this.hideOverlay);
-                document.removeEventListener('click', this.hideOverlay);
-                const pointerEvents = { pointerEvents: 'none' };
-                this.layerStyle = { ...this.layerStyle, ...pointerEvents };
-                this._hidden = true;
-                // set layer style
-                for (const [key, value] of Object.entries(this.layerStyle)) {
-                    this.layer.style[key] = value;
-                }
-                this.setAttribute('aria-hidden', 'true');
-                this.setAttribute('aria-expanded', 'false');
-                this.layer.classList.add('hidden');
-                fireEvent(this, 'ptcShow', false);
-            }
-        };
-
-        this.getOrientation = (key,elementDimensions,layerDimensions) => {
-            const formulas = new Map();
-
-            formulas.set('ltr_pn', {
-                left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
-                top: elementDimensions.top + elementDimensions.height + 'px',
-            });
-
-            formulas.set('ltr_np', {
-                left: elementDimensions.left + 'px',
-                top: elementDimensions.top - layerDimensions.height + 'px',
-            });
-
-            formulas.set('ltr_pp', {
-                left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
-                top: elementDimensions.top - layerDimensions.height + 'px',
-            });
-
-            formulas.set('ltr_nn', {
-                left: elementDimensions.left + 'px',
-                top: elementDimensions.top + elementDimensions.height + 'px',
-            });
-
-            formulas.set('rtl_pn', {
-                left: elementDimensions.left + 'px',
-                top: elementDimensions.top + elementDimensions.height + 'px',
-            });
-
-            formulas.set('rtl_np', {
-                left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
-                top: elementDimensions.top - layerDimensions.height + 'px',
-            });
-
-            formulas.set('rtl_pp', {
-                left: elementDimensions.left + 'px',
-                top: elementDimensions.top - layerDimensions.height + 'px',
-            });
-
-            formulas.set('rtl_nn', {
-                left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
-                top: elementDimensions.top + elementDimensions.height + 'px',
-            });
-
-            return formulas.get(key);
+      if (!isWithin) {
+        document.removeEventListener('scroll', this.hideOverlay, true)
+        window.removeEventListener('resize', this.hideOverlay)
+        document.removeEventListener('click', this.hideOverlay)
+        const pointerEvents = { pointerEvents: 'none' }
+        this.layerStyle = { ...this.layerStyle, ...pointerEvents }
+        this._hidden = true
+        // set layer style
+        for (const [key, value] of Object.entries(this.layerStyle)) {
+          this.layer.style[key] = value
         }
+        this.setAttribute('aria-hidden', 'true')
+        this.setAttribute('aria-expanded', 'false')
+        this.layer.classList.add('hidden')
+        fireEvent(this, 'ptcShow', false)
+      }
+    }
 
-        this.positionOverlay = () => {
-            // find position on screen
-            const elementDimensions = this.targetElement.getBoundingClientRect();
+    this.getOrientation = (key, elementDimensions, layerDimensions) => {
+      const formulas = new Map()
 
-            // get overlay dimensions
-            const layerDimensions = this.layer.getBoundingClientRect();
+      formulas.set('ltr_pn', {
+        left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
+        top: elementDimensions.top + elementDimensions.height + 'px'
+      })
 
-            // get window width and height
-            const windowDimensions = {
-                width: document.documentElement.clientWidth,
-                height: document.documentElement.clientHeight,
-            };
+      formulas.set('ltr_np', {
+        left: elementDimensions.left + 'px',
+        top: elementDimensions.top - layerDimensions.height + 'px'
+      })
 
-            // define base overlay style
-            const minWidth =
-                this.width === 'auto' && this.block ? this.targetElement.getBoundingClientRect().width + 'px' : this.minWidth;
-            const layerStyle = {
-                width: this.layerStyle.width,
-                height: layerDimensions.height + 'px',
-                left: '',
-                top: '',
-                pointerEvents: 'all',
-                minWidth,
-            };
+      formulas.set('ltr_pp', {
+        left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
+        top: elementDimensions.top - layerDimensions.height + 'px'
+      })
 
-            let caseString;
-            let flow;
-            let lateralOverflow;
-            let verticalOverflow;
+      formulas.set('ltr_nn', {
+        left: elementDimensions.left + 'px',
+        top: elementDimensions.top + elementDimensions.height + 'px'
+      })
 
-            /*
+      formulas.set('rtl_pn', {
+        left: elementDimensions.left + 'px',
+        top: elementDimensions.top + elementDimensions.height + 'px'
+      })
+
+      formulas.set('rtl_np', {
+        left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
+        top: elementDimensions.top - layerDimensions.height + 'px'
+      })
+
+      formulas.set('rtl_pp', {
+        left: elementDimensions.left + 'px',
+        top: elementDimensions.top - layerDimensions.height + 'px'
+      })
+
+      formulas.set('rtl_nn', {
+        left: elementDimensions.left + elementDimensions.width - layerDimensions.width + 'px',
+        top: elementDimensions.top + elementDimensions.height + 'px'
+      })
+
+      return formulas.get(key)
+    }
+
+    this.positionOverlay = () => {
+      // find position on screen
+      const elementDimensions = this.targetElement.getBoundingClientRect()
+
+      // get overlay dimensions
+      const layerDimensions = this.layer.getBoundingClientRect()
+
+      // get window width and height
+      const windowDimensions = {
+        width: document.documentElement.clientWidth,
+        height: document.documentElement.clientHeight
+      }
+
+      // define base overlay style
+      const minWidth =
+                this.width === 'auto' && this.block ? this.targetElement.getBoundingClientRect().width + 'px' : this.minWidth
+      const layerStyle = {
+        width: this.layerStyle.width,
+        height: layerDimensions.height + 'px',
+        left: '',
+        top: '',
+        pointerEvents: 'all',
+        minWidth
+      }
+
+      let caseString
+      let flow
+      let lateralOverflow
+      let verticalOverflow
+
+      /*
             EXPLANATION OF NOMENCLATURE
-        
+
             When organizing the direction that the overlay has to go
             the class names were chosen around the positive/negative orientation for each axis
             therefore, a class name of 'pp' means that the overlay is flowing
             positively horizontally (to the start) and positively vertically (upwards).
             This also means that a class name of 'nn' determines that
             the overlay should open negatively horizontally (to the end) and negatively vertically (downwards).
-        
+
             All calsses are build using this logic.
             */
 
-            if (this.direction) {
-                flow = 'ltr';
-                const directionArray = this.direction.split('');
+      if (this.direction) {
+        flow = 'ltr'
+        const directionArray = this.direction.split('')
 
-                caseString = (directionArray[1] === 'w' ? 'p' : 'n') + (directionArray[0] === 'n' ? 'p' : 'n');
-            } else {
-                if (!this.rtl) {
-                    // calculate if overflows
-                    lateralOverflow = elementDimensions.left + layerDimensions.width - windowDimensions.width;
-                    verticalOverflow = elementDimensions.top + layerDimensions.height - windowDimensions.height;
+        caseString = (directionArray[1] === 'w' ? 'p' : 'n') + (directionArray[0] === 'n' ? 'p' : 'n')
+      } else {
+        if (!this.rtl) {
+          // calculate if overflows
+          lateralOverflow = elementDimensions.left + layerDimensions.width - windowDimensions.width
+          verticalOverflow = elementDimensions.top + layerDimensions.height - windowDimensions.height
 
-                    // define the overflow scenario for a particular class and the positioning switch
-                    // display overlay downwards when window heigh is smaller than the overlay
-                    caseString =
+          // define the overflow scenario for a particular class and the positioning switch
+          // display overlay downwards when window heigh is smaller than the overlay
+          caseString =
                         windowDimensions.height < layerDimensions.height
-                            ? (lateralOverflow > 0 ? 'p' : 'n') + 'n'
-                            : (lateralOverflow > 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n');
-                    // if (windowDimensions.height < layerDimensions.height) {
-                    //   caseString = (lateralOverflow > 0 ? 'p' : 'n') + 'n';
-                    // } else {
-                    //   caseString = (lateralOverflow > 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n');
-                    // }
-                    flow = 'ltr';
-                } else {
-                    // calculate if overflows
-                    lateralOverflow = elementDimensions.right - layerDimensions.width;
-                    verticalOverflow = elementDimensions.top + layerDimensions.height - windowDimensions.height;
+                          ? (lateralOverflow > 0 ? 'p' : 'n') + 'n'
+                          : (lateralOverflow > 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n')
+          // if (windowDimensions.height < layerDimensions.height) {
+          //   caseString = (lateralOverflow > 0 ? 'p' : 'n') + 'n';
+          // } else {
+          //   caseString = (lateralOverflow > 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n');
+          // }
+          flow = 'ltr'
+        } else {
+          // calculate if overflows
+          lateralOverflow = elementDimensions.right - layerDimensions.width
+          verticalOverflow = elementDimensions.top + layerDimensions.height - windowDimensions.height
 
-                    // define the overflow scenario for a particular class and the positioning switch
-                    // display overlay downwards when window heigh is smaller than the overlay
-                    caseString =
+          // define the overflow scenario for a particular class and the positioning switch
+          // display overlay downwards when window heigh is smaller than the overlay
+          caseString =
                         windowDimensions.height < layerDimensions.height
-                            ? (lateralOverflow < 0 ? 'p' : 'n') + 'n'
-                            : (lateralOverflow < 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n');
-                    // if (windowDimensions.height < layerDimensions.height) {
-                    //   caseString = (lateralOverflow < 0 ? 'p' : 'n') + 'n';
-                    // } else {
-                    //   caseString = (lateralOverflow < 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n');
-                    // }
-                    flow = 'rtl';
-                }
-            }
+                          ? (lateralOverflow < 0 ? 'p' : 'n') + 'n'
+                          : (lateralOverflow < 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n')
+          // if (windowDimensions.height < layerDimensions.height) {
+          //   caseString = (lateralOverflow < 0 ? 'p' : 'n') + 'n';
+          // } else {
+          //   caseString = (lateralOverflow < 0 ? 'p' : 'n') + (verticalOverflow > 0 ? 'p' : 'n');
+          // }
+          flow = 'rtl'
+        }
+      }
 
-            // get the top left values with the orientation string
-            const topleft = this.getOrientation(
+      // get the top left values with the orientation string
+      const topleft = this.getOrientation(
                 `${flow}_${caseString}`,
                 elementDimensions,
-                layerDimensions,
-            );
+                layerDimensions
+      )
 
-            // assign the new layer style
-            this.layerStyle = { ...layerStyle, ...topleft };
-            // assign the orientation for custom orientation classes
-            this.orientation = caseString;
-        };
+      // assign the new layer style
+      this.layerStyle = { ...layerStyle, ...topleft }
+      // assign the orientation for custom orientation classes
+      this.orientation = caseString
+    }
 
-        this.handleKeyDown = (event) => {
-            if (event.key === 'Escape') {
-                this.hideOverlay({
-                    target: this.targetElement,
-                    composedPath() {
-                        return false;
-                    },
-                });
-            }
-        }
+    this.handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        this.hideOverlay({
+          target: this.targetElement,
+          composedPath () {
+            return false
+          }
+        })
+      }
+    }
 
-        this.onSlotChange = () => {
-            const pointerEvents = this._hidden ? 'none' : 'all';
-            this.layerStyle = {
-                pointerEvents,
-            };
-            this.setLayerStyle({ pointerEvents });
+    this.onSlotChange = () => {
+      const pointerEvents = this._hidden ? 'none' : 'all'
+      this.layerStyle = {
+        pointerEvents
+      }
+      this.setLayerStyle({ pointerEvents })
 
-            // Correct dimensions for variant select
-            if (this.variant === 'select') {
-                setTimeout(() => {
-                    this.correctLayerDimensionsOnSelect(pointerEvents);
-                }, 100);
-            }
-        };
+      // Correct dimensions for variant select
+      if (this.variant === 'select') {
+        setTimeout(() => {
+          this.correctLayerDimensionsOnSelect(pointerEvents)
+        }, 100)
+      }
+    }
 
-        /**
+    /**
          * Correct overlay dimensions
          * When the component is on its max height, define this height to the component
          * to prevent hiding scrollbar
          */
-        this.correctLayerDimensionsOnSelect = (pointerEvents) => {
-            const layerDimensions = this.layer.getBoundingClientRect();
-            if (layerDimensions.height === this.selectMaxHeight) {
-                const correctedDimensions = {
-                    pointerEvents,
-                    height: layerDimensions.height + 'px',
-                };
-                this.setLayerStyle(correctedDimensions);
-            }
+    this.correctLayerDimensionsOnSelect = (pointerEvents) => {
+      const layerDimensions = this.layer.getBoundingClientRect()
+      if (layerDimensions.height === this.selectMaxHeight) {
+        const correctedDimensions = {
+          pointerEvents,
+          height: layerDimensions.height + 'px'
         }
+        this.setLayerStyle(correctedDimensions)
+      }
+    }
+  }
 
+  setLayerStyle (layerStyles) {
+    this.layerStyle = {
+      width: this.width,
+      height: this.height,
+      ...layerStyles
     }
 
-    setLayerStyle = layerStyles => {
-        this.layerStyle = {
-            width: this.width,
-            height: this.height,
-            ...layerStyles,
-        };
-
-        for (const key in this.layerStyle) {
-            (this.layer.style[key] = this.layerStyle[key]);
-        }
-    };
-
-    connectedCallback() {
-        for (const a of this.attributes) {
-            this[a.name] = a.value;
-        }
-
-
-
-
-        // rendering
-        this.block && this.classList.add('block');
-        this.targetElement = document.createElement('div');
-        this.targetElement.setAttribute('class', 'ptc-overlay__target' + (this.disabled ? ' disabled' : ''))
-        this.targetElement.addEventListener('click', this.toggleOverlay);
-        this.targetElement.style.display = (this.block ? 'block' : 'inline-block')
-        const targetSlot = document.createElement('slot')
-        targetSlot.setAttribute('name', 'target')
-        this.targetElement.appendChild(targetSlot)
-
-        this.layer = document.createElement('div');
-        this.layer.setAttribute('class', `ptc-overlay ${this.variant} ${this.orientation} ${this._hidden ? 'hidden' : ''}`);
-        for (const [key, value] of Object.entries(this.layerStyle)) {
-            this.layer.style[key] = value;
-        }
-        this.layer.setAttribute('role', 'dialog');
-        this.layer.setAttribute('aria-modal', 'true');
-        this.layer.setAttribute('aria-label', this.ariaLabel);        // component will load
-
-        this.setLayerStyle({ pointerEvents: 'none' });
-
-        this.contentSlot = document.createElement('slot')
-        this.contentSlot.setAttribute('name', 'content')
-        this.layer.appendChild(this.contentSlot)
-
-
-        this._shadow = this.attachShadow({ mode: 'open' })
-
-        const styles = document.createElement('style')
-        styles.innerHTML = Css
-        this._shadow.appendChild(styles)
-
-        this._shadow.appendChild(this.targetElement)
-        this._shadow.appendChild(this.layer)
-
-
-
-        if (this.show) {
-            this.showOverlay();
-        }
-        this.contentSlot.addEventListener('slotchange', this.onSlotChange);
+    for (const key in this.layerStyle) {
+      (this.layer.style[key] = this.layerStyle[key])
     }
+  };
+
+  connectedCallback () {
+    for (const a of this.attributes) {
+      this[a.name] = a.value
+    }
+
+    // rendering
+    this.block && this.classList.add('block')
+    this.targetElement = document.createElement('div')
+    this.targetElement.setAttribute('class', 'ptc-overlay__target' + (this.disabled ? ' disabled' : ''))
+    this.targetElement.addEventListener('click', this.toggleOverlay)
+    this.targetElement.style.display = (this.block ? 'block' : 'inline-block')
+    const targetSlot = document.createElement('slot')
+    targetSlot.setAttribute('name', 'target')
+    this.targetElement.appendChild(targetSlot)
+
+    this.layer = document.createElement('div')
+    this.layer.setAttribute('class', `ptc-overlay ${this.variant} ${this.orientation} ${this._hidden ? 'hidden' : ''}`)
+    for (const [key, value] of Object.entries(this.layerStyle)) {
+      this.layer.style[key] = value
+    }
+    this.layer.setAttribute('role', 'dialog')
+    this.layer.setAttribute('aria-modal', 'true')
+    this.layer.setAttribute('aria-label', this.ariaLabel) // component will load
+
+    this.setLayerStyle({ pointerEvents: 'none' })
+
+    this.contentSlot = document.createElement('slot')
+    this.contentSlot.setAttribute('name', 'content')
+    this.layer.appendChild(this.contentSlot)
+
+    this._shadow = this.attachShadow({ mode: 'open' })
+
+    const styles = document.createElement('style')
+    styles.innerHTML = Css
+    this._shadow.appendChild(styles)
+
+    this._shadow.appendChild(this.targetElement)
+    this._shadow.appendChild(this.layer)
+
+    if (this.show) {
+      this.showOverlay()
+    }
+    this.contentSlot.addEventListener('slotchange', this.onSlotChange)
+  }
 }

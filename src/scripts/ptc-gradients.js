@@ -1,7 +1,7 @@
-import { parseGradient } from './lib-gradients.js';
-import { fireEvent } from './lib-events.js';
-import angleImg from './img-angle.js';
-import { arrayMove } from './lib-utils.js';
+import { parseGradient } from './lib-gradients.js'
+import { fireEvent } from './lib-events.js'
+import angleImg from './img-angle.js'
+import { arrayMove } from './lib-utils.js'
 
 const Css = `
 :host {
@@ -273,285 +273,284 @@ input[type="number"] {
         color: #0095FF;
     }
 }
-`;
+`
 
 const units = {
-    'px': 'px',
-    '%': '%',
-    'deg': '°'
+  px: 'px',
+  '%': '%',
+  deg: '°'
 }
 
 export default class PtcGradients extends HTMLElement {
+  constructor () {
+    super()
 
-    constructor() {
-        super()
+    this._value = 'conic-gradient(from 45deg at 100% 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
+    Object.defineProperty(this, 'value', {
+      get: () => this._value,
+      set: (val) => {
+        this._value = val
+        this.swatch.style.backgroundImage = val
+        this.tempValue = val
+        fireEvent(this, 'change', val)
+      }
+    })
 
-        this._value = 'conic-gradient(from 45deg at 100% 30%, rgba(255,0,0,1) 0deg, rgba(0,255,0,1) 90deg, rgba(0,0,255,1) 180deg, rgba(255,0,0,1) 270deg)'
-        Object.defineProperty(this, 'value', {
-            get: () => this._value,
-            set: (val) => {
-                this._value = val
-                this.swatch.style.backgroundImage = val
-                this.tempValue = val
-                fireEvent(this, 'change', val)
+    this._tempValue = this.value
+    Object.defineProperty(this, 'tempValue', {
+      get: () => {
+        return this._tempValue
+      },
+      set: (val) => {
+        this._tempValue = val
+        this.sample.style.backgroundImage = val
+        this.controls.style.backgroundImage = val
+        //
+      }
+    })
+    this._type = 'linear'
+    Object.defineProperty(this, 'type', {
+      get: () => {
+        return this._type
+      },
+      set: (val = 'linear') => {
+        let reRenderSteps = false
+        // convert px values to percentages in conic only
+        const pxSteps = this.gradientObject.colorStopList.filter(cs => cs.unit === 'px')
+
+        const stepsPctToDeg = (create = false) => {
+          this.gradientObject.colorStopList.forEach(cs => {
+            if (cs.unit !== 'deg') {
+              cs.unit = 'deg'
+              cs.position = cs.position * 360 / 100
             }
-        })
-
-        this._tempValue = this.value;
-        Object.defineProperty(this, 'tempValue', {
-            get: () => {
-                return this._tempValue;
-            },
-            set: (val) => {
-                this._tempValue = val;
-                this.sample.style.backgroundImage = val;
-                this.controls.style.backgroundImage = val;
-                //
-            }
-        })
-        this._type = 'linear';
-        Object.defineProperty(this, 'type', {
-            get: () => {
-                return this._type;
-            },
-            set: (val = 'linear') => {
-                let reRenderSteps = false;
-                // convert px values to percentages in conic only
-                const pxSteps = this.gradientObject.colorStopList.filter(cs => cs.unit === 'px')
-
-                const stepsPctToDeg = (create = false) => {
-                    this.gradientObject.colorStopList.forEach(cs => {
-                        if (cs.unit !== 'deg') {
-                            cs.unit = 'deg'
-                            cs.position = cs.position * 360 / 100
-                        }
-                    })
-                    this._type = val;
-                    this.tempValue = this.generateGradientString();
-                }
-
-                const stepsDegToPct = () => {
-                    reRenderSteps = true;
-                    this.gradientObject.colorStopList.forEach(cs => {
-                        cs.unit = '%'
-                        cs.position = cs.position * 100 / 360
-                    })
-                    this._type = val;
-                    this.tempValue = this.generateGradientString();
-                }
-
-                if (val !== 'conic' && this._type === 'conic') {
-                    reRenderSteps = true;
-                    stepsDegToPct();
-                }
-                if (val === 'conic' && this._type !== 'conic') {
-                    reRenderSteps = true;
-                    if (pxSteps.length) {
-                        reRenderSteps = true; const confirm = window.confirm('Conic gradients cannot have px values. Convert to degrees?')
-                        if (confirm) {
-                            stepsPctToDeg(true);
-                        } else {
-                            return
-                        }
-                    }
-                    stepsPctToDeg();
-                }
-                if (val !== 'conic' && this._type !== 'conic') {
-                    this._type = val;
-                    this.tempValue = this.generateGradientString();
-                }
-                this.wrap.setAttribute('class', `dialog ${this._type}`)
-                this.typeSelect.value = this._type;
-                reRenderSteps && this.createSteps();
-            }
-        })
-
-        this._angle = '0deg';
-        Object.defineProperty(this, 'angle', {
-            get: () => {
-                return this._angle;
-            },
-            set: (val = '0deg') => {
-                this._angle = val;
-                this.angleInput.value = parseInt(val.replace('deg', ''));
-                this.tempValue = this.generateGradientString();
-            }
-        })
-
-        this._radialType = 'ellipse';
-        Object.defineProperty(this, 'radialType', {
-            get: () => {
-                return this._radialType;
-            },
-            set: (val = 'ellipse') => {
-                this._radialType = val;
-                const gradientString = this.generateGradientString();
-                this.tempValue = gradientString;
-                this.radialTypeSelect.value = this._radialType;
-            }
-        })
-
-        this._repeat = false;
-        Object.defineProperty(this, 'repeat', {
-            get: () => {
-                return this._repeat;
-            },
-            set: (val = false) => {
-                this._repeat = val;
-                const gradientString = this.generateGradientString();
-                this.tempValue = gradientString;
-                this.repeatCheckbox.checked = this._repeat;
-            }
-        })
-
-        this._positionX = 50;
-        Object.defineProperty(this, 'positionX', {
-            get: () => {
-                return this._positionX;
-            },
-            set: (val = 50) => {
-                this._positionX = val;
-                this.positionXInput.value = val;
-                const gradientString = this.generateGradientString();
-                this.tempValue = gradientString;
-            }
-        })
-
-        this._positionXUnit = '%';
-        Object.defineProperty(this, 'positionXUnit', {
-            get: () => {
-                return this._positionXUnit;
-            },
-            set: (val = '%') => {
-                this._positionXUnit = val;
-                this.positionXUnitSelect.innerText = val;
-                const gradientString = this.generateGradientString();
-                this.tempValue = gradientString;
-            }
-        })
-
-        this._positionY = 50;
-        Object.defineProperty(this, 'positionY', {
-            get: () => {
-                return this._positionY;
-            },
-            set: (val = 50) => {
-                this._positionY = val;
-                this.positionYInput.value = val;
-                const gradientString = this.generateGradientString();
-                this.tempValue = gradientString;
-            }
-        })
-
-        this._positionYUnit = '%';
-        Object.defineProperty(this, 'positionYUnit', {
-            get: () => {
-                return this._positionYUnit;
-            },
-            set: (val = '%') => {
-                this._positionYUnit = val;
-                this.positionYUnitSelect.innerText = val;
-                const gradientString = this.generateGradientString();
-                this.tempValue = gradientString;
-            }
-        })
-
-        this._open = false;
-        Object.defineProperty(this, 'open', {
-            get: () => {
-                return this._open;
-            },
-            set: (val = false) => {
-                this._open = val;
-                this.classList[val ? 'add' : 'remove']('open');
-            }
-        })
-
-        this.generateGradientString = () => {
-            const go = this.gradientObject;
-            const type = this.type;
-            let output = ``;
-
-            if (type === 'linear') {
-                output += `linear-gradient(${go.angle}`
-                go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position}${cs.unit}`
-                })
-                output += `)`
-            }
-            if (type === 'radial') {
-                output += this.repeat ? `repeating-` : ``
-                output += `radial-gradient(`
-                output += this.radialType ? this.radialType : 'ellipse'
-                output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
-                output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
-                go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position}${cs.unit}`
-                })
-                output += `)`
-            }
-            if (type === 'conic') {
-                output += this.repeat ? `repeating-` : ``
-                output += `conic-gradient(`
-                output += this.angle ? 'from ' + this.angle : 'from 0deg'
-                output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
-                output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
-                go.colorStopList.forEach((cs, i) => {
-                    output += `, ${cs.color} ${cs.position}deg`
-                })
-                output += `)`
-            }
-            return output;
+          })
+          this._type = val
+          this.tempValue = this.generateGradientString()
         }
 
-        this.checkMinSteps = () => {
-            if (this.gradientObject.colorStopList.length < 3) {
-                this.steps.classList.add('no-remove')
+        const stepsDegToPct = () => {
+          reRenderSteps = true
+          this.gradientObject.colorStopList.forEach(cs => {
+            cs.unit = '%'
+            cs.position = cs.position * 100 / 360
+          })
+          this._type = val
+          this.tempValue = this.generateGradientString()
+        }
+
+        if (val !== 'conic' && this._type === 'conic') {
+          reRenderSteps = true
+          stepsDegToPct()
+        }
+        if (val === 'conic' && this._type !== 'conic') {
+          reRenderSteps = true
+          if (pxSteps.length) {
+            reRenderSteps = true; const confirm = window.confirm('Conic gradients cannot have px values. Convert to degrees?')
+            if (confirm) {
+              stepsPctToDeg(true)
             } else {
-                this.steps.classList.remove('no-remove')
+              return
             }
+          }
+          stepsPctToDeg()
         }
-
-        this.createDropZone = (i) => {
-            const go = this.gradientObject;
-            const dropZone = document.createElement('div');
-            dropZone.classList.add('step-drop-zone');
-            dropZone.dataset.index = i;
-
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const theIndex = e.dataTransfer.getData('text/plain');
-                if (theIndex !== i) {
-                    e.dataTransfer.dropEffect = 'move';
-                    dropZone.classList.add('drag-over');
-                }
-            });
-            dropZone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('drag-over');
-            });
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('drag-over');
-                const draggedStepIndex = e.dataTransfer.getData('text/plain');
-                const newIndex = (draggedStepIndex > i) ? i + 1 : i;
-                arrayMove(go.colorStopList, draggedStepIndex, newIndex);
-                this.tempValue = this.generateGradientString();
-
-                this.createSteps(false);
-            });
-
-            return dropZone;
+        if (val !== 'conic' && this._type !== 'conic') {
+          this._type = val
+          this.tempValue = this.generateGradientString()
         }
+        this.wrap.setAttribute('class', `dialog ${this._type}`)
+        this.typeSelect.value = this._type
+        reRenderSteps && this.createSteps()
+      }
+    })
 
-        this.createStep = (cs, i) => {
-            const go = this.gradientObject;
-            const step = document.createElement('div');
+    this._angle = '0deg'
+    Object.defineProperty(this, 'angle', {
+      get: () => {
+        return this._angle
+      },
+      set: (val = '0deg') => {
+        this._angle = val
+        this.angleInput.value = parseInt(val.replace('deg', ''))
+        this.tempValue = this.generateGradientString()
+      }
+    })
 
-            step.innerHTML = `
+    this._radialType = 'ellipse'
+    Object.defineProperty(this, 'radialType', {
+      get: () => {
+        return this._radialType
+      },
+      set: (val = 'ellipse') => {
+        this._radialType = val
+        const gradientString = this.generateGradientString()
+        this.tempValue = gradientString
+        this.radialTypeSelect.value = this._radialType
+      }
+    })
+
+    this._repeat = false
+    Object.defineProperty(this, 'repeat', {
+      get: () => {
+        return this._repeat
+      },
+      set: (val = false) => {
+        this._repeat = val
+        const gradientString = this.generateGradientString()
+        this.tempValue = gradientString
+        this.repeatCheckbox.checked = this._repeat
+      }
+    })
+
+    this._positionX = 50
+    Object.defineProperty(this, 'positionX', {
+      get: () => {
+        return this._positionX
+      },
+      set: (val = 50) => {
+        this._positionX = val
+        this.positionXInput.value = val
+        const gradientString = this.generateGradientString()
+        this.tempValue = gradientString
+      }
+    })
+
+    this._positionXUnit = '%'
+    Object.defineProperty(this, 'positionXUnit', {
+      get: () => {
+        return this._positionXUnit
+      },
+      set: (val = '%') => {
+        this._positionXUnit = val
+        this.positionXUnitSelect.innerText = val
+        const gradientString = this.generateGradientString()
+        this.tempValue = gradientString
+      }
+    })
+
+    this._positionY = 50
+    Object.defineProperty(this, 'positionY', {
+      get: () => {
+        return this._positionY
+      },
+      set: (val = 50) => {
+        this._positionY = val
+        this.positionYInput.value = val
+        const gradientString = this.generateGradientString()
+        this.tempValue = gradientString
+      }
+    })
+
+    this._positionYUnit = '%'
+    Object.defineProperty(this, 'positionYUnit', {
+      get: () => {
+        return this._positionYUnit
+      },
+      set: (val = '%') => {
+        this._positionYUnit = val
+        this.positionYUnitSelect.innerText = val
+        const gradientString = this.generateGradientString()
+        this.tempValue = gradientString
+      }
+    })
+
+    this._open = false
+    Object.defineProperty(this, 'open', {
+      get: () => {
+        return this._open
+      },
+      set: (val = false) => {
+        this._open = val
+        this.classList[val ? 'add' : 'remove']('open')
+      }
+    })
+
+    this.generateGradientString = () => {
+      const go = this.gradientObject
+      const type = this.type
+      let output = ''
+
+      if (type === 'linear') {
+        output += `linear-gradient(${go.angle}`
+        go.colorStopList.forEach((cs, i) => {
+          output += `, ${cs.color} ${cs.position}${cs.unit}`
+        })
+        output += ')'
+      }
+      if (type === 'radial') {
+        output += this.repeat ? 'repeating-' : ''
+        output += 'radial-gradient('
+        output += this.radialType ? this.radialType : 'ellipse'
+        output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
+        output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
+        go.colorStopList.forEach((cs, i) => {
+          output += `, ${cs.color} ${cs.position}${cs.unit}`
+        })
+        output += ')'
+      }
+      if (type === 'conic') {
+        output += this.repeat ? 'repeating-' : ''
+        output += 'conic-gradient('
+        output += this.angle ? 'from ' + this.angle : 'from 0deg'
+        output += this.positionX ? ` at ${this.positionX}${this.positionXUnit}` : ''
+        output += this.positionY ? ` ${this.positionY}${this.positionYUnit}` : ''
+        go.colorStopList.forEach((cs, i) => {
+          output += `, ${cs.color} ${cs.position}deg`
+        })
+        output += ')'
+      }
+      return output
+    }
+
+    this.checkMinSteps = () => {
+      if (this.gradientObject.colorStopList.length < 3) {
+        this.steps.classList.add('no-remove')
+      } else {
+        this.steps.classList.remove('no-remove')
+      }
+    }
+
+    this.createDropZone = (i) => {
+      const go = this.gradientObject
+      const dropZone = document.createElement('div')
+      dropZone.classList.add('step-drop-zone')
+      dropZone.dataset.index = i
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const theIndex = e.dataTransfer.getData('text/plain')
+        if (theIndex !== i) {
+          e.dataTransfer.dropEffect = 'move'
+          dropZone.classList.add('drag-over')
+        }
+      })
+      dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        dropZone.classList.remove('drag-over')
+      })
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        dropZone.classList.remove('drag-over')
+        const draggedStepIndex = e.dataTransfer.getData('text/plain')
+        const newIndex = (draggedStepIndex > i) ? i + 1 : i
+        arrayMove(go.colorStopList, draggedStepIndex, newIndex)
+        this.tempValue = this.generateGradientString()
+
+        this.createSteps(false)
+      })
+
+      return dropZone
+    }
+
+    this.createStep = (cs, i) => {
+      const go = this.gradientObject
+      const step = document.createElement('div')
+
+      step.innerHTML = `
             <div class="step" draggable="true" id="step-${i}" data-index="${i}">
                 <div class="step-handle"><i class="fa-solid fa-grip-vertical"></i></div>
                 <div class="step-color"><ptc-color-picker value="${cs.color}"></ptc-color-picker></div>
@@ -559,105 +558,103 @@ export default class PtcGradients extends HTMLElement {
                 <div class="step-remove"><button class="step-remove-button"><i class="fa-solid fa-xmark"></i></button></div>
             </div>
             `
-            const stepInput = step.querySelector('input');
+      const stepInput = step.querySelector('input')
 
-            stepInput.addEventListener('focus', (e) => {
-                fireEvent(this, 'toggleKeyboardShortcuts', false)
-            })
+      stepInput.addEventListener('focus', (e) => {
+        fireEvent(this, 'toggleKeyboardShortcuts', false)
+      })
 
-            stepInput.addEventListener('blur', (e) => {
-                fireEvent(this, 'toggleKeyboardShortcuts', true)
-            })
-            stepInput.addEventListener('change', (e) => {
-                const pos = e.target.value;
-                cs.position = pos;
-                this.tempValue = this.generateGradientString();
-            });
+      stepInput.addEventListener('blur', (e) => {
+        fireEvent(this, 'toggleKeyboardShortcuts', true)
+      })
+      stepInput.addEventListener('change', (e) => {
+        const pos = e.target.value
+        cs.position = pos
+        this.tempValue = this.generateGradientString()
+      })
 
-            const unitLabel = step.querySelector('.unit');
-            unitLabel.addEventListener('click', (e) => {
-                if (this.type !== 'conic') {
-                    if (cs.unit === '%') {
-                        cs.unit = 'px';
-                        unitLabel.innerText = 'px';
-                    } else {
-                        cs.unit = '%';
-                        unitLabel.innerText = '%';
-                    }
-                    this.tempValue = this.generateGradientString();
-                }
-            })
-
-            const colorInput = step.querySelector('ptc-color-picker');
-            colorInput.addEventListener('change', (e) => {
-                const color = e.detail.value;
-                cs.color = color;
-                this.tempValue = this.generateGradientString();
-            });
-
-            const removeButton = step.querySelector('.step-remove-button');
-            removeButton.addEventListener('click', (e) => {
-                this.steps.removeChild(step);
-                go.colorStopList.splice(i, 1);
-                this.tempValue = this.generateGradientString();
-
-                this.checkMinSteps();
-            });
-
-            const dragItem = step.querySelector('.step');
-
-            dragItem.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', e.target.dataset.index);
-                e.dataTransfer.effectAllowed = 'move';
-            });
-
-            return step;
+      const unitLabel = step.querySelector('.unit')
+      unitLabel.addEventListener('click', (e) => {
+        if (this.type !== 'conic') {
+          if (cs.unit === '%') {
+            cs.unit = 'px'
+            unitLabel.innerText = 'px'
+          } else {
+            cs.unit = '%'
+            unitLabel.innerText = '%'
+          }
+          this.tempValue = this.generateGradientString()
         }
+      })
 
-        this.addStep = () => {
-            const go = this.gradientObject;
-            const stepData = {
-                color: 'rgba(0,0,0,1)',
-                position: 100,
-                unit: '%'
-            }
-            go.colorStopList.push(stepData)
-            const step = this.createStep(stepData, go.colorStopList.length - 1);
-            this.steps.appendChild(step);
-            this.tempValue = this.generateGradientString();
-            this.checkMinSteps();
+      const colorInput = step.querySelector('ptc-color-picker')
+      colorInput.addEventListener('change', (e) => {
+        const color = e.detail.value
+        cs.color = color
+        this.tempValue = this.generateGradientString()
+      })
+
+      const removeButton = step.querySelector('.step-remove-button')
+      removeButton.addEventListener('click', (e) => {
+        this.steps.removeChild(step)
+        go.colorStopList.splice(i, 1)
+        this.tempValue = this.generateGradientString()
+
+        this.checkMinSteps()
+      })
+
+      const dragItem = step.querySelector('.step')
+
+      dragItem.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', e.target.dataset.index)
+        e.dataTransfer.effectAllowed = 'move'
+      })
+
+      return step
+    }
+
+    this.addStep = () => {
+      const go = this.gradientObject
+      const stepData = {
+        color: 'rgba(0,0,0,1)',
+        position: 100,
+        unit: '%'
+      }
+      go.colorStopList.push(stepData)
+      const step = this.createStep(stepData, go.colorStopList.length - 1)
+      this.steps.appendChild(step)
+      this.tempValue = this.generateGradientString()
+      this.checkMinSteps()
+    }
+
+    this.createSteps = () => {
+      this.steps.innerHTML = ''
+      this.gradientObject.colorStopList.forEach((cs, i) => {
+        const step = this.createStep(cs, i)
+        const dropZone = this.createDropZone(i)
+        if (i === 0) {
+          this.steps.appendChild(this.createDropZone(-1))
         }
+        this.steps.appendChild(step)
+        this.steps.appendChild(dropZone)
+      })
+    }
 
-        this.createSteps = () => {
-            this.steps.innerHTML = '';
-            this.gradientObject.colorStopList.forEach((cs, i) => {
-                const step = this.createStep(cs, i);
-                const dropZone = this.createDropZone(i);
-                if (i === 0) {
-                    this.steps.appendChild(this.createDropZone(-1));
-                }
-                this.steps.appendChild(step);
-                this.steps.appendChild(dropZone);
-            });
+    // attach shadow dom
+    this._shadow = this.attachShadow({ mode: 'open' })
 
-            this.gradientObject.colorStopList.appendChild
-        }
+    const styles = document.createElement('style')
+    styles.innerHTML = Css
+    this._shadow.appendChild(styles)
 
-        // attach shadow dom
-        this._shadow = this.attachShadow({ mode: 'open' })
+    const fontawesome = document.createElement('link')
+    fontawesome.setAttribute('rel', 'stylesheet')
+    fontawesome.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css')
+    this._shadow.appendChild(fontawesome)
 
-        const styles = document.createElement('style')
-        styles.innerHTML = Css
-        this._shadow.appendChild(styles)
-
-        const fontawesome = document.createElement('link')
-        fontawesome.setAttribute('rel', 'stylesheet')
-        fontawesome.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css')
-        this._shadow.appendChild(fontawesome)
-
-        this.wrap = document.createElement('div')
-        this.wrap.setAttribute('class', 'dialog linear')
-        this.wrap.innerHTML = `
+    this.wrap = document.createElement('div')
+    this.wrap.setAttribute('class', 'dialog linear')
+    this.wrap.innerHTML = `
 <div class="sample">
     <div class="sample-gradient"></div>
 </div>
@@ -719,136 +716,136 @@ export default class PtcGradients extends HTMLElement {
     <button class="button save-button">Apply</button>
 </div>
       `
-        this.sample = this.wrap.querySelector('.sample-gradient')
-        this.controls = this.wrap.querySelector('.controls')
-        this.steps = this.wrap.querySelector('.steps')
-        this.typeSelect = this.wrap.querySelector('#type')
-        this.stepsAddButton = this.wrap.querySelector('.add-button')
+    this.sample = this.wrap.querySelector('.sample-gradient')
+    this.controls = this.wrap.querySelector('.controls')
+    this.steps = this.wrap.querySelector('.steps')
+    this.typeSelect = this.wrap.querySelector('#type')
+    this.stepsAddButton = this.wrap.querySelector('.add-button')
 
-        this.stepsAddButton.addEventListener('click', (e) => {
-            this.addStep()
-        })
+    this.stepsAddButton.addEventListener('click', (e) => {
+      this.addStep()
+    })
 
-        this.typeSelect.addEventListener('change', (e) => {
-            this.type = e.target.value;
-        })
+    this.typeSelect.addEventListener('change', (e) => {
+      this.type = e.target.value
+    })
 
-        this.angleInput = this.wrap.querySelector('#direction');
-        this.angleInput.addEventListener('focus', (e) => {
-            fireEvent(this, 'toggleKeyboardShortcuts', false)
-        })
+    this.angleInput = this.wrap.querySelector('#direction')
+    this.angleInput.addEventListener('focus', (e) => {
+      fireEvent(this, 'toggleKeyboardShortcuts', false)
+    })
 
-        this.angleInput.addEventListener('blur', (e) => {
-            fireEvent(this, 'toggleKeyboardShortcuts', true)
-        })
-        this.angleInput.addEventListener('change', (e) => {
-            const angle = e.target.value;
-            this.angle = angle + 'deg';
-            const val = this.generateGradientString();
-            this.tempValue = val
-        })
+    this.angleInput.addEventListener('blur', (e) => {
+      fireEvent(this, 'toggleKeyboardShortcuts', true)
+    })
+    this.angleInput.addEventListener('change', (e) => {
+      const angle = e.target.value
+      this.angle = angle + 'deg'
+      const val = this.generateGradientString()
+      this.tempValue = val
+    })
 
-        this.radialTypeSelect = this.wrap.querySelector('#radial-type')
-        this.radialTypeSelect.addEventListener('change', (e) => {
-            this.radialType = e.target.value;
-        })
+    this.radialTypeSelect = this.wrap.querySelector('#radial-type')
+    this.radialTypeSelect.addEventListener('change', (e) => {
+      this.radialType = e.target.value
+    })
 
-        this.repeatCheckbox = this.wrap.querySelector('#repeat')
-        this.repeatCheckbox.addEventListener('change', (e) => {
-            this.repeat = e.target.checked;
-        });
-        this.repeatCheckbox.nextSibling.addEventListener('click', (e) => {
-            this.repeatCheckbox.checked = !this.repeatCheckbox.checked;
-        });
+    this.repeatCheckbox = this.wrap.querySelector('#repeat')
+    this.repeatCheckbox.addEventListener('change', (e) => {
+      this.repeat = e.target.checked
+    })
+    this.repeatCheckbox.nextSibling.addEventListener('click', (e) => {
+      this.repeatCheckbox.checked = !this.repeatCheckbox.checked
+    })
 
-        this.positionXInput = this.wrap.querySelector('#position-x')
-        this.positionXInput.addEventListener('focus', (e) => {
-            fireEvent(this, 'toggleKeyboardShortcuts', false)
-        })
-        this.positionXInput.addEventListener('blur', (e) => {
-            fireEvent(this, 'toggleKeyboardShortcuts', true)
-        })
-        this.positionXInput.addEventListener('change', (e) => {
-            this.positionX = e.target.value;
-        })
+    this.positionXInput = this.wrap.querySelector('#position-x')
+    this.positionXInput.addEventListener('focus', (e) => {
+      fireEvent(this, 'toggleKeyboardShortcuts', false)
+    })
+    this.positionXInput.addEventListener('blur', (e) => {
+      fireEvent(this, 'toggleKeyboardShortcuts', true)
+    })
+    this.positionXInput.addEventListener('change', (e) => {
+      this.positionX = e.target.value
+    })
 
-        this.positionXUnitSelect = this.wrap.querySelector('#position-x-unit')
-        this.positionXUnitSelect.addEventListener('click', (e) => {
-            const newUnit = e.target.innerText === '%' ? 'px' : '%';
-            this.positionXUnit = newUnit;
-            this.positionXUnitSelect.innerText = newUnit;
-        })
+    this.positionXUnitSelect = this.wrap.querySelector('#position-x-unit')
+    this.positionXUnitSelect.addEventListener('click', (e) => {
+      const newUnit = e.target.innerText === '%' ? 'px' : '%'
+      this.positionXUnit = newUnit
+      this.positionXUnitSelect.innerText = newUnit
+    })
 
-        this.positionYInput = this.wrap.querySelector('#position-y')
-        this.positionYInput.addEventListener('focus', (e) => {
-            fireEvent(this, 'toggleKeyboardShortcuts', false)
-        })
-        this.positionYInput.addEventListener('blur', (e) => {
-            fireEvent(this, 'toggleKeyboardShortcuts', true)
-        })
-        this.positionYInput.addEventListener('change', (e) => {
-            this.positionY = e.target.value;
-        })
+    this.positionYInput = this.wrap.querySelector('#position-y')
+    this.positionYInput.addEventListener('focus', (e) => {
+      fireEvent(this, 'toggleKeyboardShortcuts', false)
+    })
+    this.positionYInput.addEventListener('blur', (e) => {
+      fireEvent(this, 'toggleKeyboardShortcuts', true)
+    })
+    this.positionYInput.addEventListener('change', (e) => {
+      this.positionY = e.target.value
+    })
 
-        this.positionYUnitSelect = this.wrap.querySelector('#position-y-unit')
-        this.positionYUnitSelect.addEventListener('click', (e) => {
-            const newUnit = e.target.innerText === '%' ? 'px' : '%';
-            this.positionYUnit = newUnit;
-            this.positionYUnitSelect.innerText = newUnit;
-        })
+    this.positionYUnitSelect = this.wrap.querySelector('#position-y-unit')
+    this.positionYUnitSelect.addEventListener('click', (e) => {
+      const newUnit = e.target.innerText === '%' ? 'px' : '%'
+      this.positionYUnit = newUnit
+      this.positionYUnitSelect.innerText = newUnit
+    })
 
-        if (this.tempValue) {
-            this.gradientObject = parseGradient(this.tempValue);
-            this.type = this.gradientObject.type;
-            this.angle = this.gradientObject.angle;
-            this.radialType = this.gradientObject.shape;
-            if (this.gradientObject.position) {
-                this.positionX = this.gradientObject.position.x.value;
-                this.positionXUnit = this.gradientObject.position.x.unit;
-                this.positionY = this.gradientObject.position.y?.value;
-                this.positionYUnit = this.gradientObject.position.y?.unit;
-            }
-            this.createSteps();
-        }
-
-        this.close = () => {
-            this.open = false
-            this.tempValue = this.value;
-        }
-
-        const backdrop = document.createElement('div');
-        backdrop.classList.add('backdrop');
-        backdrop.addEventListener('click', (e) => {
-            this.close();
-        });
-
-        this.acceptButton = this.wrap.querySelector('.save-button')
-        this.acceptButton.addEventListener('click', (e) => {
-            this.value = this.tempValue;
-            this.close();
-        });
-
-        this.cancelButton = this.wrap.querySelector('.cancel-button')
-        this.cancelButton.addEventListener('click', (e) => {
-            this.close();
-        });
-
-        this.swatch = document.createElement('div');
-        this.swatch.classList.add('swatch');
-        this.swatch.style.backgroundImage = this.tempValue;
-        this.swatch.addEventListener('click', (e) => {
-            this.open = true
-        });
-
-        this._shadow.appendChild(this.swatch);
-
-        this._shadow.appendChild(backdrop);
-        this._shadow.appendChild(this.wrap)
+    if (this.tempValue) {
+      this.gradientObject = parseGradient(this.tempValue)
+      this.type = this.gradientObject.type
+      this.angle = this.gradientObject.angle
+      this.radialType = this.gradientObject.shape
+      if (this.gradientObject.position) {
+        this.positionX = this.gradientObject.position.x.value
+        this.positionXUnit = this.gradientObject.position.x.unit
+        this.positionY = this.gradientObject.position.y?.value
+        this.positionYUnit = this.gradientObject.position.y?.unit
+      }
+      this.createSteps()
     }
 
-    connectedCallback() {
-        const style = document.createElement('style')
-        style.textContent = Css
-        this.appendChild(style)
+    this.close = () => {
+      this.open = false
+      this.tempValue = this.value
     }
+
+    const backdrop = document.createElement('div')
+    backdrop.classList.add('backdrop')
+    backdrop.addEventListener('click', (e) => {
+      this.close()
+    })
+
+    this.acceptButton = this.wrap.querySelector('.save-button')
+    this.acceptButton.addEventListener('click', (e) => {
+      this.value = this.tempValue
+      this.close()
+    })
+
+    this.cancelButton = this.wrap.querySelector('.cancel-button')
+    this.cancelButton.addEventListener('click', (e) => {
+      this.close()
+    })
+
+    this.swatch = document.createElement('div')
+    this.swatch.classList.add('swatch')
+    this.swatch.style.backgroundImage = this.tempValue
+    this.swatch.addEventListener('click', (e) => {
+      this.open = true
+    })
+
+    this._shadow.appendChild(this.swatch)
+
+    this._shadow.appendChild(backdrop)
+    this._shadow.appendChild(this.wrap)
+  }
+
+  connectedCallback () {
+    const style = document.createElement('style')
+    style.textContent = Css
+    this.appendChild(style)
+  }
 }

@@ -1,5 +1,5 @@
-import * as ColorPicker from './lib-color-picker.js'
 import { LoadParticles } from './lib-loader.js'
+
 const Css = `
 :host{
     display: inline-flex;
@@ -65,154 +65,148 @@ const Css = `
 }
 `
 export default class PtcColorPicker extends HTMLElement {
+  constructor () {
+    super()
 
-    constructor() {
-        super();
+    LoadParticles(['ptc-overlay'])
 
-        LoadParticles(['ptc-overlay'])
+    this._value = null
 
-        this._value = null;
+    this._color = 'transparent'
 
-        this._color = 'transparent'
+    this._opacity = 100
 
-        this._opacity = 100;
+    this._name = null
 
-        this._name = null;
+    this._initial = null
 
-        this._initial = null;
-
-        Object.defineProperty(this, 'initial', {
-            get: () => {
-                return this._initial;
-            },
-            set: (val) => {
-                if (val) {
-                    this._initial = val;
-                    this.setAttribute('initial', val);
-                } else {
-                    this.removeAttribute('initial');
-                }
-            }
-        })
-
-        Object.defineProperty(this, 'name', {
-            get: () => {
-                return this._name;
-            },
-            set: (val) => {
-                if (val) {
-                    this._name = val;
-                    this.setAttribute('name', val);
-                } else {
-                    this.removeAttribute('name');
-                }
-            }
-        })
-
-
-        Object.defineProperty(this, 'value', {
-            get: () => {
-                return this._value;
-            },
-            set: (val) => {
-                if (val) {
-                    this._value = val;
-                    this.setAttribute('value', val);
-                    this.swatch.style.backgroundColor = val;
-                    this.colorInput.value = val;
-
-                    this._color = val;
-                } else {
-                    this.removeAttribute('value');
-                    this.swatch.style.backgroundColor = 'transparent';
-                }
-            }
-        })
-
-        this.setColor = () => {
-            this.value = this._color
-            this.swatch.style.backgroundColor = this.value;
-
-            this.dispatchEvent(new CustomEvent('change', {
-                detail: {
-                    value: this.value
-                },
-                bubbles: true,
-                composed: true
-            }));
+    Object.defineProperty(this, 'initial', {
+      get: () => {
+        return this._initial
+      },
+      set: (val) => {
+        if (val) {
+          this._initial = val
+          this.setAttribute('initial', val)
+        } else {
+          this.removeAttribute('initial')
         }
+      }
+    })
 
-        this.onColorChange = (e) => {
-            this._color = e.target.value;
-            this.setColor();
+    Object.defineProperty(this, 'name', {
+      get: () => {
+        return this._name
+      },
+      set: (val) => {
+        if (val) {
+          this._name = val
+          this.setAttribute('name', val)
+        } else {
+          this.removeAttribute('name')
         }
+      }
+    })
 
+    Object.defineProperty(this, 'value', {
+      get: () => {
+        return this._value
+      },
+      set: (val) => {
+        if (val) {
+          this._value = val
+          this.setAttribute('value', val)
+          this.swatch.style.backgroundColor = val
+          this.colorInput.value = val
 
-
-        // attach shadow dom
-        this._shadow = this.attachShadow({ mode: 'open' })
-
-        const styles = document.createElement('style')
-        styles.innerHTML = Css
-        this._shadow.appendChild(styles)
-
-        const swatchWrapper = document.createElement('div')
-        swatchWrapper.classList.add('swatch-wrapper');
-
-        this.closeOverlay = (e)=>{
-            const path = e.path || (e.composedPath && e.composedPath());
-            if ((this.getAttribute('open') === 'true') && !path.includes(this.colorOverlay)) {
-                this.colorOverlay.classList.remove('visible')
-                this.removeAttribute('open');
-                document.removeEventListener('mousedown', this.closeOverlay);
-                document.removeEventListener('workspaceInputStart', this.closeOverlay);
-            }
+          this._color = val
+        } else {
+          this.removeAttribute('value')
+          this.swatch.style.backgroundColor = 'transparent'
         }
+      }
+    })
 
-        this.swatch = document.createElement('div')
-        this.swatch.classList.add('swatch')
+    this.setColor = () => {
+      this.value = this._color
+      this.swatch.style.backgroundColor = this.value
 
-        this._color = this.getAttribute('value')
-        this.swatch.style.backgroundColor = this._color;
-
-        this._name = this.getAttribute('name')
-
-        swatchWrapper.appendChild(this.swatch)
-        swatchWrapper.setAttribute('slot','target')
-
-        this.colorInput = document.createElement('color-picker')
-        this.colorInput.setAttribute('slot','content');
-        this.colorInput.style.margin = '8px'
-        this.colorInput.formats = ['rgb', 'hsl','hex']
-        this.colorInput.addEventListener('input', this.onColorChange)
-
-        const colorPopover = document.createElement('ptc-overlay');
-        colorPopover.variant = 'popover';
-        colorPopover.height = '260px'
-        colorPopover.width = '256px'
-        colorPopover.appendChild(swatchWrapper)
-        colorPopover.appendChild(this.colorInput)
-        colorPopover.addEventListener('ptcShow', (e) => {
-            this.colorInput._valueChanged();
-        })
-        this._shadow.appendChild(colorPopover)
-
-
-        for (const a of this.attributes) {
-            this[a.name] = a.value;
-        }
-
-        // this.initial = this.getAttribute('initial');
-        if (this.initial) {
-            const initial = document.createElement('div')
-            initial.classList.add('initial')
-            initial.innerHTML = this.initial
-            this._shadow.appendChild(initial)
-        }
+      this.dispatchEvent(new CustomEvent('change', {
+        detail: {
+          value: this.value
+        },
+        bubbles: true,
+        composed: true
+      }))
     }
 
-    connectedCallback() {
-
-        
+    this.onColorChange = (e) => {
+      this._color = e.target.value
+      this.setColor()
     }
+
+    // attach shadow dom
+    this._shadow = this.attachShadow({ mode: 'open' })
+
+    const styles = document.createElement('style')
+    styles.innerHTML = Css
+    this._shadow.appendChild(styles)
+
+    const swatchWrapper = document.createElement('div')
+    swatchWrapper.classList.add('swatch-wrapper')
+
+    this.closeOverlay = (e) => {
+      const path = e.path || (e.composedPath && e.composedPath())
+      if ((this.getAttribute('open') === 'true') && !path.includes(this.colorOverlay)) {
+        this.colorOverlay.classList.remove('visible')
+        this.removeAttribute('open')
+        document.removeEventListener('mousedown', this.closeOverlay)
+        document.removeEventListener('workspaceInputStart', this.closeOverlay)
+      }
+    }
+
+    this.swatch = document.createElement('div')
+    this.swatch.classList.add('swatch')
+
+    this._color = this.getAttribute('value')
+    this.swatch.style.backgroundColor = this._color
+
+    this._name = this.getAttribute('name')
+
+    swatchWrapper.appendChild(this.swatch)
+    swatchWrapper.setAttribute('slot', 'target')
+
+    this.colorInput = document.createElement('color-picker')
+    this.colorInput.setAttribute('slot', 'content')
+    this.colorInput.style.margin = '8px'
+    this.colorInput.formats = ['rgb', 'hsl', 'hex']
+    this.colorInput.addEventListener('input', this.onColorChange)
+
+    const colorPopover = document.createElement('ptc-overlay')
+    colorPopover.variant = 'popover'
+    colorPopover.height = '260px'
+    colorPopover.width = '256px'
+    colorPopover.appendChild(swatchWrapper)
+    colorPopover.appendChild(this.colorInput)
+    colorPopover.addEventListener('ptcShow', (e) => {
+      this.colorInput._valueChanged()
+    })
+    this._shadow.appendChild(colorPopover)
+
+    for (const a of this.attributes) {
+      this[a.name] = a.value
+    }
+
+    // this.initial = this.getAttribute('initial');
+    if (this.initial) {
+      const initial = document.createElement('div')
+      initial.classList.add('initial')
+      initial.innerHTML = this.initial
+      this._shadow.appendChild(initial)
+    }
+  }
+
+  connectedCallback () {
+
+  }
 }

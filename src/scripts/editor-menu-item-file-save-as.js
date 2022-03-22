@@ -2,7 +2,6 @@ import EditorMenuItem from './editor-menu-item.js'
 // import { LoadParticles } from "./lib-loader.js";
 
 class EditorMenuItemFileSaveAs extends EditorMenuItem {
-
   constructor () {
     super()
 

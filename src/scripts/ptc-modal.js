@@ -46,7 +46,6 @@ const closeButtonStyle = {
 }
 
 class PtcModal extends HTMLElement {
-
   constructor () {
     super()
 

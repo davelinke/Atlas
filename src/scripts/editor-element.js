@@ -34,8 +34,7 @@ const Css = `
 `
 
 class EditorElement extends HTMLElement {
-
-  constructor() {
+  constructor () {
     super()
 
     /**
@@ -54,7 +53,6 @@ class EditorElement extends HTMLElement {
     /**
      * THE ELEMENT PROPERTIES
      */
-
 
     /**
      * Is it picked?
@@ -86,15 +84,14 @@ class EditorElement extends HTMLElement {
      * A method to set the element name
      */
     this.setName = (name) => {
-      this.setAttribute('data-name', name);
+      this.setAttribute('data-name', name)
     }
-
 
     /**
      * A method to set what kind of element is this (box, text, image, etc)
      */
     this.setType = (type) => {
-      this.setAttribute('data-type', type);
+      this.setAttribute('data-type', type)
     }
 
     /**
@@ -110,7 +107,7 @@ class EditorElement extends HTMLElement {
     this.setProp = (prop, value) => {
       this.states[this.currentState][prop] = value
       this.setAttribute(`data-states-${this.currentState}`, JSON.stringify(this.states[this.currentState]))
-      const units = propUnitsJs[prop] ? propUnitsJs[prop] : '';
+      const units = propUnitsJs[prop] ? propUnitsJs[prop] : ''
       this.style[prop] = value + units
     }
 
@@ -138,15 +135,15 @@ class EditorElement extends HTMLElement {
   /**
    * A method to execute when we insert in the DOM
    */
-  connectedCallback() {
+  connectedCallback () {
     /**
-     * since we hold the states in the element's data attributes 
+     * since we hold the states in the element's data attributes
      * so we can serialize and store them as text
      * we need to deserialize them and store them in the states object
      */
-     for (const [key, value] of Object.entries(this.dataset)) {
-      const regex = new RegExp('states*');
-      if (regex.test(key)) {
+    for (const [key, value] of Object.entries(this.dataset)) {
+      const match = /^states/.test(key)
+      if (match) {
         const statename = key.replace('states', '').toLowerCase()
         const props = JSON.parse(value)
         this.setState(statename, props)

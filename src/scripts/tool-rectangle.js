@@ -128,7 +128,7 @@ class ToolRectangle extends Tool {
       let addedElement = null
 
       if (this._tentativeRectangle) {
-        addedElement = ws.addElement('rectangle',this._tentativeRectangle)
+        addedElement = ws.addElement('rectangle', this._tentativeRectangle)
 
         // store the doc
         this.app.storeDocument()
