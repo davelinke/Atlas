@@ -22,6 +22,7 @@ export default class EditorMenuItemObjectRemove extends EditorMenuItem {
       this.pick.forEach((element) => {
         this.app.workspace.removeElement(element)
       })
+      fireEvent(this, 'pickChange', this.pick)
       // this.deselectAll()
 
       // store the doc
@@ -35,6 +36,11 @@ export default class EditorMenuItemObjectRemove extends EditorMenuItem {
 
       this.app.registerKeyDownShortcut({
         key: 'Delete',
+        action: this.removePick
+      })
+
+      this.app.registerKeyDownShortcut({
+        key: 'backspace',
         action: this.removePick
       })
     }

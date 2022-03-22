@@ -134,6 +134,20 @@ class InspectorWorkspace extends HTMLElement {
     }
 
     /**
+     * A method to handle when an element is removed to the document
+     */
+    this.elementRemoved = (e) => {
+      const actualElement = e.detail;
+
+      const inspectorElements = Array.from(this.scroller.children);
+      for (let child of inspectorElements) {
+        if (child.actualElement === actualElement) {
+          this.scroller.removeChild(child);
+        }
+      }
+    }
+
+    /**
      * A method to handle the handshake with the app
      */
     this.onHandShake = (app) => {
@@ -144,6 +158,8 @@ class InspectorWorkspace extends HTMLElement {
       app.addEventListener('pickChange', this.pickChange)
 
       app.addEventListener('editorElementAdded', this.elementAdded)
+
+      app.addEventListener('editorElementRemoved',this.elementRemoved)
 
       //   this.app.addEventListener('canvasModEnd', this.pickModEnd)
 

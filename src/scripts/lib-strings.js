@@ -20,16 +20,15 @@ export function IncreaseNameNumber(string) {
   const stringArray = string.split(' ');
   const lastLetter = stringArray[stringArray.length - 1];
   const number = parseInt(lastLetter);
-  
+
   const newNumber = isNaN(number) ? 1 : number + 1;
 
-  const restOfString = stringArray.length > 1 ? stringArray.slice(0, stringArray.length - 1).join(' '): stringArray.join(' ');
+  const restOfString = stringArray.length > 1 ? stringArray.slice(0, stringArray.length - 1).join(' ') : stringArray.join(' ');
 
   return restOfString + ' ' + newNumber;
 }
 
 export function FixDuplicateName(name, names) {
-  console.log(name, names)
   let i = 1;
   while (names.includes(name)) {
     name = IncreaseNameNumber(name);
