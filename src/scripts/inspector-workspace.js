@@ -57,7 +57,7 @@ class InspectorWorkspace extends HTMLElement {
           const minElement = Math.min(start, end);
           const maxElement = Math.max(start, end) + 1;
           const range = allElements.slice(minElement, maxElement);
-          
+
           elementArray = range.map(element => element.actualElement);
         }
       } else {
@@ -67,6 +67,15 @@ class InspectorWorkspace extends HTMLElement {
       }
       // we send the selection to the selection tool via event.
       fireEvent(this, 'toolsSelectPickSet', elementArray)
+    }
+
+    this.renameElement = (e) => {
+      const theElement = e.target.actualElement;
+      const name = prompt('Rename Element', theElement.dataset.name);
+      if (name) {
+        theElement.dataset.name = name;
+        e.target.innerText = name;
+      }
     }
 
     /**
@@ -80,6 +89,7 @@ class InspectorWorkspace extends HTMLElement {
       div.addEventListener('click', this.handleSelection)
       div.setAttribute('data-id', element.getAttribute('id'));
       div.setAttribute('data-type', element.getAttribute('type'));
+      div.addEventListener('dblclick', this.renameElement);
       return div;
     }
 
