@@ -78,7 +78,6 @@ class EditorElement extends HTMLElement {
      * A method to set the current visual state
      */
     this.setState = (state, props) => {
-      console.log(state, props)
       this.states[state] = props
       this.setAttribute(`data-states-${state}`, JSON.stringify(props))
     }

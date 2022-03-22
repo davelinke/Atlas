@@ -3,6 +3,7 @@ import { LoadParticles } from './lib-loader.js'
 import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
 import { propUnitsJs } from './lib-units.js'
+import { GenerateName, FixDuplicateName } from './lib-strings.js'
 
 
 /**
@@ -239,11 +240,16 @@ class EditorWorkspace extends HTMLElement {
 
       const elementId = GenerateId()
 
+      console.log(this.app)
+
+
+      const elementName = FixDuplicateName(GenerateName(type), this.getElements().map(e => e.dataset.name));
+
       element.setAttribute('id', elementId)
 
       element.currentState = 'default'
       element.setType(type)
-      element.setName(type)
+      element.setName(elementName)
       element.setState('default', args)
 
       for (const prop in args) {
