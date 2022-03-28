@@ -1,3 +1,4 @@
+import ColorPicker from './lib-color-picker.js'
 import { LoadParticles } from './lib-loader.js'
 
 const Css = `
@@ -69,6 +70,7 @@ export default class PtcColorPicker extends HTMLElement {
     super()
 
     LoadParticles(['ptc-overlay'])
+    window.customElements.define('color-picker', ColorPicker)
 
     this._value = null
 

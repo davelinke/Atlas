@@ -4260,4 +4260,5 @@ class ColorPicker extends PropertiesChangedHandler(PropertiesChangedCallback(Pro
   }
 }
 
-window.customElements.define('color-picker', ColorPicker)
+// window.customElements.define('color-picker', ColorPicker)
+export default ColorPicker
