@@ -78,7 +78,6 @@ const CssPa = `
 }
 `
 
-
 const handles = [
   ['n', 'w'],
   ['n', ''],
@@ -91,7 +90,7 @@ const handles = [
 ]
 
 class ToolSelect extends Tool {
-  constructor() {
+  constructor () {
     super()
 
     this.name = 'select'
@@ -115,7 +114,7 @@ class ToolSelect extends Tool {
 
     this.dragSelect = false
 
-    this.handles = {};
+    this.handles = {}
 
     // METHODS
 
@@ -172,12 +171,12 @@ class ToolSelect extends Tool {
         const right = viewportDim - (lowestX + width)
         const bottom = viewportDim - (lowestY + height)
 
-        this.pickAreaElement.setDimension('left', left);
-        this.pickAreaElement.setDimension('top', top);
-        this.pickAreaElement.setDimension('right', right);
-        this.pickAreaElement.setDimension('bottom', bottom);
+        this.pickAreaElement.setDimension('left', left)
+        this.pickAreaElement.setDimension('top', top)
+        this.pickAreaElement.setDimension('right', right)
+        this.pickAreaElement.setDimension('bottom', bottom)
       } else {
-        this.pickAreaElement.setDimension('opacity', 0);
+        this.pickAreaElement.setDimension('opacity', 0)
       }
     }
 
@@ -189,7 +188,7 @@ class ToolSelect extends Tool {
       element.picked = true
       this.pick.push(element)
       this.resizePickArea()
-      //this.firePickChangeEvent()
+      // this.firePickChangeEvent()
     }
 
     this.removeFormPick = (element) => {
@@ -358,7 +357,7 @@ class ToolSelect extends Tool {
 
             element.setProp(end, newEnd)// add filtering/grid here
           })
-          this.pickAreaElement.setDimension(end, pickAreaEnd);
+          this.pickAreaElement.setDimension(end, pickAreaEnd)
 
           // store the doc
           this.appReference.storeDocument()
@@ -412,7 +411,7 @@ class ToolSelect extends Tool {
             element.setProp(end, newEnd) // add filtering/grid here
           })
 
-          this.pickAreaElement.setDimension(start, pickAreaStart);
+          this.pickAreaElement.setDimension(start, pickAreaStart)
 
           // store the doc
           this.appReference.storeDocument()
@@ -537,10 +536,10 @@ class ToolSelect extends Tool {
       }
       this.pickAreaElement.setDimension = (dimension, value) => {
         const nuDim = { ...this.pickAreaElement.dims }
-        nuDim[dimension] = value;
+        nuDim[dimension] = value
         this.pickAreaElement.dims = nuDim
-        const units = propUnitsJs[dimension] ? propUnitsJs[dimension] : '';
-        this.pickAreaElement.style[dimension] = value + units;
+        const units = propUnitsJs[dimension] ? propUnitsJs[dimension] : ''
+        this.pickAreaElement.style[dimension] = value + units
       }
 
       // create the drag area
@@ -559,7 +558,7 @@ class ToolSelect extends Tool {
         handle.dataset.resizeV = v
         handle.dataset.resizeH = h
         handle.addEventListener('mousedown', this.startResize)
-        this.handles[`${v}${h}`] = handle;
+        this.handles[`${v}${h}`] = handle
         this.pickAreaElement.appendChild(handle)
       }
 
@@ -570,21 +569,20 @@ class ToolSelect extends Tool {
       ws._canvas.appendChild(this.pickAreaElement)
       ws._shadow.appendChild(this.selectAreaElement)
 
-
-      this.appReference.addEventListener('zoomChange', this.resizeHandles);
+      this.appReference.addEventListener('zoomChange', this.resizeHandles)
       ws && ws.activateSelection()
-      this.resizeHandles();
+      this.resizeHandles()
     }
     this.resizeHandles = (e) => {
-      const scale = e ? 1 / e.detail : 1 / this.appReference.zoomScale;
-      for (let handleId in this.handles) {
-        const handle = this.handles[handleId];
-        handle.style.transform = `scale(${scale})`;
+      const scale = e ? 1 / e.detail : 1 / this.appReference.zoomScale
+      for (const handleId in this.handles) {
+        const handle = this.handles[handleId]
+        handle.style.transform = `scale(${scale})`
       }
-    };
+    }
     this.toolDestroy = (app) => {
       const ws = app.workspace
-      this.appReference.removeEventListener('zoomChange', this.resizeHandles);
+      this.appReference.removeEventListener('zoomChange', this.resizeHandles)
       ws._canvas.removeChild(this.pickAreaElement)
       ws._shadow.removeChild(this.selectAreaElement)
       this.pickAreaElement = null
@@ -629,7 +627,7 @@ class ToolSelect extends Tool {
 
     this.inputStart = (e) => {
       const me = e.detail.mouseEvent
-      const ePath = me.path || (me.composedPath && me.composedPath());
+      const ePath = me.path || (me.composedPath && me.composedPath())
       const element = this.getCompElement(ePath)
       const shiftKey = e.detail.mouseEvent.shiftKey
       //   const ctrlKey = me.ctrlKey
@@ -711,7 +709,7 @@ class ToolSelect extends Tool {
       //   const ctrlKey = e.detail.mouseEvent.ctrlKey
       //   const altKey = e.detail.mouseEvent.altKey
       if (!this.pickAreaHidden) {
-        this.pickAreaElement.setDimension('opacity', 0);
+        this.pickAreaElement.setDimension('opacity', 0)
       }
 
       // i have to determine if this is a dragselect to either move or manage the pick
@@ -804,7 +802,7 @@ class ToolSelect extends Tool {
           this.isAdding = false
         })
 
-        this.firePickChangeEvent();
+        this.firePickChangeEvent()
 
         this.pickBeforeDrag = []
         this.dragCoveredElements = []
@@ -822,7 +820,7 @@ class ToolSelect extends Tool {
       this.pickStartUpdate()
 
       if (this.pick.length > 0) {
-        this.pickAreaElement.setDimension('opacity', 1);
+        this.pickAreaElement.setDimension('opacity', 1)
         // this.pickAreaElement.style.opacity = 1
         this.pickAreaHidden = false
       }
@@ -853,7 +851,7 @@ class ToolSelect extends Tool {
       })
 
       this.app.addEventListener('toolsSelectIsAdding', (e) => {
-        this.isAdding = e.detail;
+        this.isAdding = e.detail
       })
 
       this.app.addEventListener('editorElementRemoved', (e) => {
