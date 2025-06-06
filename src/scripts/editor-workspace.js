@@ -303,7 +303,7 @@ class EditorWorkspace extends HTMLElement {
     this.getDocumentHTML = () => {
       // tools to register
       const doc = this._canvas.cloneNode(true)
-      doc.querySelectorAll(':not(editor-element').forEach(el => el.remove())
+      doc.querySelectorAll(':not(editor-element)').forEach(el => el.remove())
       doc.querySelectorAll('editor-element[class]').forEach(e => {
         e.removeAttribute('class')
       })
