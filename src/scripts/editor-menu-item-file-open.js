@@ -1,7 +1,6 @@
 import EditorMenuItem from './editor-menu-item.js'
 
 class EditorMenuItemFileOpen extends EditorMenuItem {
-
   constructor () {
     super()
     const fileInput = document.createElement('input')

@@ -6,7 +6,7 @@ class EditorApp extends HTMLElement {
    * this is the main class of the editor
    * where we hold the global state
    */
-  constructor() {
+  constructor () {
     super()
 
     /**
@@ -155,7 +155,6 @@ class EditorApp extends HTMLElement {
      * EVENT LISTENERS
      */
 
-
     /**
      * the handshake event listeners that gives visibility to other components of the app
      */
@@ -168,7 +167,7 @@ class EditorApp extends HTMLElement {
      * an event listener to store the document at it's current state
      */
     this.addEventListener('storeDocument', (e) => {
-      this.storeDocument();
+      this.storeDocument()
     })
 
     /**

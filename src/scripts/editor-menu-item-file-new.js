@@ -5,10 +5,10 @@ import EditorMenuItem from './editor-menu-item.js'
  * @extends EditorMenuItem
  * @example
  * <editor-menu-item-file-new></editor-menu-item-file-new>
- * 
+ *
  * TODO:
  * verify if the current file is stored or saved if not, ask the user if he wants to save it
- * 
+ *
  * create a modal not to have the native prompt
  */
 

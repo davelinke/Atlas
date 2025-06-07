@@ -18,9 +18,9 @@ export async function LoadParticles (particles) {
   // document.querySelector('head').appendChild(style);
 
   const loadedModules = await Promise.all(moduleCalls)
-
   missingModules.forEach((particle, i) => {
     // const customElement = customElements.get(particle)
+
     if (!customElements.get(particle)) {
       const loadedModule = loadedModules[i]
       customElements.define(particle, loadedModule.default)

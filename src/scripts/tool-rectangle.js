@@ -8,15 +8,12 @@ class ToolRectangle extends Tool {
 
     // PROPS
     this.name = 'rectangle'
-
     this.iconClass = 'fa-regular fa-square'
 
     // STATE
 
     this._inputDown = null
-
     this._tentativeRectangle = null
-
     this.app = null
 
     // METHODS
@@ -42,25 +39,11 @@ class ToolRectangle extends Tool {
       }
       this._inputDown = id
 
-      let top, left, bottom, right
-
-      if (gridActive) {
-        top = filterCoord(id.top, ws.gridSize)
-        left = filterCoord(id.left, ws.gridSize)
-        bottom = filterCoord(id.bottom, ws.gridSize)
-        right = filterCoord(id.right, ws.gridSize)
-      } else {
-        top = id.top
-        left = id.left
-        bottom = id.bottom
-        right = id.right
-      }
-
       const iaArgs = {
-        top: top,
-        left: left,
-        right: right,
-        bottom: bottom
+        top: gridActive ? filterCoord(id.top, ws.gridSize) : id.top,
+        left: gridActive ? filterCoord(id.left, ws.gridSize) : id.left,
+        bottom: gridActive ? filterCoord(id.bottom, ws.gridSize) : id.bottom,
+        right: gridActive ? filterCoord(id.right, ws.gridSize) : id.right
       }
       ws.inputAreaStart({ ...iaArgs, variant: 'solid' })
     }
@@ -128,7 +111,7 @@ class ToolRectangle extends Tool {
       let addedElement = null
 
       if (this._tentativeRectangle) {
-        addedElement = ws.addElement('rectangle',this._tentativeRectangle)
+        addedElement = ws.addElement('rectangle', this._tentativeRectangle)
 
         // store the doc
         this.app.storeDocument()

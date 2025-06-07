@@ -80,7 +80,7 @@ h3{
 }
 `
 class SidebarPanel extends HTMLElement {
-  constructor() {
+  constructor () {
     super()
 
     // STATE
@@ -106,13 +106,13 @@ class SidebarPanel extends HTMLElement {
     }
 
     this.createInput = (args, appendTo = this.grid, unit = 'px') => {
-      //name, initial, icon = null, type = 'number'
+      // name, initial, icon = null, type = 'number'
       const wrap = document.createElement('div')
       wrap.classList.add('input-wrap')
-      args.wrap?.class ? wrap.classList.add(args.wrap.class) : null;
+      args.wrap?.class ? wrap.classList.add(args.wrap.class) : null
       wrap.setAttribute('title', args.input.name)
 
-      const input = ci(args.input);
+      const input = ci(args.input)
       if (args.label) {
         const label = document.createElement('label')
         label.classList.add('input-label')
@@ -151,23 +151,23 @@ class SidebarPanel extends HTMLElement {
     }
 
     this.addSeparator = () => {
-      const separator = document.createElement('div');
-      separator.classList.add('separator');
-      this.grid.appendChild(separator);
+      const separator = document.createElement('div')
+      separator.classList.add('separator')
+      this.grid.appendChild(separator)
     }
 
     this.addHeading = (text, addbutton = false) => {
-      const heading = document.createElement('div');
-      heading.classList.add('heading');
-      heading.innerHTML = text;
+      const heading = document.createElement('div')
+      heading.classList.add('heading')
+      heading.innerHTML = text
       if (addbutton) {
-        const button = document.createElement('button');
-        button.classList.add('add-button');
-        button.innerHTML = '<i class="fa-solid fa-plus"></i>';
-        heading.appendChild(button);
+        const button = document.createElement('button')
+        button.classList.add('add-button')
+        button.innerHTML = '<i class="fa-solid fa-plus"></i>'
+        heading.appendChild(button)
       }
-      this.grid.appendChild(heading);
-      return heading;
+      this.grid.appendChild(heading)
+      return heading
     }
 
     this.onHandShake = (app) => {
@@ -192,15 +192,14 @@ class SidebarPanel extends HTMLElement {
     fontawesome.setAttribute('href', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css')
     this._shadow.appendChild(fontawesome)
 
-
-    const scroller = document.createElement('div');
+    const scroller = document.createElement('div')
     scroller.classList.add('scroller')
 
     this.grid = document.createElement('div')
     this.grid.classList.add('grid')
 
-    scroller.appendChild(this.grid);
-    this._shadow.appendChild(scroller);
+    scroller.appendChild(this.grid)
+    this._shadow.appendChild(scroller)
 
     this.mainHeadingElement = document.createElement('h3')
     this.mainHeadingElement.classList.add('span-2')
@@ -208,7 +207,7 @@ class SidebarPanel extends HTMLElement {
     this.grid.appendChild(this.mainHeadingElement)
   }
 
-  async connectedCallback() {
+  async connectedCallback () {
     !this.isDefaultPanel && this.classList.add('hidden')
 
     this.mainHeading && (this.mainHeadingElement.innerHTML = this.mainHeading)

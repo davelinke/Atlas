@@ -1,5 +1,4 @@
 class EditorMenu extends HTMLElement {
-
   constructor () {
     super()
 
