@@ -6,9 +6,11 @@
   "author": "David Linke",
   "license": "MIT",
   "devDependencies": {
-    "browser-sync": "^2.27.9"
+    "browser-sync": "^2.27.9",
+    "eslint": "^7.32.0"
   },
   "scripts": {
-    "start": "node start.js"
+    "start": "node start.js",
+    "lint": "eslint ."
   }
 }
