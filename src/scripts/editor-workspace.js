@@ -1,10 +1,8 @@
-import { GenerateId } from './lib-strings.js'
+import { GenerateId, GenerateName, FixDuplicateName } from './lib-strings.js'
 import { LoadParticles } from './lib-loader.js'
 import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
 import { propUnitsJs } from './lib-units.js'
-import { GenerateName, FixDuplicateName } from './lib-strings.js'
-
 
 /**
  * THE VIEWPORT DIMENSION BOTH IN HEIGHT AND WIDTH
@@ -72,9 +70,8 @@ const Css = `
 `
 
 class EditorWorkspace extends HTMLElement {
-  constructor() {
+  constructor () {
     super()
-
 
     /**
      * LOAD DEPENDENCIES
@@ -236,11 +233,12 @@ class EditorWorkspace extends HTMLElement {
         },
         ...props
       }
-      const element = document.createElement('editor-element')
+      const elementTag = type === 'group' ? 'editor-group' : 'editor-element'
+      const element = document.createElement(elementTag)
 
       const elementId = GenerateId()
 
-      const elementName = FixDuplicateName(GenerateName(type), this.getElements().map(e => e.dataset.name));
+      const elementName = FixDuplicateName(GenerateName(type), this.getElements().map(e => e.dataset.name))
 
       element.setAttribute('id', elementId)
 
@@ -266,6 +264,62 @@ class EditorWorkspace extends HTMLElement {
     this.removeElement = (element) => {
       fireEvent(this, 'editorElementRemoved', element)
       this._canvas.removeChild(element)
+    }
+
+    this.groupElements = (elements) => {
+      if (!elements || elements.length === 0) {
+        return null
+      }
+      const viewport = this.viewportDim
+      let xMin = null
+      let yMin = null
+      let xMax = null
+      let yMax = null
+      elements.forEach(el => {
+        const dims = el.getDimensions()
+        const x1 = dims.left
+        const y1 = dims.top
+        const x2 = viewport - dims.right
+        const y2 = viewport - dims.bottom
+        if (xMin === null || x1 < xMin) { xMin = x1 }
+        if (yMin === null || y1 < yMin) { yMin = y1 }
+        if (xMax === null || x2 > xMax) { xMax = x2 }
+        if (yMax === null || y2 > yMax) { yMax = y2 }
+      })
+
+      const width = xMax - xMin
+      const height = yMax - yMin
+
+      const group = this.addElement('group', {
+        left: xMin,
+        top: yMin,
+        right: viewport - (xMin + width),
+        bottom: viewport - (yMin + height),
+        backgroundColor: 'transparent',
+        borderWidth: 0,
+        borderColor: 'transparent'
+      })
+
+      elements.forEach(el => {
+        const dims = el.getDimensions()
+        const x1 = dims.left
+        const y1 = dims.top
+        const w = (viewport - dims.right) - x1
+        const h = (viewport - dims.bottom) - y1
+
+        const newLeft = x1 - xMin
+        const newTop = y1 - yMin
+        const newRight = width - (newLeft + w)
+        const newBottom = height - (newTop + h)
+
+        el.setProp('left', newLeft)
+        el.setProp('top', newTop)
+        el.setProp('right', newRight)
+        el.setProp('bottom', newBottom)
+        group.appendChild(el)
+      })
+
+      return group
     }
 
     /**
@@ -303,8 +357,8 @@ class EditorWorkspace extends HTMLElement {
     this.getDocumentHTML = () => {
       // tools to register
       const doc = this._canvas.cloneNode(true)
-      doc.querySelectorAll(':not(editor-element)').forEach(el => el.remove())
-      doc.querySelectorAll('editor-element[class]').forEach(e => {
+      doc.querySelectorAll(':not(editor-element):not(editor-group)').forEach(el => el.remove())
+      doc.querySelectorAll('editor-element[class],editor-group[class]').forEach(e => {
         e.removeAttribute('class')
       })
       return doc.innerHTML
@@ -314,7 +368,7 @@ class EditorWorkspace extends HTMLElement {
      * A method to clear the canvas
      */
     this.clearCanvas = () => {
-      this._canvas.querySelectorAll('editor-element').forEach(el => {
+      this._canvas.querySelectorAll('editor-element,editor-group').forEach(el => {
         this.removeElement(el)
       })
     }
@@ -388,14 +442,13 @@ class EditorWorkspace extends HTMLElement {
     this.getElements = () => {
       const elements = Array.from(this._canvas.childNodes)
       return elements.filter(el => {
-        return (el.tagName === 'EDITOR-ELEMENT')
+        return (el.tagName === 'EDITOR-ELEMENT' || el.tagName === 'EDITOR-GROUP')
       })
     }
 
     /**
      * LET'S CREATE THE WORKSPACE STRUCTURE
      */
-
 
     this._shadow = this.attachShadow({ mode: 'open' })
 
@@ -428,12 +481,10 @@ class EditorWorkspace extends HTMLElement {
     this._wrapper.append(this._workspace)
   }
 
-
-
   /**
    * A METHOD TO EXECUTE WHEN THE WORKSPACE IS INSTANTIATED IN THE DOM
    */
-  connectedCallback() {
+  connectedCallback () {
     // scroll to middle point of the workspace if it's not defined
     this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))
