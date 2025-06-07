@@ -1,10 +1,8 @@
-import { GenerateId } from './lib-strings.js'
+import { GenerateId, GenerateName, FixDuplicateName } from './lib-strings.js'
 import { LoadParticles } from './lib-loader.js'
 import { coordsFilterFn } from './lib-filters.js'
 import { fireEvent } from './lib-events.js'
 import { propUnitsJs } from './lib-units.js'
-import { GenerateName, FixDuplicateName } from './lib-strings.js'
-
 
 /**
  * THE VIEWPORT DIMENSION BOTH IN HEIGHT AND WIDTH
@@ -72,9 +70,8 @@ const Css = `
 `
 
 class EditorWorkspace extends HTMLElement {
-  constructor() {
+  constructor () {
     super()
-
 
     /**
      * LOAD DEPENDENCIES
@@ -240,7 +237,7 @@ class EditorWorkspace extends HTMLElement {
 
       const elementId = GenerateId()
 
-      const elementName = FixDuplicateName(GenerateName(type), this.getElements().map(e => e.dataset.name));
+      const elementName = FixDuplicateName(GenerateName(type), this.getElements().map(e => e.dataset.name))
 
       element.setAttribute('id', elementId)
 
@@ -396,7 +393,6 @@ class EditorWorkspace extends HTMLElement {
      * LET'S CREATE THE WORKSPACE STRUCTURE
      */
 
-
     this._shadow = this.attachShadow({ mode: 'open' })
 
     const styles = document.createElement('style')
@@ -428,12 +424,10 @@ class EditorWorkspace extends HTMLElement {
     this._wrapper.append(this._workspace)
   }
 
-
-
   /**
    * A METHOD TO EXECUTE WHEN THE WORKSPACE IS INSTANTIATED IN THE DOM
    */
-  connectedCallback() {
+  connectedCallback () {
     // scroll to middle point of the workspace if it's not defined
     this._wrapper.scrollLeft = ((viewportDim / 2) - (this.getBoundingClientRect().width / 2))
     this._wrapper.scrollTop = ((viewportDim / 2) - (this.getBoundingClientRect().height / 2))

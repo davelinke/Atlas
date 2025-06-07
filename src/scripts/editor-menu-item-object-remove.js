@@ -2,7 +2,6 @@ import EditorMenuItem from './editor-menu-item.js'
 import { fireEvent } from './lib-events.js'
 
 export default class EditorMenuItemObjectRemove extends EditorMenuItem {
-
   constructor () {
     super()
 

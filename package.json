@@ -6,17 +6,9 @@
   "author": "David Linke",
   "license": "MIT",
   "devDependencies": {
-    "browser-sync": "^2.27.9",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-html": "^6.2.0",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-json": "^3.1.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.1"
+    "browser-sync": "^2.27.9"
   },
   "scripts": {
-    "start": "node start.js",
-    "lint": "./node_modules/.bin/eslint src/** --fix --no-error-on-unmatched-pattern"
+    "start": "node start.js"
   }
 }

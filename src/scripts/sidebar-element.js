@@ -1,6 +1,6 @@
 import SidebarPanel from './sidebar-panel.js'
 import { fireEvent } from './lib-events.js'
-import { LoadParticles } from "./lib-loader.js";
+import { LoadParticles } from './lib-loader.js'
 
 const Css = `
 input[type=number]{
@@ -47,13 +47,13 @@ select{
 `
 
 class SidebarDocument extends SidebarPanel {
-  constructor() {
+  constructor () {
     super()
     this.mainHeading = 'Element'
 
-    LoadParticles(['ptc-overlay']);
-    LoadParticles(['ptc-color-picker']);
-    LoadParticles(['ptc-shadow-picker']);
+    LoadParticles(['ptc-overlay'])
+    LoadParticles(['ptc-color-picker'])
+    LoadParticles(['ptc-shadow-picker'])
 
     this.pickLengthShow = function (pick) {
       return pick.length === 1
@@ -66,7 +66,6 @@ class SidebarDocument extends SidebarPanel {
         this._shadow.appendChild(element)
       })
     }
-
 
     this.disableInputs = () => {
       this.inputs.forEach(input => {
@@ -172,7 +171,7 @@ class SidebarDocument extends SidebarPanel {
           break
         }
         default: {
-          const value = input.value ? input.value : (e.detail ? e.detail.value : null);
+          const value = input.value ? input.value : (e.detail ? e.detail.value : null)
           element.setProp(dimension, value)
           fireEvent(this, 'storeDocument', null)
         }
@@ -191,7 +190,7 @@ class SidebarDocument extends SidebarPanel {
         type: 'number'
       },
       label: {
-        initial: 'T',
+        initial: 'T'
       }
     })
 
@@ -202,7 +201,7 @@ class SidebarDocument extends SidebarPanel {
           type: 'number'
         },
         label: {
-          initial: 'L',
+          initial: 'L'
         }
       }
     )
@@ -213,7 +212,7 @@ class SidebarDocument extends SidebarPanel {
         type: 'number'
       },
       label: {
-        initial: 'W',
+        initial: 'W'
       }
     })
 
@@ -223,20 +222,18 @@ class SidebarDocument extends SidebarPanel {
         type: 'number'
       },
       label: {
-        initial: 'H',
+        initial: 'H'
       }
     })
 
     // angle input
 
+    this.addSeparator()
 
-
-    this.addSeparator();
-
-    this.addHeading('Opacity');
+    this.addHeading('Opacity')
 
     const opacityInput = this.createInput({
-      //'opacity', 'BG', 'fa-regular fa-eye' ,'range'
+      // 'opacity', 'BG', 'fa-regular fa-eye' ,'range'
       wrap: {
         class: 'range-2'
       },
@@ -248,71 +245,70 @@ class SidebarDocument extends SidebarPanel {
         step: 0.01,
         initial: 1
       }
-    },this.grid,false)
+    }, this.grid, false)
 
-    this.addSeparator();
+    this.addSeparator()
 
-    this.addHeading('Fill');
+    this.addHeading('Fill')
 
-    const colorInput = document.createElement('ptc-color-picker');
-    colorInput.setAttribute('name', 'backgroundColor');
+    const colorInput = document.createElement('ptc-color-picker')
+    colorInput.setAttribute('name', 'backgroundColor')
     colorInput.classList.add('span-2')
     this.grid.appendChild(colorInput)
 
-    this.addSeparator();
+    this.addSeparator()
 
-    this.addHeading('Border');
+    this.addHeading('Border')
 
     const borderDiv = document.createElement('div')
     borderDiv.classList.add('border-div')
     this.grid.appendChild(borderDiv)
 
-    const borderColorInput = document.createElement('ptc-color-picker');
-    borderColorInput.setAttribute('name', 'borderColor');
+    const borderColorInput = document.createElement('ptc-color-picker')
+    borderColorInput.setAttribute('name', 'borderColor')
     borderDiv.appendChild(borderColorInput)
 
     const borderWidthInput = this.createInput({
       input: {
         name: 'borderWidth',
         type: 'number',
-        min: 0,
+        min: 0
       },
       label: {
-        initial: 'W',
+        initial: 'W'
       }
-    }, borderDiv);
+    }, borderDiv)
 
-    const borderStyleInput = document.createElement('select');
-    borderStyleInput.setAttribute('name', 'borderStyle');
+    const borderStyleInput = document.createElement('select')
+    borderStyleInput.setAttribute('name', 'borderStyle')
     borderStyleInput.addEventListener('change', (e) => {
-      this.modifyElement(e);
+      this.modifyElement(e)
     })
-    const borderOptions = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset'];
+    const borderOptions = ['none', 'solid', 'dashed', 'dotted', 'double', 'groove', 'ridge', 'inset', 'outset']
     borderOptions.forEach(option => {
-      const optionEl = document.createElement('option');
-      optionEl.value = option;
-      optionEl.innerText = option;
-      borderStyleInput.appendChild(optionEl);
-    });
+      const optionEl = document.createElement('option')
+      optionEl.value = option
+      optionEl.innerText = option
+      borderStyleInput.appendChild(optionEl)
+    })
 
+    borderDiv.appendChild(borderStyleInput)
 
-    borderDiv.appendChild(borderStyleInput);
+    this.addSeparator()
 
-    this.addSeparator();
-
-    const shadowHeading = this.addHeading('Shadows', true);
+    const shadowHeading = this.addHeading('Shadows', true)
     shadowHeading.addEventListener('click', () => {
       const element = this.pick[0]
       const elementDims = element.getDimensions()
-      const currentShadow = elementDims.boxShadow;
-      const newShadow = (currentShadow ? currentShadow + ', ' : '') + `0px 2px 3px 0 rgba(0,0,0, 0.25)`
+      const currentShadow = elementDims.boxShadow
+      const newShadow = (currentShadow ? currentShadow + ', ' : '') + '0px 2px 3px 0 rgba(0,0,0, 0.25)'
       element.setProp('boxShadow', newShadow)
       fireEvent(this, 'storeDocument', null)
       this.modifyLayoutInputs(element)
     })
 
-    const shadowInput = document.createElement('ptc-shadow-picker');
-    shadowInput.setAttribute('name', 'boxShadow');
+    const shadowInput = document.createElement('ptc-shadow-picker')
+    shadowInput.setAttribute('name', 'boxShadow')
     shadowInput.classList.add('span-2')
     this.grid.appendChild(shadowInput)
 
@@ -332,7 +328,7 @@ class SidebarDocument extends SidebarPanel {
     })
   }
 
-  async onInit() {
+  async onInit () {
 
   }
 }

@@ -1,5 +1,4 @@
 class CustomElement extends HTMLElement {
-
   constructor () {
     super()
 
