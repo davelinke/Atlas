@@ -76,7 +76,8 @@ class EditorWorkspace extends HTMLElement {
     /**
      * LOAD DEPENDENCIES
      */
-    LoadParticles(['editor-element'])
+    // ensure both single elements and groups are available
+    LoadParticles(['editor-element', 'editor-group'])
 
     /**
      * THE WORKPSACE STATE
