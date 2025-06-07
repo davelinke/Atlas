@@ -61,10 +61,10 @@ export default class EditorMenuItemObjectGroup extends EditorMenuItem {
             borderWidth: 0,
             position: 'absolute'
         })
+        groupContainer.setAttribute('type', 'group') 
         
         // Calculate group bounds
         const bounds = this.calculateGroupBounds(this.pick)
-        console.log('Calculated group bounds:', bounds)
         
         // Set group container dimensions
         groupContainer.setProp('left', bounds.left)
@@ -78,7 +78,6 @@ export default class EditorMenuItemObjectGroup extends EditorMenuItem {
         
         // Move elements into group
         this.pick.forEach(element => {
-            console.log(element)
             const elementDims = element.getDimensions()
             
             // Calculate relative position within group
@@ -88,13 +87,6 @@ export default class EditorMenuItemObjectGroup extends EditorMenuItem {
             // Calculate right and bottom relative to the group container
             const relativeRight = groupWidth - (relativeLeft + (viewportDim - (elementDims.left + elementDims.right)))
             const relativeBottom = groupHeight - (relativeTop + (viewportDim - (elementDims.top + elementDims.bottom)))
-            
-            console.log(`Moving element ${element.id} to relative position:`, {
-                left: relativeLeft,
-                top: relativeTop,
-                right: relativeRight,
-                bottom: relativeBottom
-            })
             
             // Update element position relative to group
             element.setProp('left', relativeLeft)
@@ -111,12 +103,9 @@ export default class EditorMenuItemObjectGroup extends EditorMenuItem {
         })
         
         // Clear selection
-        this.pick = [groupContainer];
-        fireEvent(this, 'pickChange', this.pick)
-        
-        // Select the new group
-        //this.app.querySelector('tool-select').pickRegister(groupContainer)
-        
+        // Select only the new group using the selection tool's event
+        fireEvent(this.app, 'toolsSelectPickSet', [groupContainer]);
+
         // Store document state
         fireEvent(this, 'storeDocument', null)
     }
@@ -148,4 +137,4 @@ export default class EditorMenuItemObjectGroup extends EditorMenuItem {
         console.log('Connected callback called, dispatching handShake event')
         fireEvent(this, 'handShake', this)
     }
-} 
+}

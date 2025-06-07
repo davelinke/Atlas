@@ -100,7 +100,8 @@ class InspectorWorkspace extends HTMLElement {
      * A method to build the tree of elements
      */
     this.buildTree = (element, target) => {
-      const children = element.querySelectorAll('editor-element')
+      // Only direct children that are editor-elements
+      const children = Array.from(element.children).filter(child => child.tagName === 'EDITOR-ELEMENT')
       for (let i = 0; i < children.length; i++) {
         const div = this.createEntanglement(children[i])
         target.appendChild(div)
